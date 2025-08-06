@@ -1,0 +1,55 @@
+<!-- navbar.html -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="height: 80px;">
+    <div class="container-fluid">
+        <!-- 로고 이미지 -->
+        <a href="/index.html" class="navbar-brand">
+            <img class="logo" src="/css/icons/logo.png" alt="Logo" style="height: 70px; width: 120px;">
+        </a>
+
+        <!-- 햄버거 토글 버튼 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#allNavbarCollapse"
+            aria-controls="allNavbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="allNavbarCollapse">
+            <!-- 메인 기능 메뉴들 (중앙 정렬, 로그인 후 보이는 메뉴) -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="nav-activity">운동</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="nav-fasting">단식</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="nav-inbody">인바디</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="nav-meal">식단</a>
+                </li>
+            </ul>
+
+            <!-- 사용자/인증 관련 메뉴 (우측 정렬) -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <!-- 사용자 이름 표시 (Intro) -->
+                <li class="nav-item" id="nav-intro-li">
+                    <span class="nav-link" id="intro"></span>
+                </li>
+                <!-- 로그인 전 보이는 메뉴 -->
+                <li class="nav-item" id="nav-login-li">
+                    <a class="nav-link" id="nav-login" href="#">로그인</a>
+                </li>
+                <li class="nav-item" id="nav-signup-li">
+                    <a class="nav-link" id="nav-signup" href="#">회원가입</a>
+                </li>
+
+                <!-- 로그인 후 보이는 메뉴 -->
+                <li class="nav-item" id="nav-mypage-li" style="display: none;">
+                    <a class="nav-link" id="nav-mypage" href="#">마이페이지</a>
+                </li>
+                <li class="nav-item" id="nav-logout-li" style="display: none;">
+                    <a class="nav-link" id="nav-logout" href="#" onclick="handleLogout()">로그아웃</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
