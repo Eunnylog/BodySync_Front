@@ -23,6 +23,7 @@ async function injectNavbar() {
         let nav_fasting = document.getElementById("nav-fasting")
         let nav_inbody = document.getElementById("nav-inbody")
         let nav_meal = document.getElementById("nav-meal")
+        let nav_logout = document.getElementById("nav-logout-li")
 
         // 로그인 전 갈 수 없는 항목들 숨겨주기
         if (nav_mypage) nav_mypage.style.display = "none"
@@ -59,26 +60,27 @@ async function injectNavbar() {
                 if (nav_fasting) nav_fasting.style.display = "block"
                 if (nav_inbody) nav_inbody.style.display = "block"
                 if (nav_meal) nav_meal.style.display = "block"
+                if (nav_logout) nav_logout.style = "block"
 
                 // 로그아웃 버튼 동적 생성 및 삽입
-                let navbar_left = document.getElementById('nav-center')
+                // let navbar_left = document.getElementById('nav-center')
 
-                if (navbar_left) {
-                    let new_li = document.createElement("li")
-                    new_li.setAttribute("class", "nav_item nav-mid")
-                    new_li.setAttribute("id", "nav_logout")
+                // if (navbar_left) {
+                //     let new_li = document.createElement("li")
+                //     new_li.setAttribute("class", "nav_item nav-mid")
+                //     new_li.setAttribute("id", "nav_logout")
 
-                    let new_a = document.createElement("a")
-                    new_a.setAttribute("class", "nav_link active")
-                    new_a.innerText = "로그아웃"
-                    new_a.setAttribute("href", "../index.html")
-                    new_a.color = "black"
+                //     let new_a = document.createElement("a")
+                //     new_a.setAttribute("class", "nav_link active")
+                //     new_a.innerText = "로그아웃"
+                //     new_a.setAttribute("href", "../index.html")
+                //     new_a.color = "black"
 
-                    new_a.addEventListener('click', handleLogout)
+                //     new_a.addEventListener('click', handleLogout)
 
-                    new_li.appendChild(new_a)
-                    navbar_left.appendChild(new_li)
-                }
+                //     new_li.appendChild(new_a)
+                //     navbar_left.appendChild(new_li)
+                // }
 
             }
 

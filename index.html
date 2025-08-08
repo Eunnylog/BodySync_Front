@@ -8,10 +8,15 @@
     <title>💪BodySync</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
         crossorigin="anonymous"></script>
     <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script type="module" src="js/api.js"></script>
+
 </head>
 
 <body>
@@ -21,6 +26,59 @@
             <!-- navbar -->
         </div>
     </header>
+    <!-- 로그인 모달창-->
+    <div class="modal fade" id="login_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" style="color: #7a7f83;">Login</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="sign-in-up">
+                        <form class="sign-in-form active">
+                            <input name="email" id="login-email" type="email" class="form-control login-input"
+                                placeholder="이메일">
+                            <input name="password" id="login-password" type="password" class="form-control login-input"
+                                placeholder="비밀번호" style="margin-bottom: 10px;">
+
+                            <span>
+                                <button type="button" onclick="handleSignin()" class="my-btn"
+                                    style="float: right; width: 100%;">
+                                    로그인
+                                </button>
+                            </span>
+                    </div>
+                    </form>
+                    <div class="divider">
+                        <div style="color: #7a7f83; text-align: center;">OR</div>
+                        <div style="color: #7a7f83; text-align: center;">아이디와 비밀번호 입력하기 귀찮으죠?</div>
+                        <div style="color: #7a7f83; text-align: center">1초 회원가입으로 입력없이 간단하게 로그인 하세요.</div>
+                    </div>
+                    <div class="social-login">
+                        <button onclick="kakaoLogin()" class="kakao-btn">
+                            <img src="css/icons/kakao-logo.png" class="kakao-icon">
+                            Kakao 1초 로그인 / 회원가입
+                        </button>
+                        <button onclick="googleLogin()" class="google-btn">
+                            <img src="css/icons/google-logo.png" class="google-icon">
+                            Google 1초 로그인/회원가입
+                        </button>
+                    </div>
+                    <div style="text-align: center;">
+                        <a href="" data-bs-toggle="modal" data-bs-target="#findPassword" id="find-password"
+                            class="findpassword"
+                            style="text-decoration: none; font-size: 18px; color: #7a7f83; margin: 5px;">
+                            비밀번호를 잃어버리셨나요? </a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="my-btn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
