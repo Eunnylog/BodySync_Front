@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync 로그인 처리중 ....</title>
+</head>
+
+<body>
+    <p>구글 로그인 처리 중입니다. 잠시만 기다려주세요...</p>
+
+    <script>
+        const backend_base_url = 'http://localhost:8000'
+        const urlParams = new URLSearchParams(window.location.search)
+        const code = urlParams.get('code')
+        const decode = decodeURIComponent(code); // %2F → /
+
+        if (decode) {
+            fetch(`${backend_base_url}/users/google/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ 'code': decode })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('로그인 성공', data)
+                    localStorage.setItem('payload', JSON.stringify(data.payload))
+                    window.location.href = 'index.html'
+                })
+                .catch(err => {
+                    console.error('로그인 실패:', err);
+                });
+        } else {
+            console.error('인가코드가 없습니다.');
+            window.location.href = '/index.html';
+        }
+    </script>
+</body>
+
+</html>

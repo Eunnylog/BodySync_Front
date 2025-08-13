@@ -62,26 +62,6 @@ async function injectNavbar() {
                 if (nav_meal) nav_meal.style.display = "block"
                 if (nav_logout) nav_logout.style = "block"
 
-                // 로그아웃 버튼 동적 생성 및 삽입
-                // let navbar_left = document.getElementById('nav-center')
-
-                // if (navbar_left) {
-                //     let new_li = document.createElement("li")
-                //     new_li.setAttribute("class", "nav_item nav-mid")
-                //     new_li.setAttribute("id", "nav_logout")
-
-                //     let new_a = document.createElement("a")
-                //     new_a.setAttribute("class", "nav_link active")
-                //     new_a.innerText = "로그아웃"
-                //     new_a.setAttribute("href", "../index.html")
-                //     new_a.color = "black"
-
-                //     new_a.addEventListener('click', handleLogout)
-
-                //     new_li.appendChild(new_a)
-                //     navbar_left.appendChild(new_li)
-                // }
-
             }
 
         }
@@ -102,4 +82,4 @@ function handleLogout() {
 }
 
 
-document.addEventListener('DOMContentLoaded', injectNavbar)
+document.addEventListener('DOMContentLoaded', injectNavbar) 

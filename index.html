@@ -8,15 +8,13 @@
     <title>💪BodySync</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style/index.css">
+    <link rel="stylesheet" href="css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
         crossorigin="anonymous"></script>
     <script src="js/loader.js"></script>
     <script src="js/api.js"></script>
-    <script type="module" src="js/api.js"></script>
-
 </head>
 
 <body>
@@ -27,12 +25,11 @@
         </div>
     </header>
     <!-- 로그인 모달창-->
-    <div class="modal fade" id="login_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal" tabindex="-1" id="login-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel" style="color: #7a7f83;">Login</h1>
+                    <h5 class="modal-title" style="color: #7a7f83;">Login</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -58,19 +55,19 @@
                     </div>
                     <div class="social-login">
                         <button onclick="kakaoLogin()" class="kakao-btn">
-                            <img src="css/icons/kakao-logo.png" class="kakao-icon">
+                            <img src="assert/icons/kakao-logo.png" class="kakao-icon">
                             Kakao 1초 로그인 / 회원가입
                         </button>
                         <button onclick="googleLogin()" class="google-btn">
-                            <img src="css/icons/google-logo.png" class="google-icon">
+                            <img src="assert/icons/google-logo.png" class="google-icon">
                             Google 1초 로그인/회원가입
                         </button>
                     </div>
                     <div style="text-align: center;">
-                        <a href="" data-bs-toggle="modal" data-bs-target="#findPassword" id="find-password"
-                            class="findpassword"
-                            style="text-decoration: none; font-size: 18px; color: #7a7f83; margin: 5px;">
-                            비밀번호를 잃어버리셨나요? </a>
+                        <!-- <a href="" data-bs-toggle="modal" data-bs-target="#findPassword" id="find-password"
+                        class="findpassword"
+                        style="text-decoration: none; font-size: 18px; color: #7a7f83; margin: 5px;">
+                        비밀번호를 잃어버리셨나요? </a> -->
                     </div>
                 </div>
                 <div class="modal-footer">

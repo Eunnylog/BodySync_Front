@@ -1,15 +1,21 @@
-import jwt_decode from 'jwt-decode';
-
-const backend_base_url = 'http://127.0.0.1:8000'
-const frontend_base_url = "http://127.0.0.1:5500"
+const backend_base_url = 'http://localhost:8000'
+const frontend_base_url = "http://localhost:5500"
 
 
-// 로그인 모달창 close
-$(document).ready(function () {
-    $('#login_modal').on('hide.bs.modal', function () {
-        $('#login-email').val("");
-        $('#login-password').val("");
-    })
+
+// 로그인 모달창
+document.addEventListener('DOMContentLoaded', function () {
+    let loginModal = document.getElementById('login-modal')
+
+    // 모달 열 때 이벤트 (필요하면)
+    loginModal.addEventListener('shown.bs.modal', function () {
+    });
+
+    // 모달 닫을 때 입력 초기화
+    loginModal.addEventListener('hide.bs.modal', function () {
+        document.getElementById('login-email').value = "";
+        document.getElementById('login-password').value = "";
+    });
 })
 
 
@@ -24,6 +30,7 @@ async function handleSignin(email = null, password = null) {
                 'content-type': 'application/json',
             },
             method: 'POST',
+            credentials: 'include',
             body: JSON.stringify({
                 'email': emailInput,
                 'password': passwordInput,
@@ -31,16 +38,11 @@ async function handleSignin(email = null, password = null) {
         })
         if (response.status == 200) {
             const response_json = await response.json()
-            console.log(response_json)
-            localStorage.setItem('access', response_json.access)
-            const base64Url = response_json.access.split('.')[1]
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-            }).join(''))
+            localStorage.setItem('payload', JSON.stringify(response_json.payload))
+            setTimeout(function () {
+                window.location.href = 'index.html'
+            }, 1000)
 
-            localStorage.setItem('payload', jsonPayload)
-            document.getElementById("login-modal").querySelector('[data-bs-dismiss="modal"]').click()
         }
     } catch (error) {
         console.log(error)
@@ -48,39 +50,41 @@ async function handleSignin(email = null, password = null) {
 
 }
 
-// 액세스토큰 디코딩
-function getDecodeAccessToken() {
-    const accessToken = localStorage.getItem('access')
 
-    if (accessToken) {
-        try {
-            const decodedToken = jwt_decode(accessToken)
-            const currentTime = Date.now() / 1000
-
-            if (decodedToken.exp < currentTime) {
-                console.warn("액세스 토큰의 유효기간이 지났습니다.")
-                return null
-            }
-            return decodedToken
-        } catch (error) {
-            console.error("디코딩 실패", error)
-            localStorage.removeItem('access')
-            alert('유효하지 않은 토큰입니다. 다시 로그인 해주세요.')
-            window.location.href = 'index.html'
-            return null
-        }
-    }
-    return null
+// 로그아웃
+async function handleLogout() {
+    await fetch(`${backend_base_url}/users/logout/`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
+    setTimeout(function () {
+        window.location.href = 'index.html'
+    }, 1000)
 }
 
-// 토큰 디코딩 정보
-const userPayload = getDecodeAccessToken()
 
-if (userPayload) {
-    const payload_user_id = userPayload.user_id
-    const payload_email = userPayload.email
-    const payload_nickname = userPayload.nickname
-    const payload_is_staff = userPayload.is_staff
-    const payload_is_social_login = userPayload.is_social_login
-    console.log(userPayload)
+const KAKAO_CLIENT_ID = "69ffa5c0f47c5c7084def27b4dee214b"
+const KAKAO_REDIRECT_URI = "http://localhost:5500/callback_kakao.html"
+
+const GOOGLE_CLIENT_ID = "804892791014-jesh4bfaabudi6up3b1ke554r8binvff.apps.googleusercontent.com"
+const GOOGLE_REDIRECT_URI = "http://localhost:5500/callback_google.html"
+
+
+
+// 카카오 로그인
+async function kakaoLogin() {
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`
+    window.location.href = KAKAO_AUTH_URL
+}
+
+
+// 구글 로그인
+function googleLogin() {
+    // 구글 로그인 구현 시
+    const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&access_type=offline&include_granted_scopes=true&response_type=code&state=security_token%3D1%26url%3Dhttps://oauth2.example.com/callback&redirect_uri=${GOOGLE_REDIRECT_URI}&client_id=${GOOGLE_CLIENT_ID}`;
+    window.location.href = GOOGLE_AUTH_URL;
 }
