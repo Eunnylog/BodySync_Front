@@ -24,6 +24,121 @@
             <!-- navbar -->
         </div>
     </header>
+    <div>
+        <img src="assert/icons/main.jpg" style="max-width: -webkit-fill-available;">
+    </div>
+    <div class="container-fluid" style="margin-top: 2em; margin-bottom: 2em;" id="dashboard-cards">
+        <div class="row justify-content-center">
+            <!-- 1. 식단 카드 -->
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <img src="assert/icons/nutrition-plan1.png" class="img-fluid mb-3" alt="식단 아이콘"
+                            style="max-height: 80px;">
+                        <h5 class="card-title">오늘 식단</h5>
+                        <p class="card-text fs-5 text-success">총 칼로리: <span id="meal-calories-display">0</span> kcal</p>
+                        <p class="card-text fs-6">탄수화물: <span id="meal-carbs-display">0</span>g</p>
+                        <p class="card-text fs-6">단백질: <span id="meal-protein-display">0</span>g</p>
+                        <p class="card-text fs-6">지방: <span id="meal-fat-display">0</span>g</p>
+                        <!-- <p class="card-text fs-4 text-success">1200 / 1800 kcal</p>
+                        <p class="card-text"><small class="text-muted">🍽️ 목표 60% 달성</small></p> -->
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="/meals/history.html" class="btn btn-success btn-sm">식단 기록</a>
+                        <a href="/meals/history.html" class="btn btn-outline-success btn-sm">모든 기록</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 운동 카드 -->
+            <div class="col-12 col-md-6 col-lg-3 mb-4"> <!-- lg-3 (큰 화면에서 한 줄에 4개 배치) 또는 md-6 (중간 화면에서 한 줄에 2개 배치) -->
+                <div class="card h-100"> <!-- h-100: 높이를 동일하게 유지 -->
+                    <div class="card-body text-center"> <!-- 텍스트 중앙 정렬 -->
+                        <img src="assert/icons/excercise.png" class="img-fluid mb-3" alt="운동 아이콘"
+                            style="max-height: 80px;">
+                        <h5 class="card-title">오늘 운동</h5>
+                        <p class="card-text fs-4 text-primary"><span id="activity-duration-display">0</span>분 / <span
+                                id="activity-calories-display">0</span> kcal</p>
+                        <!-- <p class="card-text fs-4 text-primary">30분 / 250 kcal</p>
+                        <p class="card-text"><small class="text-muted">🏃‍♀️ 현재 주4회 달성중</small></p> -->
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="/activities/history.html" class="btn btn-primary btn-sm">운동 기록</a>
+                        <a href="/activities/history.html" class="btn btn-outline-primary btn-sm">모든 기록</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 단식 카드 -->
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <img src="assert/icons/no1.png" class="img-fluid mb-3" alt="단식 아이콘" style="max-height: 80px;">
+                        <h5 class="card-title">현재 단식</h5>
+                        <p class="card-text fs-5 text-info">상태: <span id="fasting-status-display"></span></p>
+                        <p class="card-text fs-5 text-info">경과: <span id="fasting-duration-display"></span></p>
+                        <p class="card-text fs-5 text-info">남은시간: <span id="fasting-remaining-display"></span></p>
+                        <!-- <p class="card-text fs-4 text-info">14시간 30분 경과</p>
+                        <p class="card-text"><small class="text-muted">⏱️ 16시간 단식 중</small></p> -->
+                    </div>
+                    <div class="card-footer text-center d-flex justify-content-center align-items-center">
+                        <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-start-btn">단식 시작</a>
+                        <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-end-btn">단식 중단</a>
+                        <a href="/fasting/history.html" class="btn btn-outline-info btn-sm mx-1">모든 기록</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 인바디 카드 -->
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <img src="assert/icons/body-scan.png" class="img-fluid mb-3" alt="인바디 아이콘"
+                            style="max-height: 80px;">
+                        <h5 class="card-title">최근 인바디</h5>
+                        <p class="card-text fs-5 text-warning">체중: <span id="inbody-weight-display">0</span> kg</p>
+                        <p class="card-text fs-5 text-warning">골격근량: <span id="inbody-muscle-display">0</span> kg</p>
+                        <p class="card-text fs-5 text-warning">체지방률: <span id="inbody-fat-display">0</span> %</p>
+                        <!-- <p class="card-text fs-4 text-warning">55 kg / 골격근 24 kg</p>
+                        <p class="card-text"><small class="text-muted">📈 목표 체중 -5kg</small></p> -->
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="/inbody/history.html" class="btn btn-warning btn-sm">인바디 기록</a>
+                        <a href="/inbody/history.html" class="btn btn-outline-warning btn-sm">모든 기록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 로그인 전 사용자에게 보여줄 메시지 (선택 사항) -->
+        <div id="login-required-message" class="text-center mt-5 p-4 d-none">
+            <h2 class="mb-3" style="color:#547f48;">로그인하여 나만의 건강 대시보드를 확인하세요!</h2>
+            <p class="lead">운동, 식단, 단식, 인바디 기록을 통해 건강한 습관을 만들어 보세요.</p>
+            <button class="btn my-btn btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#login-modal">로그인하기</button>
+            <p class="mt-3">아직 회원이 아니신가요? <a href="/signup.html" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                    data-bs-target="#signup-modal" style="color:#7a7f83; text-decoration: none;"
+                    class="card-singup">회원가입</a>
+            </p>
+        </div>
+    </div>
+    <!-- 회원가입 모달창-->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel" style="color:#7a7f83;">Sign Up</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Understood</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- 로그인 모달창-->
     <div class="modal" tabindex="-1" id="login-modal">
         <div class="modal-dialog">
@@ -76,6 +191,38 @@
             </div>
         </div>
     </div>
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="http://localhost:8000/api/schema/swagger-ui/" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="http://localhost:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+
+            <!-- 필요하다면 GitHub 링크 등 다른 정보 추가 -->
+        </div>
+    </footer>
 </body>
 
 </html>

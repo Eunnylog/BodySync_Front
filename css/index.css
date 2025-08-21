@@ -14,12 +14,26 @@ body {
 
 .nav-link:hover {
     text-decoration: underline;
-    color: #e8530e;
+    color: #fd6f22;
+}
+
+.card-singup:hover {
+    color: #fd6f22;
+}
+
+.footer-link {
+    cursor: default;
+    color: #000000A6
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+    color: #fd6f22;
 }
 
 .my-btn {
-    background-color: #e8530e;
-    border: #e8530e;
+    background-color: #fd6f22;
+    border: #fd6f22;
     color: #ffff;
     padding: 10px 12px;
     border-radius: 5px;
@@ -28,8 +42,8 @@ body {
 }
 
 .my-btn:hover {
-    background-color: #f5763b;
-    border: #f5763b;
+    background-color: #e8530e;
+    border: #e8530e;
     color: #fff;
 }
 
