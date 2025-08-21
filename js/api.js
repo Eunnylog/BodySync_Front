@@ -1,21 +1,31 @@
 const backend_base_url = 'http://localhost:8000'
 const frontend_base_url = "http://localhost:5500"
-
+let commonToastInstance;
 
 
 // 로그인 모달창
 document.addEventListener('DOMContentLoaded', function () {
+    const toastElement = document.getElementById('common-toast')
     let loginModal = document.getElementById('login-modal')
+    let signupModal = document.getElementById('signup-modal')
 
-    // 모달 열 때 이벤트 (필요하면)
-    loginModal.addEventListener('shown.bs.modal', function () {
-    });
+    if (toastElement) {
+        commonToastInstance = new bootstrap.Toast(toastElement)
+    }
 
-    // 모달 닫을 때 입력 초기화
+    // 로그인 모달 닫을 때 입력 초기화
     loginModal.addEventListener('hide.bs.modal', function () {
         document.getElementById('login-email').value = "";
         document.getElementById('login-password').value = "";
     });
+
+    // 회원가입 모달 닫을 때 초기화
+    signupModal.addEventListener('hide.bs.modal', function () {
+        document.getElementById('signup-email').value = ""
+        document.getElementById('signup-nickname').value = ""
+        document.getElementById('signup-password').value = ""
+        document.getElementById('signup-password2').value = ""
+    })
 
     injectNavbar();
 
@@ -33,6 +43,28 @@ document.addEventListener('DOMContentLoaded', function () {
         loginRequiredMessage.classList.remove('d-none')
     }
 })
+
+
+// Toast
+function showToast(message, type = 'info', title = '알림') {
+    if (!commonToastInstance) {
+        console.log('Toast Error')
+        return
+    }
+
+    const toastElement = commonToastInstance._element // Toast DOM 접근
+
+    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning', 'text-bg-info')
+
+    if (type !== 'info') {
+        toastElement.classList.add(`text-bg-${type}`)
+    }
+
+    document.getElementById('common-toast-title').innerText = title;
+    document.getElementById('common-toast-body').innerText = message;
+
+    commonToastInstance.show();
+}
 
 
 // 로그인
@@ -53,6 +85,7 @@ async function handleSignin(email = null, password = null) {
             })
         })
         if (response.status == 200) {
+            showToast('로그인 되었습니다!', 'success')
             const response_json = await response.json()
             localStorage.setItem('payload', JSON.stringify(response_json.payload))
             setTimeout(function () {
@@ -66,6 +99,82 @@ async function handleSignin(email = null, password = null) {
 
 }
 
+// 회원가입
+async function handleSignup() {
+    let emailInput = document.getElementById('signup-email').value
+    let nicknameInput = document.getElementById('signup-nickname').value
+    let passwordInput = document.getElementById('signup-password').value
+    let password2Input = document.getElementById('signup-password2').value
+
+    try {
+        const response = await fetch(`${backend_base_url}/users/signup/`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "email": emailInput,
+                "nickname": nicknameInput,
+                "password": passwordInput,
+                "password2": password2Input
+            })
+        })
+        if (response.status == 201) {
+            showToast('회원가입이 완료되었습니다!', 'success', '환영합니다!')
+
+            const signupModalElement = document.getElementById('signup-modal');
+            const signupModalInstance = bootstrap.Modal.getInstance(signupModalElement); // Bootstrap Modal 인스턴스 가져오기
+            if (signupModalInstance) {
+                signupModalInstance.hide(); // 모달 숨기기 이벤트 트리거
+            }
+
+            setTimeout(function () {
+                window.location.href = 'index.html'
+            }, 1000)
+
+        } else {
+            const errorData = await response.json()
+            console.log(errorData.status, errorData)
+
+            let errorMessage = '';
+
+            if (typeof errorData == 'object' && errorData !== null) {
+                for (const key in errorData) {
+                    if (Array.isArray(errorData[key])) {
+                        let fieldName = key
+                        switch (key) {
+                            case 'email': fieldName = '이메일'; break
+                            case 'nickname': fieldName = '닉네임'; break
+                            case 'password': fieldName = '비밀번호'; break
+                            case 'password2': fieldName = '비밀번호 확인'; break
+                            case 'non_field_errors': fieldName = '오류'; break
+                            default: fieldName = key;
+                        }
+                        errorMessage += `${fieldName}: ${errorData[key].join(', ')}\n`; // 각 에러 메시지를 한 줄로 합침
+                    } else if (typeof errorData[key] === 'string') {
+                        // 에러 메시지가 바로 문자열인 경우 (e.g. detail: "인증 실패")
+                        errorMessage += `${errorData[key]}\n`;
+                    }
+                }
+            }
+            if (errorMessage === '') {
+                if (errorData.detail) { // DRF의 detail 에러 메시지
+                    errorMessage = errorData.detail;
+                } else {
+                    errorMessage = '회원가입 중 알 수 없는 오류가 발생했습니다.';
+                }
+            }
+
+            // showToast는 한 줄 메시지에 최적화되어 있으므로, 여러 줄이면 맨 앞만 보이거나 스크롤 생길 수 있습니다.
+            // 필요하다면, 에러 메시지를 더 적절한 UI(예: 폼 필드 아래에 직접 표시)로 보여주는 것도 좋습니다.
+            showToast(errorMessage.trim(), 'danger', '회원가입 실패');
+        }
+    } catch (error) {
+        showToast('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'danger', '오류')
+    }
+
+}
 
 // 로그아웃
 async function handleLogout() {
@@ -76,6 +185,7 @@ async function handleLogout() {
             'Content-Type': 'application/json',
         },
     });
+    showToast('로그아웃 되었습니다!', 'success')
     localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
     setTimeout(function () {
         window.location.href = 'index.html'
