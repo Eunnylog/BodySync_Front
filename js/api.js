@@ -3,44 +3,67 @@ const frontend_base_url = "http://localhost:5500"
 let commonToastInstance;
 
 
-// 로그인 모달창
 document.addEventListener('DOMContentLoaded', function () {
     const toastElement = document.getElementById('common-toast')
-    let loginModal = document.getElementById('login-modal')
-    let signupModal = document.getElementById('signup-modal')
+    const loginModal = document.getElementById('login-modal')
+    const signupModal = document.getElementById('signup-modal')
+    const dashboardCards = document.getElementById('dashboard-cards')
+    const loginRequiredMessage = document.getElementById('login-required-message')
 
     if (toastElement) {
         commonToastInstance = new bootstrap.Toast(toastElement)
     }
 
-    // 로그인 모달 닫을 때 입력 초기화
-    loginModal.addEventListener('hide.bs.modal', function () {
-        document.getElementById('login-email').value = "";
-        document.getElementById('login-password').value = "";
-    });
+    // 로그인 모달 닫을 때 초기화
+    if (loginModal) {
+        loginModal.addEventListener('hide.bs.modal', function () {
+            const loginEmailField = document.getElementById('login-email');
+            const loginPasswordField = document.getElementById('login-password');
+            if (loginEmailField) loginEmailField.value = "";
+            if (loginPasswordField) loginPasswordField.value = "";
+        });
+    }
 
     // 회원가입 모달 닫을 때 초기화
-    signupModal.addEventListener('hide.bs.modal', function () {
-        document.getElementById('signup-email').value = ""
-        document.getElementById('signup-nickname').value = ""
-        document.getElementById('signup-password').value = ""
-        document.getElementById('signup-password2').value = ""
-    })
+    if (signupModal) {
+        signupModal.addEventListener('hide.bs.modal', function () {
+            const signupEmailField = document.getElementById('signup-email');
+            const signupNicknameField = document.getElementById('signup-nickname');
+            const signupPasswordField = document.getElementById('signup-password');
+            const signupPassword2Field = document.getElementById('signup-password2');
+
+            if (signupEmailField) signupEmailField.value = "";
+            if (signupNicknameField) signupNicknameField.value = "";
+            if (signupPasswordField) signupPasswordField.value = "";
+            if (signupPassword2Field) signupPassword2Field.value = "";
+        });
+    }
 
     injectNavbar();
 
     const payload = localStorage.getItem('payload')
-    const dashboardCards = document.getElementById('dashboard-cards').querySelector('.row')
-    const loginRequiredMessage = document.getElementById('login-required-message')
+
+    let dashboardRow = null
+    if (dashboardCards) {
+        dashboardRow = dashboardCards.querySelector('.row')
+    }
 
     if (payload) {
         console.log(payload)
-        dashboardCards.classList.remove('d-none')
-        loginRequiredMessage.classList.add('d-none')
-        loadDashboardData()
+        if (dashboardRow) {
+            dashboardRow.classList.remove('d-none')
+            loadDashboardData()
+        }
+        if (loginRequiredMessage) {
+            loginRequiredMessage.classList.add('d-none');
+        }
     } else {
-        dashboardCards.classList.add('d-none')
-        loginRequiredMessage.classList.remove('d-none')
+        if (dashboardRow) {
+            dashboardRow.classList.add('d-none');
+        }
+        if (loginRequiredMessage) {
+            loginRequiredMessage.classList.remove('d-none');
+        }
     }
 })
 
@@ -283,5 +306,69 @@ function updateDashboardCards(data) {
         document.getElementById('inbody-weight-display').innerText = `${parseFloat(inbodyData.weight).toFixed(1)}`
         document.getElementById('inbody-muscle-display').innerText = `${parseFloat(inbodyData.skeletal_muscle_mass_kg).toFixed(1)}`
         document.getElementById('inbody-fat-display').innerText = `${parseFloat(inbodyData.body_fat_percentage).toFixed(1)}`
+    }
+}
+
+
+// 유저 프로필
+async function fetchUserProfile() {
+    try {
+        const response = await fetch(`${backend_base_url}/users/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        })
+        if (response.ok) {
+            const userData = await response.json()
+            console.log(userData)
+            return userData
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            showToast(`사용자 정보 불러오기 실패: ${errorData.detail || '알 수 없는 오류'}`, 'danger', '오류')
+            return null
+        }
+    } catch (error) {
+        showToast('사용자 정보 불러오기 중 네트워크 오류가 발생했습니다.', 'danger', '오류')
+        return null
+    }
+}
+
+
+// 마이페이지 수정
+async function updateProfile(data) {
+    try {
+        const response = await fetch(`${backend_base_url}/users/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+
+        })
+
+        if (response.ok) {
+            const updateUserData = await response.json()
+
+
+            const currentPayload = JSON.parse(localStorage.getItem('payload'))
+            const newPayload = { ...currentPayload } // 복사
+
+            if (updateUserData.nickname) newPayload.nickname = updateUserData.nickname
+            localStorage.setItem('payload', JSON.stringify(newPayload))
+            injectNavbar()
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            showToast('프로필 수정 실패', 'danger')
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크에러', error)
+        return false
     }
 }
