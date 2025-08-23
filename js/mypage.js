@@ -18,9 +18,58 @@ document.addEventListener('DOMContentLoaded', function () {
                         window.location.href = 'index.html'
                     }, 1500)
                 } else {
-                    showToast('회원 탈퇴 중 문제가 생겼습니다.', 'success')
+                    showToast('회원 탈퇴 중 문제가 생겼습니다.', 'danger')
                 }
             }
+        })
+    }
+
+    // 비밀번호 변경 모달
+    const changePasswordForm = document.getElementById('password-change-form')
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const confirmMessage = confirm('비밀번호를 변경하시겠습니까?')
+
+            if (!confirmMessage) {
+                return
+            }
+
+            const current_password = document.getElementById('currentPassword').value
+            const new_password = document.getElementById('newPassword').value
+            const confirm_password = document.getElementById('confirmNewPassword').value
+
+            if (!current_password || !new_password || !confirm_password) {
+                showToast('모든 비밀번호 필드를 입력해주세요.', 'warning', '경고');
+                return;
+            }
+            if (new_password !== confirm_password) {
+                showToast('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.', 'danger', '오류');
+                return;
+            }
+            if (new_password === current_password) {
+                showToast('새 비밀번호는 현재 비밀번호와 같을 수 없습니다.', 'warning', '경고');
+                return;
+            }
+
+            const data = {
+                "pre_password": current_password,
+                "new_password": new_password,
+                "new_password2": confirm_password
+            }
+
+            const success = await changePassword(data)
+            if (success) {
+                // localStorage.removeItem('payload')
+                await handleLogout()
+                showToast('비밀번호 변경이 완료되었습니다. 다시 로그인해주세요.', 'success')
+                setTimeout(function () {
+                    window.location.href = 'index.html'
+                }, 1500)
+            } else {
+                // api에서 로직 처리됨
+            }
+
         })
     }
 });

@@ -70,7 +70,7 @@
                 </div>
             </form>
 
-            <!-- 비밀번호 변경하기 버튼 (모달 트리거) -->
+            <!-- 비밀번호 변경하기 버튼 -->
             <div class="text-center mt-4 mypage-buttons">
                 <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
                     data-bs-target="#passwordChangeModal" id="password-modal">
@@ -79,7 +79,6 @@
                 <button type="button" id="delete-user" class="btn btn-outline-secondary" style="width:112.76px;">
                     회원 탈퇴
                 </button>
-                <!-- 회원 탈퇴 등 추가 버튼은 여기에 -->
             </div>
         </div>
     </div>
@@ -111,7 +110,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" class="btn btn-primary" form="password-change-form">변경하기</button>
+                    <button type="submit" class="btn my-btn" id="change-password"
+                        form="password-change-form">변경하기</button>
                 </div>
             </div>
         </div>

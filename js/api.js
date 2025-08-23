@@ -405,7 +405,7 @@ async function deleteUser() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include'
+            credentials: 'include',
         })
 
         if (response.status == 204) {
@@ -420,4 +420,51 @@ async function deleteUser() {
         return false
     }
 
+}
+
+
+// 비밀번호 변경
+async function changePassword(data) {
+    try {
+        const response = await fetch(`${backend_base_url}/users/password-change/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            return true
+        } else {
+            let errorData = null; // 파싱된 에러 데이터 또는 텍스트
+            let errorMessage = '비밀번호 변경에 실패했습니다.'; // 기본 메시지
+
+            try {
+                errorData = await response.json();
+            } catch (parseError) {
+                console.warn('비밀번호 변경: 에러 응답 본문이 JSON 형식이 아님:', parseError);
+                errorData = await response.text(); // 텍스트로 파싱
+            }
+
+            errorMessage = Object.values(errorData).flat().join('\n')
+
+            if (response.status === 401) {
+                showToast(errorMessage, 'danger')
+                console.log(1, errorMessage)
+            } else if (response.status === 400) {
+                showToast(errorMessage, 'danger')
+                console.log(2, errorMessage)
+            } else {
+                showToast(errorMessage, 'danger')
+                console.log(3, errorMessage)
+            }
+            return false
+        }
+    } catch (error) {
+        console.error('비밀번호 변경 네트워크 오류 (fetch 실패):', error);
+        showToast('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'danger', '네트워크 오류');
+        return false
+    }
 }
