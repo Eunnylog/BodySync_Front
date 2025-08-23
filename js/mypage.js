@@ -4,16 +4,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // 프로필 수정 폼 제출 이벤트
     document.getElementById('profile-edit-form').addEventListener('submit', handleProfileSubmit);
 
-    // // 비밀번호 변경 폼 제출 이벤트
-    // document.getElementById('password-change-form').addEventListener('submit', handlePasswordChangeSubmit);
-    // document.getElementById('password-change-form').addEventListener('submit', function (event) {
-    //     event.preventDefault(); // 기본 폼 제출 방지
-    //     // TODO: 비밀번호 변경 API 호출
-    //     console.log('비밀번호 변경 폼 제출됨');
-    //     showToast('비밀번호가 변경되었습니다!', 'success');
-    //     const passwordChangeModal = bootstrap.Modal.getInstance(document.getElementById('passwordChangeModal'));
-    //     passwordChangeModal.hide(); // 변경 후 모달 닫기
-    // });
+    // 회원탈퇴 이벤트리스너
+    const deleteUserBtn = document.getElementById('delete-user')
+    if (deleteUserBtn) {
+        deleteUserBtn.addEventListener('click', async function () {
+            const confirmMessage = confirm('정말로 회원 탈퇴를 하시겠습니까?\n모든 기록이 삭제됩니다.')
+            if (confirmMessage) {
+                const success = await deleteUser()
+                if (success) {
+                    showToast('회원 탈퇴가 완료되었습니다. 이용해주셔서 감사합니다.', 'success')
+                    localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
+                    setTimeout(function () {
+                        window.location.href = 'index.html'
+                    }, 1500)
+                } else {
+                    showToast('회원 탈퇴 중 문제가 생겼습니다.', 'success')
+                }
+            }
+        })
+    }
 });
 
 
@@ -88,7 +97,7 @@ async function handleProfileSubmit(event) {
 
         setTimeout(function () {
             window.location.href = 'index.html'
-        }, 1000)
+        }, 1500)
     } else {
         showToast('프로필 정보 수정에 실패했습니다.', 'danger')
     }

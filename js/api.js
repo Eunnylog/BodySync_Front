@@ -113,8 +113,31 @@ async function handleSignin(email = null, password = null) {
             localStorage.setItem('payload', JSON.stringify(response_json.payload))
             setTimeout(function () {
                 window.location.href = 'index.html'
-            }, 1000)
+            }, 1500)
 
+        } else {
+            const errorData = await response.json();
+            let errorMessage = '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.'; // 일반적인 실패 메시지
+
+            console.error('로그인 API 실패:', response.status, errorData); // 디버깅용
+
+            if (response.status === 401) { // Unauthorized (인증 실패)
+                // simplejwt가 기본으로 반환하는 에러 코드와 커스텀 에러 코드를 모두 확인
+                if (errorData && (errorData.code === 'user_inactive' || errorData.code === 'user_inactive_account')) {
+                    errorMessage = "비활성화된 계정입니다. 관리자에게 문의하거나 다시 회원가입해 주세요."
+                } else if (errorData && errorData.detail) {
+                    // 일반적인 401 Unauthorized (예: "No active account found with the given credentials" -> 아이디/비번 틀림)
+                    errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다. 다시 입력해 주세요."
+                }
+            } else if (response.status === 400) { // Bad Request (유효성 검사 실패, 예를 들어 시리얼라이저에 추가 유효성 로직이 있다면)
+                if (typeof errorData === 'object' && errorData !== null) {
+                    errorMessage = Object.values(errorData).flat().join('\n') || errorMessage; // 모든 필드 에러 합치기
+                }
+            } else { // 기타 5xx 등의 서버 에러
+                errorMessage = `서버 오류 (${response.status}): ${errorData.detail || '알 수 없는 문제'}`
+            }
+
+            showToast(`로그인 실패: ${errorMessage}`, 'danger', '오류')
         }
     } catch (error) {
         console.log(error)
@@ -154,7 +177,7 @@ async function handleSignup() {
 
             setTimeout(function () {
                 window.location.href = 'index.html'
-            }, 1000)
+            }, 1500)
 
         } else {
             const errorData = await response.json()
@@ -212,7 +235,7 @@ async function handleLogout() {
     localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
     setTimeout(function () {
         window.location.href = 'index.html'
-    }, 1000)
+    }, 1500)
 }
 
 
@@ -371,4 +394,30 @@ async function updateProfile(data) {
         console.log('네트워크에러', error)
         return false
     }
+}
+
+
+// 회원 탈퇴
+async function deleteUser() {
+    try {
+        const response = await fetch(`${backend_base_url}/users/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+
+        if (response.status == 204) {
+            return true
+        } else {
+            const error = await response.json()
+            console.log('회원 탈퇴 실패', error, response.status)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류')
+        return false
+    }
+
 }
