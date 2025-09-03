@@ -23,6 +23,8 @@ async function injectNavbar() {
         let nav_fasting = document.getElementById("nav-fasting")
         let nav_inbody = document.getElementById("nav-inbody")
         let nav_meal = document.getElementById("nav-meal")
+        let nav_logout = document.getElementById("nav-logout-li")
+        let nav_intro = document.getElementById("nav-intro")
 
         // 로그인 전 갈 수 없는 항목들 숨겨주기
         if (nav_mypage) nav_mypage.style.display = "none"
@@ -30,9 +32,11 @@ async function injectNavbar() {
         if (nav_fasting) nav_fasting.style.display = "none"
         if (nav_inbody) nav_inbody.style.display = "none"
         if (nav_meal) nav_meal.style.display = "none"
+        if (nav_intro) nav_intro.style.display = "none"
 
         // 이메일을 넣어주기 위해서 payload 불러오기
         let payload = localStorage.getItem("payload")
+        let payload_parse = JSON.parse(payload)
 
         // 로그인 후 보여주는 화면
         if (payload) {
@@ -40,46 +44,25 @@ async function injectNavbar() {
             if (nav_login) nav_login.style.display = "none"
             if (nav_signup) nav_signup.style.display = "none"
 
-            // payload값에서 이메일 불러오기 쉽게 json형식으로 payload 불러오기
-            let payload_parse
-            console.log(payload_parse)
-            try {
-                payload_parse = JSON.parse(payload);
-            } catch (e) {
-                console.error("Error parsing payload from localStorage:", e);
-                // 유효하지 않은 payload는 무시하고 로그인되지 않은 상태처럼 처리
-                payload = null;
-            }
+            // try {
+            //     payload_parse = JSON.parse(payload);
+            // } catch (e) {
+            //     console.error("Error parsing payload from localStorage:", e);
+            //     // 유효하지 않은 payload는 무시하고 로그인되지 않은 상태처럼 처리
+            //     payload = null;
+            // }
             // payload에서 불러온 email값 넣어주기
             if (payload) {
                 // intro.innerText = `안녕하세요! ${payload_parse.email.split('@')[0]}님 😄`
-
+                console.log(payload_parse.nickname)
                 if (nav_mypage) nav_mypage.style.display = "block"
                 if (nav_activity) nav_activity.style.display = "block"
                 if (nav_fasting) nav_fasting.style.display = "block"
                 if (nav_inbody) nav_inbody.style.display = "block"
                 if (nav_meal) nav_meal.style.display = "block"
-
-                // 로그아웃 버튼 동적 생성 및 삽입
-                let navbar_left = document.getElementById('nav-center')
-
-                if (navbar_left) {
-                    let new_li = document.createElement("li")
-                    new_li.setAttribute("class", "nav_item nav-mid")
-                    new_li.setAttribute("id", "nav_logout")
-
-                    let new_a = document.createElement("a")
-                    new_a.setAttribute("class", "nav_link active")
-                    new_a.innerText = "로그아웃"
-                    new_a.setAttribute("href", "../index.html")
-                    new_a.color = "black"
-
-                    new_a.addEventListener('click', handleLogout)
-
-                    new_li.appendChild(new_a)
-                    navbar_left.appendChild(new_li)
-                }
-
+                if (nav_logout) nav_logout.style = "block"
+                if (nav_intro) nav_intro.style = "block"
+                if (nav_intro) nav_intro.innerText = `환영합니다! ${payload_parse.nickname}님`
             }
 
         }
@@ -90,14 +73,5 @@ async function injectNavbar() {
 }
 
 
-function handleLogout() {
-    console.log("로그아웃 버튼 클릭됨")
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    localStorage.removeItem('payload')
 
-    window.location.href = "../index.html"
-}
-
-
-document.addEventListener('DOMContentLoaded', injectNavbar)
+document.addEventListener('DOMContentLoaded', injectNavbar) 

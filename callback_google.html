@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync 로그인 처리중 ....</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- Toast -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1081;">
+        <div id="common-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto" id="common-toast-title">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="common-toast-body">
+            </div>
+        </div>
+    </div>
+    <p>구글 로그인 처리 중입니다. 잠시만 기다려주세요...</p>
+
+    <script>
+        const backend_base_url = 'http://localhost:8000'
+        let commonToastInstance;
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const toastElement = document.getElementById('common-toast')
+            if (toastElement) {
+                commonToastInstance = new bootstrap.Toast(toastElement)
+            }
+
+
+            const urlParams = new URLSearchParams(window.location.search)
+            const code = urlParams.get('code')
+
+            if (code) {
+                try {
+                    const response = await fetch(`${backend_base_url}/users/google/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ 'code': code })
+                    });
+
+                    if (response.status === 200) {
+                        showToast('로그인 성공! 환영합니다!', 'success')
+                        const response_json = await response.json()
+                        localStorage.setItem('payload', JSON.stringify(response_json.payload))
+                        setTimeout(function () {
+                            window.location.href = 'index.html'
+                        }, 1500)
+                    } else {
+                        const errorData = await response.json()
+                        let errorMessage = '로그인에 실패했습니다. 다시 시도해주세요.'
+
+                        console.error('로그인 API 실패:', response.status, errorData)
+
+                        if (response.status === 401) {
+                            if (errorData && (errorData.code === 'user_inactive' || errorData.code === 'user_inactive_account')) {
+                                errorMessage = "비활성화된 계정입니다. 관리자에게 문의하거나 다시 회원가입해 주세요."
+                            } else if (errorData && errorData.detail) {
+                                errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다. 다시 입력해 주세요."
+                            }
+                        } else if (response.status === 400) {
+                            if (typeof errorData === 'object' && errorData !== null) {
+                                errorMessage = Object.values(errorData).flat().join('\n') || errorMessage;
+                            }
+                        } else {
+                            errorMessage = `서버 오류 (${response.status}): ${errorData.detail || '알 수 없는 문제'}`
+                        }
+
+                        showToast(`로그인 실패: ${errorMessage}`, 'danger', '오류')
+                        setTimeout(() => {
+                            window.location.href = '/index.html';
+                        }, 1500);
+                    }
+                } catch (error) {
+                    console.error('구글 로그인 네트워크 오류:', error)
+                    showToast('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'danger', '네트워크 오류')
+                    setTimeout(() => {
+                        window.location.href = '/index.html'
+                    }, 1500);
+                }
+            } else {
+                console.warn('인가 코드가 없습니다. 카카오 로그인 흐름에 문제가 있거나 사용자가 취소했습니다.')
+                showToast('로그인에 필요한 정보가 없습니다.', 'warning', '로그인 오류')
+                setTimeout(() => {
+                    window.location.href = '/index.html'
+                }, 1500);
+            }
+        });
+
+
+        // Toast
+        function showToast(message, type = 'info', title = '알림') {
+            if (!commonToastInstance) {
+                console.log('Toast Error')
+                return
+            }
+
+            const toastElement = commonToastInstance._element
+
+            toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning', 'text-bg-info')
+
+            if (type !== 'info') {
+                toastElement.classList.add(`text-bg-${type}`)
+            }
+
+            document.getElementById('common-toast-title').innerText = title
+            document.getElementById('common-toast-body').innerText = message
+
+            commonToastInstance.show()
+        }
+    </script>
+</body>
+
+</html>

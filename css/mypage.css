@@ -1,0 +1,18 @@
+.mypage-form {
+    max-width: 600px;
+    margin: 3em auto;
+    /* 상하 3em, 좌우 자동 (가운데 정렬) */
+    padding: 2em;
+    border: 1px solid #ddd;
+    border-radius: 0.5em;
+    background-color: #f8f9fa;
+}
+
+/* 예시: 버튼 그룹 간격 */
+.mypage-buttons .btn {
+    margin-right: 0.5em;
+}
+
+.mypage-buttons .btn:last-child {
+    margin-right: 0;
+}

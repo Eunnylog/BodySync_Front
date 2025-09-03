@@ -1,0 +1,132 @@
+body {
+    color: #7a7f83;
+}
+
+.nav-mid {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.nav-link {
+    cursor: default;
+}
+
+
+.nav-link:hover {
+    text-decoration: underline;
+    color: #fd6f22;
+}
+
+.card-singup:hover {
+    color: #fd6f22;
+}
+
+.footer-link {
+    cursor: default;
+    color: #000000A6
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+    color: #fd6f22;
+}
+
+.my-btn {
+    background-color: #fd6f22;
+    border: #fd6f22;
+    color: #ffff;
+    padding: 10px 12px;
+    border-radius: 5px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.my-btn:hover {
+    background-color: #e8530e;
+    border: #e8530e;
+    color: #fff;
+}
+
+.my-btn:active {
+    background-color: #e8530e;
+    border: #e8530e;
+    color: #ffff;
+    transform: translateY(1px);
+}
+
+.kakao-btn {
+    padding: 10px 0 10px 30px;
+    width: 100%;
+    height: 50px;
+    background-color: #FEE500;
+    padding: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #FEE500;
+    border-radius: 5px;
+    position: relative;
+    color: #423630;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .3s
+}
+
+.kakao-icon {
+    width: 25px;
+    float: left;
+    margin: 5px;
+}
+
+.kakao-btn::before {
+    content: "";
+    background-size: contain;
+    width: 50px;
+    height: 100%;
+    background-repeat: no-repeat;
+}
+
+
+
+.google-btn {
+    padding: 10px 0 10px 30px;
+    width: 100%;
+    height: 50px;
+    background-color: #f1eeee;
+    padding: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #C2C7D0;
+    border-radius: 5px;
+    position: relative;
+    color: #dd4b39;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.google-icon {
+    width: 30px;
+    float: left;
+}
+
+.google-btn::before {
+    content: "";
+    background-size: contain;
+    width: 40px;
+    height: 100%;
+    background-repeat: no-repeat;
+}
+
+.login-input {
+    color: #000;
+    width: 100%;
+    height: 50px;
+    line-height: 48px;
+    padding: 0;
+    margin: 0 0 10px;
+    border: none;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 18px;
+    border-radius: 0px;
+    font-weight: 500;
+}

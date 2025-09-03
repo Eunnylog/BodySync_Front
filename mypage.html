@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/mypage.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <script src="js/api.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/mypage.js"></script>
+</head>
+</head>
+
+<body>
+    <header class="site-header">
+        <div id="dynamic-navbar-insert-point">
+            <!-- navbar -->
+        </div>
+    </header>
+    <!-- Toast -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1081;">
+        <div id="common-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto" id="common-toast-title">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="common-toast-body">
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="mypage-form">
+            <h2 class="text-center mb-4">My Info</h2>
+            <form id="profile-edit-form">
+                <!-- 닉네임 -->
+                <div class="mb-3">
+                    <label for="nickname" class="form-label">닉네임</label>
+                    <input type="text" class="form-control" id="mypage-nickname">
+                </div>
+
+                <!-- 성별 -->
+                <div class="mb-3">
+                    <label for="gender" class="form-label">성별</label>
+                    <select class="form-select" id="mypage-gender">
+                        <option value="">선택 안 함</option>
+                        <option value="0">남성</option>
+                        <option value="1">여성</option>
+                    </select>
+                </div>
+
+                <!-- 생년월일 -->
+                <div class="mb-3">
+                    <label for="birthDate" class="form-label">생년월일</label>
+                    <input type="date" class="form-control" id="mypage-birthDate">
+                </div>
+
+                <!-- 수정하기 버튼 -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn my-btn">수정하기</button>
+                </div>
+            </form>
+
+            <!-- 비밀번호 변경하기 버튼 -->
+            <div class="text-center mt-4 mypage-buttons">
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
+                    data-bs-target="#passwordChangeModal" id="password-modal">
+                    비밀번호 변경
+                </button>
+                <button type="button" id="delete-user" class="btn btn-outline-secondary" style="width:112.76px;">
+                    회원 탈퇴
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ 비밀번호 변경 모달 -->
+    <div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordChangeModalLabel">비밀번호 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="password-change-form">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">현재 비밀번호</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">새 비밀번호</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmNewPassword" class="form-label">새 비밀번호 확인</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn my-btn" id="change-password"
+                        form="password-change-form">변경하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
