@@ -264,17 +264,10 @@ function googleLogin() {
 
 // 대시보드 데이터
 async function loadDashboardData() {
-    console.log("대시보드 데이터")
-
     try {
-        const response = await fetch(`${backend_base_url}/users/dashboard/`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            })
+        const response = await authFetch(`${backend_base_url}/users/dashboard/`, {
+            method: 'GET',
+        })
 
         if (!response.ok) {
             const errorData = await response.json()
@@ -286,8 +279,8 @@ async function loadDashboardData() {
 
         // UI 업데이트
         updateDashboardCards(dashboardData)
-    } catch (error) {
-        console.error('대시보드 데이터 로딩 중 오류 발생', error)
+    } catch (e) {
+        console.error('대시보드 데이터 로딩 중 오류 발생', e)
     }
 }
 
@@ -333,28 +326,16 @@ function updateDashboardCards(data) {
 }
 
 
-// 유저 프로필
 async function fetchUserProfile() {
-    try {
-        const response = await fetch(`${backend_base_url}/users/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        })
-        if (response.ok) {
-            const userData = await response.json()
-            console.log(userData)
-            return userData
-        } else {
-            const errorData = await response.json()
-            console.log(errorData)
-            showToast(`사용자 정보 불러오기 실패: ${errorData.detail || '알 수 없는 오류'}`, 'danger', '오류')
-            return null
-        }
-    } catch (error) {
-        showToast('사용자 정보 불러오기 중 네트워크 오류가 발생했습니다.', 'danger', '오류')
+    const url = `${backend_base_url}/users/`
+    const response = await authFetch(url, { method: 'GET' })
+
+    if (response && response.ok) {
+        const userData = await response.json()
+        console.log(userData)
+        return userData
+    } else {
+        console.log('사용자 정보 불러오기 실패')
         return null
     }
 }
@@ -363,22 +344,16 @@ async function fetchUserProfile() {
 // 마이페이지 수정
 async function updateProfile(data) {
     try {
-        const response = await fetch(`${backend_base_url}/users/`, {
+        const response = await authFetch(`${backend_base_url}/users/`, {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
             body: JSON.stringify(data)
-
         })
-
         if (response.ok) {
             const updateUserData = await response.json()
 
-
             const currentPayload = JSON.parse(localStorage.getItem('payload'))
-            const newPayload = { ...currentPayload } // 복사
+            const newPayload = { ...currentPayload } // 복시
+
 
             if (updateUserData.nickname) newPayload.nickname = updateUserData.nickname
             localStorage.setItem('payload', JSON.stringify(newPayload))
@@ -390,8 +365,8 @@ async function updateProfile(data) {
             showToast('프로필 수정 실패', 'danger')
             return false
         }
-    } catch (error) {
-        console.log('네트워크에러', error)
+    } catch (e) {
+        console.log('네트워크에러', e)
         return false
     }
 }
@@ -400,38 +375,29 @@ async function updateProfile(data) {
 // 회원 탈퇴
 async function deleteUser() {
     try {
-        const response = await fetch(`${backend_base_url}/users/`, {
+        const response = await authFetch(`${backend_base_url}/users/`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
         })
 
         if (response.status == 204) {
             return true
         } else {
-            const error = await response.json()
-            console.log('회원 탈퇴 실패', error, response.status)
+            const errorData = await response.json()
+            console.log('회원 탍퇴 실패', errorData)
             return false
         }
     } catch (error) {
-        console.log('네트워크 오류')
+        console.log('네트워크 오류', error)
         return false
     }
-
 }
 
 
 // 비밀번호 변경
 async function changePassword(data) {
     try {
-        const response = await fetch(`${backend_base_url}/users/password-change/`, {
+        const response = await authFetch(`${backend_base_url}/users/password-change/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
             body: JSON.stringify(data)
         })
 
@@ -467,4 +433,96 @@ async function changePassword(data) {
         showToast('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'danger', '네트워크 오류');
         return false
     }
+}
+
+
+// access token 재발급
+async function tokenRefresh() {
+    try {
+        const response = await fetch(`${backend_base_url}/users/refresh/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        })
+        if (response.status === 200) {
+            if (typeof injectNavbar === 'function') { // 함수가 정의되어 있는지 확인 후 호출
+                injectNavbar();
+            }
+            console.log('access token 재발급 성공')
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log('access token 재발급 실패', response.status)
+            showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'danger')
+            await handleLogout()
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        showToast('네트워크 오류가 발생했습니다. 다시 로그인해주세요', 'danger')
+        await handleLogout()
+        return false
+    }
+}
+
+
+// access token 만료 확인 후 재발급 시도
+async function handleAccessTokenExpiration(response, originalRequestFn) {
+    let errorData = null
+
+    try {
+        errorData = await response.clone().json()
+    } catch (e) {
+        console.warn('handleAccessTokenExpiration 오류', e)
+        return response
+    }
+    console.log(errorData, '응답데이터')
+
+    const expired = response.status === 401 && (
+        errorData?.detail === "Authentication credentials were not provided." || // 브라우저: 쿠키 없음
+        errorData?.code === "token_not_valid" ||                                // 만료 토큰 있음
+        errorData?.messages?.some(m => m.message === "Token is expired")       // 메시지 기반 확인
+    )
+
+
+    if (expired) {
+        console.log('access token 만료 감지, 재발급 시도 중')
+        const refreshSuccess = await tokenRefresh()
+
+        if (refreshSuccess) {
+            console.log('access token 재발급 성공! 원래 요청 재시도')
+            return await originalRequestFn()
+        } else {
+            console.log('access token 재발급 실패')
+            return null
+        }
+    }
+
+    return response
+}
+
+
+// 모든 fetch 요청을 감싸는 공통 함수(access token 만료 시 자동으로 발급 처리해줌)
+async function authFetch(url, options = {}) {
+    // fetch를 실제로 실행하는 함수
+    const actualFetchRequest = async () => {
+        return await fetch(url, {
+            ...options,
+            credentials: 'include', // 쿠키 항상 포함
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            }
+        })
+    }
+
+    // 1차 요청
+    let response = await actualFetchRequest()
+
+    // 만료 확인 및 refresh 처리
+    response = await handleAccessTokenExpiration(response, actualFetchRequest)
+
+    return response
 }
