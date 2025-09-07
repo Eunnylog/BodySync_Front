@@ -58,6 +58,7 @@
 
                     });
                     const response_json = await response.json()
+                    console.log(response_json)
                     if (response.status === 200) {
                         showToast('로그인 성공! 환영합니다!', 'success')
                         localStorage.setItem('payload', JSON.stringify(response_json.payload))
