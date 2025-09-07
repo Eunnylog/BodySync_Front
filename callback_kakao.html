@@ -50,7 +50,12 @@
                             'Content-Type': 'application/json',
                         },
                         credentials: 'include',
-                        body: JSON.stringify({ 'code': code })
+                        // body: JSON.stringify({ 'code': code })
+                        body: JSON.stringify({
+                            code: code,
+                            redirect_uri: "https://body-sync.shop/callback_kakao.html"
+                        })
+
                     });
 
                     if (response.status === 200) {
