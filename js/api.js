@@ -1,7 +1,7 @@
-// const backend_base_url = 'http://localhost:8000'
-// const frontend_base_url = "http://localhost:5500"
-const backend_base_url = "https://api.body-sync.shop";
-const frontend_base_url = "https://body-sync.shop";
+const backend_base_url = 'http://localhost:8000'
+const frontend_base_url = "http://localhost:5500"
+// const backend_base_url = "https://api.body-sync.shop";
+// const frontend_base_url = "https://body-sync.shop";
 
 
 
@@ -245,10 +245,10 @@ async function handleLogout() {
 
 
 const KAKAO_CLIENT_ID = "69ffa5c0f47c5c7084def27b4dee214b"
-const KAKAO_REDIRECT_URI = "http://localhost:5500/callback_kakao.html"
+const KAKAO_REDIRECT_URI = "https://body-sync.shop/callback_kakao.html"
 
 const GOOGLE_CLIENT_ID = "804892791014-jesh4bfaabudi6up3b1ke554r8binvff.apps.googleusercontent.com"
-const GOOGLE_REDIRECT_URI = "http://localhost:5500/callback_google.html"
+const GOOGLE_REDIRECT_URI = "https://body-sync.shop/callback_google.html"
 
 
 
