@@ -53,7 +53,6 @@
                         credentials: 'include',
                         body: JSON.stringify({ 'code': code })
                     });
-                    console.log('response', response.json())
 
                     if (response.status === 200) {
                         showToast('로그인 성공! 환영합니다!', 'success')
