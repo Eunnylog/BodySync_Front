@@ -1,7 +1,8 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
-const backend_base_url = process.env.backend_base_url
-const frontend_base_url = process.env.frontend_base_url
+const backend_base_url = "https://api.body-sync.shop";
+const frontend_base_url = "https://body-sync.shop";
+
 
 
 let commonToastInstance;
