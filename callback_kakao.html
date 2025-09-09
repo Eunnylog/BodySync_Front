@@ -50,7 +50,6 @@
                             'Content-Type': 'application/json',
                         },
                         credentials: 'include',
-                        // body: JSON.stringify({ 'code': code })
                         body: JSON.stringify({
                             code: code,
                             redirect_uri: "https://body-sync.shop/callback_kakao.html"
@@ -85,23 +84,23 @@
                         }
 
                         showToast(`로그인 실패: ${errorMessage}`, 'danger', '오류')
-                        // setTimeout(() => {
-                        //     window.location.href = '/index.html';
-                        // }, 2000);
+                        setTimeout(() => {
+                            window.location.href = '/index.html';
+                        }, 2000);
                     }
                 } catch (error) {
                     console.error('카카오 로그인 네트워크 오류:', error)
                     showToast('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'danger', '네트워크 오류')
-                    // setTimeout(() => {
-                    //     window.location.href = '/index.html'
-                    // }, 2000);
+                    setTimeout(() => {
+                        window.location.href = '/index.html'
+                    }, 2000);
                 }
             } else {
                 console.warn('인가 코드가 없습니다. 카카오 로그인 흐름에 문제가 있거나 사용자가 취소했습니다.')
                 showToast('로그인에 필요한 정보가 없습니다.', 'warning', '로그인 오류')
-                // setTimeout(() => {
-                //     window.location.href = '/index.html'
-                // }, 2000);
+                setTimeout(() => {
+                    window.location.href = '/index.html'
+                }, 2000);
             }
         });
 

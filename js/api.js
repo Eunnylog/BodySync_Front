@@ -461,13 +461,13 @@ async function tokenRefresh() {
             const errorData = await response.json()
             console.log('access token 재발급 실패', response.status)
             showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'danger')
-            // await handleLogout()
+            await handleLogout()
             return false
         }
     } catch (error) {
         console.log('네트워크 오류', error)
         showToast('네트워크 오류가 발생했습니다. 다시 로그인해주세요', 'danger')
-        // await handleLogout()
+        await handleLogout()
         return false
     }
 }
