@@ -9,7 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const foodSearchResultUI = document.getElementById('food-search-results')
     const selectedFoodsList = document.getElementById('selected-foods')
 
-
+    const mealRecordForm = document.getElementById('meal-record-form')
+    const mealDateInput = document.getElementById('meal-date')
+    const mealTimeInput = document.getElementById('meal-time')
+    const mealNoteInput = document.getElementById('meal-note')
+    const mealTypeSelect = document.getElementById('meal-type')
 
     if (foodCreateModal) {
         foodCreateModal.addEventListener('hide.bs.modal', function () {
@@ -228,12 +232,23 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('계산 시작 SelectedItems', SelectedItems)
 
         SelectedItems.forEach(item => {
-            const caloriesPer100g = parseFloat(item.dataset.foodCalories || 0)
-            const carbsPer100g = parseFloat(item.dataset.foodCarbs || 0)
-            const proteinPer100g = parseFloat(item.dataset.foodProtein || 0)
-            const fatPer100g = parseFloat(item.dataset.foodFat || 0)
-            const sugarPer100g = parseFloat(item.dataset.foodSugars || 0)
-            const fiberPer100g = parseFloat(item.dataset.foodFiber || 0)
+            const caloriesPer100g = parseFloat(item.dataset.foodCalories)
+            const finalCaloriesPer100g = isNaN(caloriesPer100g) ? 0 : caloriesPer100g
+
+            const carbsPer100g = parseFloat(item.dataset.foodCarbs)
+            const finalCarbsPer100g = isNaN(carbsPer100g) ? 0 : carbsPer100g
+
+            const proteinPer100g = parseFloat(item.dataset.foodProtein)
+            const finalProteinPer100g = isNaN(proteinPer100g) ? 0 : proteinPer100g
+
+            const fatPer100g = parseFloat(item.dataset.foodFat)
+            const finalFatPer100g = isNaN(fatPer100g) ? 0 : fatPer100g
+
+            const sugarsPer100g = parseFloat(item.dataset.foodSugars)
+            const finalSugarsPer100g = isNaN(sugarsPer100g) ? 0 : sugarsPer100g
+
+            const fiberPer100g = parseFloat(item.dataset.foodFiber)
+            const finalFiberPer100g = isNaN(fiberPer100g) ? 0 : fiberPer100g
 
             const quantityInput = item.querySelector('.food-quantity-input')
             const quantity = parseFloat(quantityInput.value || 0)
@@ -241,12 +256,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (quantity > 0) {
                 const ratio = quantity / 100
 
-                totalCalories += caloriesPer100g * ratio
-                totalCarbs += carbsPer100g * ratio
-                totalProtein += proteinPer100g * ratio
-                totalFat += fatPer100g * ratio
-                totalSugars += sugarPer100g * ratio
-                totalFiber += fiberPer100g * ratio
+                totalCalories += finalCaloriesPer100g * ratio
+                totalCarbs += finalCarbsPer100g * ratio
+                totalProtein += finalProteinPer100g * ratio
+                totalFat += finalFatPer100g * ratio
+                totalSugars += finalSugarsPer100g * ratio
+                totalFiber += finalFiberPer100g * ratio
             }
         })
 
@@ -259,6 +274,68 @@ document.addEventListener('DOMContentLoaded', function () {
         totalFiberSpan.textContent = totalFiber.toFixed(2)
 
         console.log('계산 완료 total calories:', totalCalories)
+    }
+
+    // 페이지 로드 시 날짜와 시간 기본값 설정
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const date = String(today.getDate()).padStart(2, '0')
+
+    const hours = String(today.getHours()).padStart(2, '0')
+    const minutes = String(today.getMinutes()).padStart(2, '0')
+
+    mealDateInput.value = `${year}-${month}-${date}`
+    mealTimeInput.value = `${hours}:${minutes}`
+
+    // 식사 등록 폼
+    if (mealRecordForm) {
+        mealRecordForm.addEventListener('submit', async function (e) {
+            e.preventDefault()
+
+            console.log('식사 등록 폼 제출 완료')
+
+            // 1. 식사 정보 가져오기
+            const mealType = mealTypeSelect.value
+            const mealDate = mealDateInput.value
+            const mealTime = mealTimeInput.value
+            const mealNote = mealNoteInput.value
+
+            // 2. 선택된 음식 정보
+            const selectedFoods = []
+            const foodItems = selectedFoodsList.querySelectorAll('.selected-food-item')
+            foodItems.forEach(item => {
+                const foodId = item.dataset.foodId
+                const quantity = parseFloat(item.querySelector('.food-quantity-input').value)
+                const unit = item.querySelector('.food-unit-select').value
+
+                selectedFoods.push({
+                    food: foodId, // foodItem.food
+                    quantity: quantity, //foodItem.quantity
+                    unit: unit, // foodItem.unit
+                })
+            })
+
+            const submissionData = {
+                meal_type: mealType, // MealRecord.meal_type
+                date: mealDate, // mealRecord.date
+                time: `${mealDate}T${mealTime}:00`, // mealRecord.time
+                notes: mealNote, // mealRecord.note
+                foods: selectedFoods, // FoodItem
+            }
+            console.log('서버 전송 데이터:', submissionData)
+
+            const success = await MealRecordFetch(submissionData)
+
+            if (success) {
+                window.showToast('식단 기록 완료!', 'success')
+                setTimeout(function () {
+                    window.location.href = 'index.html'
+                }, 1500)
+            } else {
+                window.showToast('식단 기록 실패, 다시 시도해주세요.', 'danger')
+            }
+        })
     }
 })
 

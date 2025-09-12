@@ -296,10 +296,28 @@ function updateDashboardCards(data) {
     // 1. 식단 요약 카드 업데이트
     const mealData = data.meal_summary
     if (mealData) {
-        document.getElementById('meal-calories-display').innerText = `${parseFloat(mealData.today_calories).toFixed(0)}`
-        document.getElementById('meal-carbs-display').innerHTML = `${parseFloat(mealData.today_carbs).toFixed(1)}`
-        document.getElementById('meal-protein-display').innerText = `${parseFloat(mealData.today_protein).toFixed(1)}`
-        document.getElementById('meal-fat-display').innerText = `${parseFloat(mealData.today_fat).toFixed(1)}`
+        const calories = parseFloat(mealData.today_calories)
+        document.getElementById('meal-calories-display').innerText = `${isNaN(calories) ? 0 : calories.toFixed(0)}`
+
+        // 탄수화물
+        const carbs = parseFloat(mealData.today_carbs)
+        document.getElementById('meal-carbs-display').innerHTML = `${isNaN(carbs) ? 0 : carbs.toFixed(1)}`
+
+        // 단백질
+        const protein = parseFloat(mealData.today_protein)
+        document.getElementById('meal-protein-display').innerText = `${isNaN(protein) ? 0 : protein.toFixed(1)}`
+
+        // 지방
+        const fat = parseFloat(mealData.today_fat)
+        document.getElementById('meal-fat-display').innerText = `${isNaN(fat) ? 0 : fat.toFixed(1)}`
+
+        // 당류
+        const sugars = parseFloat(mealData.today_sugars)
+        document.getElementById('meal-sugars-display').innerText = `${isNaN(sugars) ? 0 : sugars.toFixed(2)}`
+
+        // 식이섬유
+        const fiber = parseFloat(mealData.today_fiber)
+        document.getElementById('meal-fiber-display').innerText = `${isNaN(fiber) ? 0 : fiber.toFixed(2)}`
     }
 
     // 2. 운동 요약 카드 업데이트
@@ -577,5 +595,28 @@ async function FoodSearchFetch(searchStr) {
         console.error('네트워크 오류', error)
         window.showToast('네트워크 오류 발생', 'danger')
         return null
+    }
+}
+
+// 식단 등록
+async function MealRecordFetch(submissionData) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/`, {
+            method: 'POST',
+            body: JSON.stringify(submissionData)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log('mealRecord POST 성공', response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error('mealRecord POST 실패', response_json)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
     }
 }
