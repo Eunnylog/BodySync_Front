@@ -35,10 +35,10 @@ body {
     background-color: #fd6f22;
     border: #fd6f22;
     color: #ffff;
-    padding: 10px 12px;
+    /* padding: 10px 12px; */
     border-radius: 5px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    /* margin-top: 15px;
+    margin-bottom: 15px; */
 }
 
 .my-btn:hover {
@@ -129,4 +129,30 @@ body {
     font-size: 18px;
     border-radius: 0px;
     font-weight: 500;
+}
+
+.mybtn-outline {
+    background-color: #ffff;
+    border-color: #fd6f22;
+    color: #fd6f22;
+    border-width: 2px;
+    margin-left: calc(-1 * var(--bs-border-width));
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
+.mybtn-outline:hover {
+    background-color: #fd6f22;
+    border: #fd6f22;
+    color: #fff;
+    border-width: 2px;
+}
+
+.mybtn-outline:active {
+    background-color: #e8530e !important;
+    border: #e8530e !important;
+    color: #ffff !important;
+    /* transform: translateY(1px); */
+    border-width: 2px;
 }

@@ -1,5 +1,7 @@
-const backend_base_url = 'http://localhost:8000'
-const frontend_base_url = "http://localhost:5500"
+// const backend_base_url = 'http://localhost:8000'
+// const frontend_base_url = "http://localhost:5500"
+const backend_base_url = 'http://127.0.0.1:8000'
+const frontend_base_url = "http://127.0.0.1:5500"
 // const backend_base_url = "https://api.body-sync.shop";
 // const frontend_base_url = "https://body-sync.shop";
 
@@ -530,4 +532,50 @@ async function authFetch(url, options = {}) {
     response = await handleAccessTokenExpiration(response, actualFetchRequest)
 
     return response
+}
+
+
+// 음식 등록
+async function FoodCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+// 음식 검색
+async function FoodSearchFetch(searchStr) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/?food-search=${encodeURIComponent(searchStr)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log('음식 검색 성공', data)
+            return data
+        } else {
+            const errorData = await response.json()
+            console.log('음식 검색 실패', errorData)
+            return null
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        window.showToast('네트워크 오류 발생', 'danger')
+        return null
+    }
 }
