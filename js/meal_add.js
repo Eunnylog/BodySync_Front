@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
+    // 음식 추가 버튼
     if (foodSearchResultUI) {
         foodSearchResultUI.addEventListener('click', function (event) {
             if (event.target.classList.contains('add-food-btn')) {
@@ -182,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             ${addBtn.dataset.foodBaseUnit !== '개' ? '<option value="개">개</option>' : ''} <!-- '개' 같은 다른 단위도 추가 가능 -->
                         </select>
                     </div>
-                    <button type="button" class="btn btn-outline-danger remove-food-btn btn-sm ms-2">삭제</button>
+                    <button type="button" class="btn btn-outline-danger remove-food-btn btn-sm ms-2" data-food-name="${foodName}">삭제</button>
                 `;
                 selectedFoodsList.appendChild(selectedFoodLi)
 
@@ -193,22 +194,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 // // 검색 결과 목록에서 선택된 음식 항목 제거 (선택 사항)
                 // addButton.closest('li').remove();
             }
-            // '삭제' 버튼 클릭 시 (이벤트 위임으로 이미 붙어있는 리스너)
-            else if (event.target.classList.contains('remove-food-btn')) {
-                console.log('선택된 음식 삭제 버튼 클릭!');
-                event.target.closest('.selected-food-item').remove()
+        })
+    }
 
-                // 만약 모든 음식을 삭제했다면 placeholder 다시 표시 (선택 사항)
-                if (selectedFoodsList.children.length === 0) {
-                    selectedFoodsList.innerHTML = `
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>선택한 음식이 이곳에 추가됩니다.</span>
-                        </li>`;
+    if (selectedFoodsList) {
+        selectedFoodsList.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-food-btn')) {
+                const itemToRemove = event.target.closest('.selected-food-item')
+                if (itemToRemove) {
+                    const removeBtn = event.target
+                    const foodName = removeBtn.dataset.foodName
+                    console.log(foodName, 'target')
+                    itemToRemove.remove()
+                    window.showToast(`'${foodName}'이(가) 삭제되었습니다!`, 'danger')
+
+                    calculateTotalMacros()
+
+                    if (selectedFoodsList.children.length === 0) {
+                        selectedFoodsList.innerHTML = `
+                        <li class="list-group-item d-flex justify-content-between align-items-center" id="selected-foods-placeholder">
+                        <span>선택한 음식이 이곳에 추가됩니다.</span>
+                        </li>`
+                    }
                 }
             }
         })
-
     }
+
 
     // 매크로와 당류, 식이섬유 계산
     const selectedFoodList = document.getElementById('selected-foods')
