@@ -599,11 +599,11 @@ async function FoodSearchFetch(searchStr) {
 }
 
 // 식단 등록
-async function MealRecordFetch(submissionData) {
+async function createMealRecord(data) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/meal-records/`, {
             method: 'POST',
-            body: JSON.stringify(submissionData)
+            body: JSON.stringify(data)
         })
 
         if (response.ok) {
@@ -618,5 +618,26 @@ async function MealRecordFetch(submissionData) {
     } catch (error) {
         console.log('네트워크 오류', error)
         return false
+    }
+}
+
+async function readMealRecords(date) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/?date=${encodeURIComponent(date)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            response_json = await response.json()
+            console.log(response_json)
+            return response_json
+        } else {
+            const errorData = await response.json()
+            console.error('readMealRecords GET 실패', errorData)
+            return null
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return null
     }
 }

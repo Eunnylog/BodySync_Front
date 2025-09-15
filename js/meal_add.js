@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             console.log('서버 전송 데이터:', submissionData)
 
-            const success = await MealRecordFetch(submissionData)
+            const success = await createMealRecord(submissionData)
 
             if (success) {
                 window.showToast('식단 기록 완료!', 'success')
