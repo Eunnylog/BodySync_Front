@@ -191,13 +191,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 calculateTotalMacros()
 
-                // // 검색 결과 목록에서 선택된 음식 항목 제거 (선택 사항)
-                // addButton.closest('li').remove();
             }
         })
     }
 
     if (selectedFoodsList) {
+        // 음식 추가
         selectedFoodsList.addEventListener('click', function (event) {
             if (event.target.classList.contains('remove-food-btn')) {
                 const itemToRemove = event.target.closest('.selected-food-item')
@@ -217,6 +216,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         </li>`
                     }
                 }
+            }
+        })
+
+        // 양 변경
+        selectedFoodsList.addEventListener('change', function (event) {
+            if (event.target.classList.contains('food-quantity-input') || event.target.classList.contains('food-unit-select')) {
+                calculateTotalMacros()
             }
         })
     }
@@ -302,6 +308,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 식사 등록 폼
     if (mealRecordForm) {
+        mealRecordForm.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault()
+            }
+        })
+
+
         mealRecordForm.addEventListener('submit', async function (e) {
             e.preventDefault()
 
@@ -350,4 +363,3 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 })
-
