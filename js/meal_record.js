@@ -26,8 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
         for (const mealTypeKey of mealType) {
             const recordsMealType = mealRecordData[mealTypeKey]
             if (recordsMealType && recordsMealType.length > 0) {
-                // const mealCardBox = document.createElement('div')
-                // mealCardBox.className = `card text-bg-light mb-2 w-100 ${mealTypeKey}-box`
                 const fragment = document.createDocumentFragment()
 
                 recordsMealType.forEach(record => {
@@ -136,6 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // date input에서 직접 변경
     dateInput.addEventListener('change', async function () {
         const selectedDate = new Date(this.value)
-        await changeDate()
+        await initializeDateInput(selectedDate)
     })
 })
