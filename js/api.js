@@ -576,7 +576,7 @@ async function FoodCreateFetch(data) {
 }
 
 // 음식 검색
-async function FoodSearchFetch(searchStr) {
+async function foodSearchFetch(searchStr) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/foods/?food-search=${encodeURIComponent(searchStr)}`, {
             method: 'GET',
@@ -621,7 +621,7 @@ async function createMealRecord(data) {
     }
 }
 
-async function readMealRecords(date) {
+async function getMealRecords(date) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/meal-records/?date=${encodeURIComponent(date)}`, {
             method: 'GET',
@@ -633,11 +633,66 @@ async function readMealRecords(date) {
             return response_json
         } else {
             const errorData = await response.json()
-            console.error('readMealRecords GET 실패', errorData)
+            console.error('getMealRecords GET 실패', errorData)
             return null
         }
     } catch (error) {
         console.log('네트워크 오류', error)
         return null
+    }
+}
+
+
+async function getMealRecord(mealRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}`, {
+            method: 'GET'
+        })
+
+        if (response.ok) {
+            const record = await response.json()
+            data = {
+                date: record.date,
+                time: record.time,
+                meal_type: record.meal_type,
+                food_items: record.food_items,
+                notes: record.notes,
+            }
+            return data
+        } else {
+            const errorData = response.json()
+            console.log(errorData)
+            return null
+        }
+
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return null
+    }
+}
+
+
+
+// meal record Patch
+async function updateMealRecord(data, mealRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
     }
 }

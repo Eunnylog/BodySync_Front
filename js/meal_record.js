@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             editBtn.classList.add('btn', 'btn-outline-warning', 'btn-sm', 'edit-food-item-btn')
                             editBtn.setAttribute('data-record-id', record.id)
                             editBtn.setAttribute('data-food-item-id', item.id)
+                            editBtn.setAttribute('onclick', `window.location.href='meal_add.html?id=${record.id}'`)
 
                             const removeBtn = document.createElement('button')
                             removeBtn.classList.add('btn', 'btn-outline-danger', 'btn-sm', 'remove-food-item-btn')
@@ -92,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const formattedDate = `${year}-${month}-${day}`
         dateInput.value = formattedDate
 
-        const mealRecordsData = await readMealRecords(formattedDate)
+        const mealRecordsData = await getMealRecords(formattedDate)
 
         if (mealRecordsData) {
             console.log('초기 식단 불러오기 성공')

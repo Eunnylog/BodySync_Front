@@ -1,226 +1,514 @@
-console.log('meal_add.html')
-document.addEventListener('DOMContentLoaded', function () {
-    const foodCreateModal = document.getElementById('food-create-modal')
-    const foodCreateForm = document.getElementById('food-create-form')
-    const bsFoodCreateModal = new bootstrap.Modal(foodCreateModal)
+const urlPrams = new URLSearchParams(window.location.search)
+const mealRecordId = urlPrams.get('id')
 
-    const foodSearchBtn = document.getElementById('food-search-btn')
-    const foodSearchInput = document.getElementById('food-search-input')
-    const foodSearchResultUI = document.getElementById('food-search-results')
-    const selectedFoodsList = document.getElementById('selected-foods')
+// 식사 수정 모드 유무
+let isEdit = false
+let mealRecordData = null
 
-    const mealRecordForm = document.getElementById('meal-record-form')
-    const mealDateInput = document.getElementById('meal-date')
-    const mealTimeInput = document.getElementById('meal-time')
-    const mealNoteInput = document.getElementById('meal-note')
-    const mealTypeSelect = document.getElementById('meal-type')
+let pageTitle
+let foodCreateModal
+let foodCreateForm
+let bsFoodCreateModal
+let foodSearchBtn
+let foodSearchInput
+let foodSearchResultUI
+let selectedFoodsList
+let mealRecordForm
+let mealDateInput
+let mealTimeInput
+let mealNoteInput
+let mealTypeSelect
 
-    if (foodCreateModal) {
-        foodCreateModal.addEventListener('hide.bs.modal', function () {
-            const foodName = document.getElementById('food-create-name')
-            const foodCalories = document.getElementById('food-create-calories')
-            const foodCarbs = document.getElementById('food-create-carbs')
-            const foodSugars = document.getElementById('food-create-sugars')
-            const foodFiber = document.getElementById('food-create-fiber')
-            const foodProtein = document.getElementById('food-create-protein')
-            const foodFat = document.getElementById('food-create-fat')
-            const foodBaseUnit = document.getElementById('base-unit')
+// 음식 생성 모달 Input들
+let foodNameInput
+let foodCaloriesInput
+let foodCarbsInput
+let foodSugarsInput
+let foodFiberInput
+let foodProteinInput
+let foodFatInput
+let foodBaseUnitInput
 
-            if (foodName) foodName.value = ""
-            if (foodCalories) foodCalories.value = ""
-            if (foodCarbs) foodCarbs.value = ""
-            if (foodSugars) foodSugars.value = ""
-            if (foodFiber) foodFiber.value = ""
-            if (foodProtein) foodProtein.value = ""
-            if (foodFat) foodFat.value = ""
-            if (foodBaseUnit) foodBaseUnit.value = ""
-        })
+// 선택된 음식의 총 영양성분 Span들
+let totalCaloriesSpan
+let totalCarbsSpan
+let totalProteinSpan
+let totalFatSpan
+let totalSugarsSpan
+let totalFiberSpan
 
-        // 음식 등록 후 식사 등록 모달로 돌아가기
-        foodCreateForm.addEventListener('submit', async function (e) {
-            e.preventDefault()
 
-            const name = document.getElementById('food-create-name').value
-            const calories = parseFloat(document.getElementById('food-create-calories').value)
-            const carbs = parseFloat(document.getElementById('food-create-carbs').value)
-            const sugars = parseFloat(document.getElementById('food-create-sugars').value)
-            const fiber = parseFloat(document.getElementById('food-create-fiber').value)
-            const protein = parseFloat(document.getElementById('food-create-protein').value)
-            const fat = parseFloat(document.getElementById('food-create-fat').value)
-            const baseUnit = document.getElementById('base-unit').value
+// 페이지 로드 시 날짜 및 시간 설정
+function setMealDateTimeInputs(targetDate = new Date()) {
+    const year = targetDate.getFullYear()
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0')
+    const day = String(targetDate.getDate()).padStart(2, '0')
 
-            const foodData = {
-                "name": name,
-                "calories_per_100g": calories,
-                "carbs_per_100g": carbs,
-                "sugars_per_100g": sugars,
-                "dietary_fiber_per_100g": fiber,
-                "protein_per_100g": protein,
-                "fat_per_100g": fat,
-                "base_unit": baseUnit
-            }
+    const hours = String(targetDate.getHours()).padStart(2, '0')
+    const minutes = String(targetDate.getMinutes()).padStart(2, '0')
 
-            const success = await FoodCreateFetch(foodData)
+    mealDateInput.value = `${year}-${month}-${day}`
+    mealTimeInput.value = `${hours}:${minutes}`
+}
 
-            if (success) {
-                showToast('음식 등록 완료!', 'success')
-                bsFoodCreateModal.hide()
-            } else {
-                showToast('음식 등록 실패했습니다. 다시 시도해주세요', 'danger')
-            }
 
-        })
+// 음식 검색 및 결과 렌더링
+async function performFoodSearch() {
+    const searchStr = foodSearchInput.value.trim()
 
+    if (!searchStr) {
+        window.showToast('검색할 음식을 입력하세요.', 'warning')
+        foodSearchResultUI.innerHTML = '<p class="text-muted">검색어를 입력해주세요.</p>'
+        return
     }
 
-    if (foodSearchBtn) {
-        foodSearchBtn.addEventListener('click', async function () {
-            const searchStr = foodSearchInput.value.trim()
+    console.log(`음식 검색 클릭! 키워드: ${searchStr}`)
+    window.showToast('음식 검색 중...', 'info')
 
-            if (!searchStr) {
-                window.showToast('검색할 음식 값을 입력하세요.', 'warning')
-                return
-            }
+    foodSearchResultUI.innerHTML = ''
 
-            console.log((`음식 검색 클릭! 키워드: ${searchStr}`))
-            window.showToast('음식 검색 중...', 'info')
+    try {
+        const searchResults = await foodSearchFetch(searchStr)
 
-            foodSearchResultUI.innerHTML = ""
-
-            const searchResults = await FoodSearchFetch(searchStr)
-
-            if (searchResults && searchResults.length > 0) {
-                searchResults.forEach(food => {
-                    const li = document.createElement('li')
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center'
-                    li.innerHTML = `
-                        <span>${food.name} (${food.calories_per_100g || 0}kcal / ${food.carbs_per_100g || 0}g / ${food.protein_per_100g || 0}g / ${food.fat_per_100g || 0}g / ${food.sugars_per_100g || 0}g / ${food.dietary_fiber_per_100g || 0}g )</span>
-                        <button type="button" class="btn btn-sm btn-outline-success add-food-btn"
-                        data-food-id="${food.id}" data-food-name="${food.name}" data-food-calories="${food.calories_per_100g}"
-                        data-food-carbs="${food.carbs_per_100g}" data-food-sugars="${food.sugars_per_100g}" data-food-fiber="${food.dietary_fiber_per_100g}"
-                        data-food-protein="${food.protein_per_100g}" data-food-fat="${food.fat_per_100g}" data-food-base-unit="${food.base_unit}">추가</button>
-                    `
-                    foodSearchResultUI.appendChild(li)
-                })
-                window.showToast(`'${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'success')
-            } else {
+        if (searchResults && searchResults.length > 0) {
+            searchResults.forEach(food => {
                 const li = document.createElement('li')
-                li.className = 'list-group-item'
-                li.textContent = `${searchStr}에 대한 검색 결과가 업습니다. 직접 등록해주세요.`
+                li.className = 'list-group-item d-flex justify-content-between align-items-center'
+                li.innerHTML = `
+                <span>${food.name} (${food.calories_per_100g || 0}kcal / ${food.carbs_per_100g || 0}g / ${food.protein_per_100g || 0}g / ${food.fat_per_100g || 0}g / ${food.sugars_per_100g || 0}g / ${food.dietary_fiber_per_100g || 0}g )</span>
+                <button type="button" class="btn btn-sm btn-outline-success add-food-btn"
+                data-food-id="${food.id}" data-food-name="${food.name}" data-food-calories="${food.calories_per_100g}"
+                data-food-carbs="${food.carbs_per_100g || 0}" data-food-sugars="${food.sugars_per_100g || 0}" data-food-fiber="${food.dietary_fiber_per_100g || 0}"
+                data-food-protein="${food.protein_per_100g || 0}" data-food-fat="${food.fat_per_100g || 0}" data-food-base-unit="${food.base_unit}">추가</button>
+                `
+
                 foodSearchResultUI.appendChild(li)
-                window.showToast(`'${searchStr}에 대한 검색 결과가 없습니다.`, 'info')
-            }
+            })
+            window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'success')
+        } else {
+            const li = document.createElement('li')
+            li.className = 'list-group-item'
+            li.textContent = `${searchStr}에 대한 검색 결과가 없습니다. 직접 등록해주세요.`
+            foodSearchResultUI.appendChild(li)
+            window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'info')
+        }
+    } catch (error) {
+        console.error('음식 검색 중 오류 발생', error)
+        foodSearchResultUI.innerHTML = '<p class="text-danger">음식 검색 중 오류가 발생했습니다.</p>'
+        window.showToast('음식 검색 중 오류가 발생했습니다.', 'danger')
+    }
+}
+
+
+
+// 선택한 음식 결과 리스트에 렌더
+function addFoodItemToSelectedList(foodDetails, initialQuantity = 100, initialUnit = null) {
+    const { foodId, foodName, foodCalories, foodCarbs, foodProtein, foodFat, foodSugars, foodFiber, foodBaseUnit } = foodDetails
+
+    // 1. 중복 확인
+    let isDuplicate = false
+    const existingFoodItems = selectedFoodsList.querySelectorAll('.selected-food-item')
+    existingFoodItems.forEach(item => {
+        if (item.dataset.foodId === foodId) {
+            isDuplicate = true
+        }
+    })
+
+    if (isDuplicate) {
+        window.showToast(`${foodName}은(는) 이미 선택된 음식입니다.`, 'warning')
+        return
+    }
+
+    // 2. placeholder 제거 (선택된 음식 없을 때)
+    const placeholderLi = selectedFoodsList.querySelector('li > span')
+    if (placeholderLi && placeholderLi.textContent.includes('선택한 음식이 이곳에 추가됩니다.')) {
+        selectedFoodsList.innerHTML = ''
+    }
+
+    // 3. 새로운 음식 선택 시 li 요소 생성 및 데이터 할당
+    const selectedFoodLi = document.createElement('li')
+    selectedFoodLi.className = 'list-group-item d-flex justify-content-between align-items-center selected-food-item'
+
+    selectedFoodLi.dataset.foodId = foodId
+    selectedFoodLi.dataset.foodName = foodName
+    selectedFoodLi.dataset.foodCalories = foodCalories
+    selectedFoodLi.dataset.foodCarbs = foodCarbs
+    selectedFoodLi.dataset.foodSugars = foodSugars
+    selectedFoodLi.dataset.foodFiber = foodFiber
+    selectedFoodLi.dataset.foodProtein = foodProtein
+    selectedFoodLi.dataset.foodFat = foodFat
+    selectedFoodLi.dataset.foodBaseUnit = foodBaseUnit
+
+    const unitOptionsHTML = []
+    const availableUnits = new Set([foodBaseUnit, 'g', 'ml', '개'])
+
+    availableUnits.forEach(unit => {
+        let optionHtml = `<option value="${unit}">${unit}</option>`;
+        if (unit === (initialUnit || foodBaseUnit)) {
+            optionHtml = `<option value="${unit}" selected>${unit}</option>`;
+        }
+        unitOptionsHTML.push(optionHtml);
+    })
+
+    // 섭취량의 초기값과 단위 초기값 설정
+    const displayQuantity = initialQuantity || 100
+
+    selectedFoodLi.innerHTML = `
+        <div class="input-group flex-grow-1" style="width:65%;">
+            <input type="hidden" name="food_id[]" value="${foodId}">
+            <span class="input-group-text text-center" style="width:30%;">${foodName}</span>
+            <input type="number" name="quantity[]" class="form-control food-quantity-input" placeholder="섭취량" min="1" required value="${displayQuantity}">
+            <select name="unit[]" class="form-select food-unit-select">
+                ${unitOptionsHTML.join('')}
+            </select>
+        </div>
+        <button type="button" class="btn btn-outline-danger remove-food-btn btn-sm ms-2" data-food-name="${foodName}">삭제</button>`
+
+    selectedFoodsList.appendChild(selectedFoodLi)
+    window.showToast(`${foodName}이(가) 선택되었습니다.`, 'success')
+    calculateTotalMacros()
+}
+
+
+
+// 선택된 음식 삭제
+function removeSelectedFoodItem(itemToRemoveElement, foodName) {
+    if (!itemToRemoveElement) return
+
+    itemToRemoveElement.remove()
+    window.showToast(`${foodName}이(가) 삭제되었습니다.`, 'danger')
+
+    calculateTotalMacros()
+
+    if (selectedFoodsList.children.length === 0) {
+        selectedFoodsList.innerHTML = `
+        <li class="list-group-item d-flex justify-content-between align-items-center" id="selected-foods-placeholder">
+        <span>선택한 음식이 이곳에 추가됩니다.</span>
+        </li>`
+    }
+}
+
+
+
+
+// 총 영양성분 계산
+function calculateTotalMacros() {
+    let totalCalories = 0
+    let totalCarbs = 0
+    let totalProtein = 0
+    let totalFat = 0
+    let totalSugars = 0
+    let totalFiber = 0
+
+    const SelectedItems = selectedFoodsList.querySelectorAll('.selected-food-item')
+    console.log('계산 시작 SelectedItems', SelectedItems)
+
+    SelectedItems.forEach(item => {
+        const caloriesPer100g = parseFloat(item.dataset.foodCalories)
+        const finalCaloriesPer100g = isNaN(caloriesPer100g) ? 0 : caloriesPer100g
+
+        const carbsPer100g = parseFloat(item.dataset.foodCarbs)
+        const finalCarbsPer100g = isNaN(carbsPer100g) ? 0 : carbsPer100g
+
+        const proteinPer100g = parseFloat(item.dataset.foodProtein)
+        const finalProteinPer100g = isNaN(proteinPer100g) ? 0 : proteinPer100g
+
+        const fatPer100g = parseFloat(item.dataset.foodFat)
+        const finalFatPer100g = isNaN(fatPer100g) ? 0 : fatPer100g
+
+        const sugarsPer100g = parseFloat(item.dataset.foodSugars)
+        const finalSugarsPer100g = isNaN(sugarsPer100g) ? 0 : sugarsPer100g
+
+        const fiberPer100g = parseFloat(item.dataset.foodFiber)
+        const finalFiberPer100g = isNaN(fiberPer100g) ? 0 : fiberPer100g
+
+        const quantityInput = item.querySelector('.food-quantity-input')
+        const quantity = parseFloat(quantityInput.value || 0)
+
+        if (quantity > 0) {
+            const ratio = quantity / 100
+
+            totalCalories += finalCaloriesPer100g * ratio
+            totalCarbs += finalCarbsPer100g * ratio
+            totalProtein += finalProteinPer100g * ratio
+            totalFat += finalFatPer100g * ratio
+            totalSugars += finalSugarsPer100g * ratio
+            totalFiber += finalFiberPer100g * ratio
+        }
+    })
+
+    // 결과값 업데이트
+    totalCaloriesSpan.textContent = totalCalories.toFixed(2)
+    totalCarbsSpan.textContent = totalCarbs.toFixed(2)
+    totalProteinSpan.textContent = totalProtein.toFixed(2)
+    totalFatSpan.textContent = totalFat.toFixed(2)
+    totalSugarsSpan.textContent = totalSugars.toFixed(2)
+    totalFiberSpan.textContent = totalFiber.toFixed(2)
+
+    console.log('계산 완료 total calories:', totalCalories)
+}
+
+// 식단 기록 수정 폼 채우기
+async function populateFormForEdit(recordId) {
+    const mealData = await getMealRecord(recordId)
+
+    if (mealData) {
+        mealRecordData = mealData
+
+        setMealDateTimeInputs(new Date(mealRecordData.date))
+
+        mealNoteInput.value = mealData.notes || ''
+        if (mealTypeSelect) mealTypeSelect.value = mealData.meal_type || ''
+
+        selectedFoodsList.innerHTML = ''
+        if (mealData.food_items && Array.isArray(mealData.food_items)) {
+            mealData.food_items.forEach(item => {
+                console.log('food_items', mealData.food_items)
+                console.log('item', item)
+                const foodDetails = {
+                    foodId: item.food,
+                    foodName: item.food_name,
+                    foodCalories: item.calories_per_100g,
+                    foodCarbs: item.carbs_per_100g,
+                    foodProtein: item.protein_per_100g,
+                    foodFat: item.fat_per_100g,
+                    foodSugars: item.sugars_per_100g,
+                    foodFiber: item.dietary_fiber_per_100g,
+                    foodBaseUnit: item.base_unit,
+                }
+
+                addFoodItemToSelectedList(foodDetails, item.quantity, item.unit)
+
+            })
+        }
+        calculateTotalMacros()
+        return true
+    } else {
+        console.error('addFoodItemToSelectedList 식단 기록 불러오기 실패')
+        window.showToast('식단 기록 불러오기 실패', 'danger')
+        return false
+    }
+}
+
+
+// 음식 생성 모달 폼 초기화
+function resetFoodCreateForm() {
+    if (foodNameInput) foodNameInput.value = ''
+    if (foodCaloriesInput) foodCaloriesInput.value = ''
+    if (foodCarbsInput) foodCarbsInput.value = ''
+    if (foodProteinInput) foodProteinInput.value = ''
+    if (foodFatInput) foodFatInput.value = ''
+    if (foodSugarsInput) foodSugarsInput.value = ''
+    if (foodFiberInput) foodFiberInput.value = ''
+    if (foodBaseUnitInput) foodBaseUnitInput.value = ''
+    console.log('food create modal 초기화')
+}
+
+
+// 음식 생성 폼 제출
+async function handleFoodCreationSubmit(e) {
+    e.preventDefault()
+
+    const name = parseFloat(foodNameInput.value)
+    const calories = parseFloat(foodCaloriesInput.value)
+    const carbs = parseFloat(foodCarbsInput.value)
+    const protein = parseFloat(foodProteinInput.value)
+    const fat = parseFloat(foodFatInput.value)
+    const sugars = parseFloat(foodSugarsInput.value)
+    const fiber = parseFloat(foodFiberInput.value)
+    const baseUnit = foodBaseUnitInput.value
+
+    const foodData = {
+        'name': name,
+        'calories_per_100g': calories,
+        'carbs_per_100g': carbs,
+        'protein_per_100g': protein,
+        'fat_per_100g': fat,
+        'sugars_per_100g': sugars,
+        'dietary_fiber_per_100g': fiber,
+        'base_unit': baseUnit
+    }
+
+    const success = await FoodCreateFetch(foodData)
+    if (success) {
+        window.showToast('음식 등록 완료!', 'success')
+        bsFoodCreateModal.hide()
+    } else {
+        window.showToast('음식 등록에 실패했습니다. 다시 시도해 주세요.', 'danger')
+    }
+}
+
+
+
+// meal record 폼 제출
+async function handleMealRecordSubmit(e) {
+    e.preventDefault()
+    console.log()
+
+    const mealType = mealTypeSelect.value
+    const mealDate = mealDateInput.value
+    const mealTime = mealTimeInput.value
+    const mealNote = mealNoteInput.value
+
+    const selectedFoods = []
+    const foodItems = selectedFoodsList.querySelectorAll('.selected-food-item')
+    foodItems.forEach(item => {
+        const foodId = item.dataset.foodId
+        const quantity = parseFloat(item.querySelector('.food-quantity-input').value)
+        const unit = item.querySelector('.food-unit-select').value
+
+        selectedFoods.push({
+            food: foodId,
+            quantity: quantity,
+            unit: unit,
+        })
+    })
+
+    const submissionData = {
+        meal_type: mealType,
+        date: mealDate,
+        time: `${mealDate}T${mealTime}:00`,
+        notes: mealNote,
+        foods: selectedFoods
+    }
+
+
+    if (isEdit) {
+        const editSuccess = await updateMealRecord(submissionData, mealRecordId)
+
+        if (editSuccess) {
+            window.showToast('식단 수정 성공', 'success')
+            setTimeout(() => {
+                window.location.href = 'meal_record.html'
+            }, 1500)
+        } else {
+            window.showToast('식단 수정 실패했습니다. 다시 시도해 주세요', 'danger')
+        }
+
+    } else {
+        const createSuccess = await createMealRecord(submissionData)
+
+        if (createSuccess) {
+            window.showToast('식단 등록 성공', 'success')
+            setTimeout(() => {
+                window.location.href = 'meal_record.html'
+            }, 1500)
+        } else {
+            window.showToast('식단 등록 실패했습니다. 다시 시도해 주세요.', 'danger')
+        }
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', async function () {
+    pageTitle = document.getElementById('page-title')
+    // 음식 추가 모달
+    foodCreateModal = document.getElementById('food-create-modal')
+    foodCreateForm = document.getElementById('food-create-form')
+
+    foodSearchBtn = document.getElementById('food-search-btn')
+    foodSearchInput = document.getElementById('food-search-input')
+    foodSearchResultUI = document.getElementById('food-search-results')
+    selectedFoodsList = document.getElementById('selected-foods')
+
+    // 식단 등록 및 수정 입력창
+    mealRecordForm = document.getElementById('meal-record-form')
+    mealDateInput = document.getElementById('meal-date')
+    mealTimeInput = document.getElementById('meal-time')
+    mealNoteInput = document.getElementById('meal-note')
+    mealTypeSelect = document.getElementById('meal-type')
+
+    // 음식 생성 모달 input
+    foodNameInput = document.getElementById('food-create-name')
+    foodCaloriesInput = document.getElementById('food-create-calories')
+    foodCarbsInput = document.getElementById('food-create-carbs')
+    foodSugarsInput = document.getElementById('food-create-sugars')
+    foodFiberInput = document.getElementById('food-create-fiber')
+    foodProteinInput = document.getElementById('food-create-protein')
+    foodFatInput = document.getElementById('food-create-fat')
+    foodBaseUnitInput = document.getElementById('base-unit')
+
+    // 선택된 음식의 영양성분
+    totalCaloriesSpan = document.getElementById('total-calories')
+    totalCarbsSpan = document.getElementById('total-carbs')
+    totalProteinSpan = document.getElementById('total-protein')
+    totalFatSpan = document.getElementById('total-fat')
+    totalSugarsSpan = document.getElementById('total-sugars')
+    totalFiberSpan = document.getElementById('total-fiber')
+
+
+    // 식단 생성 or 수정 모드
+    if (mealRecordId) {
+        isEdit = true
+        pageTitle.textContent = '식단 기록 수정'
+
+        const success = await populateFormForEdit(mealRecordId)
+
+        if (!success) {
+            isEdit = false
+            // pageTitle.textContent = '식단 기록 등록'
+            setMealDateTimeInputs()
+        }
+    } else {
+        // pageTitle.textContent = '식단 기록 등록'
+        setMealDateTimeInputs()
+    }
+
+    // 음식 생성 모달
+    if (foodCreateModal) {
+        bsFoodCreateModal = new bootstrap.Modal(foodCreateModal)
+        foodCreateModal.addEventListener('hide.bs.modal', resetFoodCreateForm)
+        if (foodCreateForm) {
+            foodCreateForm.addEventListener('submit', handleFoodCreationSubmit)
+        }
+    }
+
+
+    // 음식 검색 버튼
+    if (foodSearchBtn) {
+        foodSearchBtn.addEventListener('click', async () => {
+            await performFoodSearch()
         })
     }
 
     // 음식 추가 버튼
     if (foodSearchResultUI) {
-        foodSearchResultUI.addEventListener('click', function (event) {
+        foodSearchResultUI.addEventListener('click', (event) => {
             if (event.target.classList.contains('add-food-btn')) {
                 const addBtn = event.target
-                const foodId = addBtn.dataset.foodId
-                const foodName = addBtn.dataset.foodName
-                const foodCalories = addBtn.dataset.foodCalories
-                const foodCarbs = addBtn.dataset.foodCarbs
-                const foodSugars = addBtn.dataset.foodSugars
-                const foodFiber = addBtn.dataset.foodFiber
-                const foodProtein = addBtn.dataset.foodProtein
-                const foodFat = addBtn.dataset.foodFat
-                const foodBaseUnit = addBtn.dataset.foodBaseUnit
 
-                console.log('event.target', addBtn)
-                console.log(`음식 추가 버튼 클릭! ID: ${foodId}, 이름: ${foodName}`);
-
-                // 선택된 음식 ul에 새로운 li 추가
-
-                // 중복환인 로직
-                let isDuplicate = false
-                const existingFoodItems = selectedFoodsList.querySelectorAll('.selected-food-item')
-                existingFoodItems.forEach(item => {
-                    console.log(`foodId : ${foodId}, item.dataset.foodId: ${item.dataset.foodId}`)
-
-                    if (item.dataset.foodId === foodId) {
-                        isDuplicate = true
-                    }
-                })
-                if (isDuplicate) {
-                    window.showToast(`${foodName}은(는) 이미 선택된 음식입니다.`, 'warning')
-                    return
+                const foodDetails = {
+                    foodId: addBtn.dataset.foodId,
+                    foodName: addBtn.dataset.foodName,
+                    foodCalories: addBtn.dataset.foodCalories,
+                    foodProtein: addBtn.dataset.foodProtein,
+                    foodFat: addBtn.dataset.foodFat,
+                    foodSugars: addBtn.dataset.foodSugars,
+                    foodFiber: addBtn.dataset.foodFiber,
+                    foodBaseUnit: addBtn.dataset.foodBaseUnit,
                 }
-
-                // 1) "선택한 음식이 이곳에 추가됩니다." placeholder 제거
-                const placeholderLi = selectedFoodsList.querySelector('li > span');
-                if (placeholderLi && placeholderLi.textContent.includes('선택한 음식이 이곳에 추가됩니다.')) {
-                    selectedFoodsList.innerHTML = ''; // ul의 내용을 비웁니다.
-
-                }
-
-                // 새로운 선택 음식 li 요소 생성
-                const selectedFoodLi = document.createElement('li');
-                selectedFoodLi.className = 'list-group-item d-flex justify-content-between align-items-center selected-food-item'
-
-
-                // calculateTotalMacros가 사용할 데이터
-                selectedFoodLi.dataset.foodId = foodId
-                selectedFoodLi.dataset.foodName = foodName
-                selectedFoodLi.dataset.foodCalories = foodCalories
-                selectedFoodLi.dataset.foodCarbs = foodCarbs
-                selectedFoodLi.dataset.foodSugars = foodSugars
-                selectedFoodLi.dataset.foodFiber = foodFiber
-                selectedFoodLi.dataset.foodProtein = foodProtein
-                selectedFoodLi.dataset.foodFat = foodFat
-                selectedFoodLi.dataset.foodBaseUnit = foodBaseUnit
-
-                selectedFoodLi.innerHTML = `
-                    <div class="input-group flex-grow-1" style="width:65%;">
-                        <input type="hidden" name="food_id[]" value="${foodId}">
-                        <span class="input-group-text text-center" style="width:30%;">${foodName}</span>
-                        <input type="number" name="quantity[]" class="form-control food-quantity-input" placeholder="섭취량" min="1" required value="100">
-                        <select name="unit[]" class="form-select food-unit-select">
-                            <option value="${addBtn.dataset.foodBaseUnit}">${addBtn.dataset.foodBaseUnit}</option>
-                            ${addBtn.dataset.foodBaseUnit !== 'g' ? '<option value="g">g</option>' : ''}
-                            ${addBtn.dataset.foodBaseUnit !== 'ml' ? '<option value="ml">ml</option>' : ''}
-                            ${addBtn.dataset.foodBaseUnit !== '개' ? '<option value="개">개</option>' : ''} <!-- '개' 같은 다른 단위도 추가 가능 -->
-                        </select>
-                    </div>
-                    <button type="button" class="btn btn-outline-danger remove-food-btn btn-sm ms-2" data-food-name="${foodName}">삭제</button>
-                `;
-                selectedFoodsList.appendChild(selectedFoodLi)
-
-                window.showToast(`'${foodName}'이(가) 선택되었습니다!`, 'success')
-
-                calculateTotalMacros()
-
+                addFoodItemToSelectedList(foodDetails)
             }
         })
     }
 
+
+    // 선택된 음식 목록 렌더
     if (selectedFoodsList) {
-        // 음식 추가
-        selectedFoodsList.addEventListener('click', function (event) {
+        // 음식 삭제
+        selectedFoodsList.addEventListener('click', (event) => {
             if (event.target.classList.contains('remove-food-btn')) {
                 const itemToRemove = event.target.closest('.selected-food-item')
                 if (itemToRemove) {
-                    const removeBtn = event.target
-                    const foodName = removeBtn.dataset.foodName
-                    console.log(foodName, 'target')
-                    itemToRemove.remove()
-                    window.showToast(`'${foodName}'이(가) 삭제되었습니다!`, 'danger')
-
-                    calculateTotalMacros()
-
-                    if (selectedFoodsList.children.length === 0) {
-                        selectedFoodsList.innerHTML = `
-                        <li class="list-group-item d-flex justify-content-between align-items-center" id="selected-foods-placeholder">
-                        <span>선택한 음식이 이곳에 추가됩니다.</span>
-                        </li>`
-                    }
+                    const foodName = itemToRemove.dataset.foodName
+                    removeSelectedFoodItem(itemToRemove, foodName)
                 }
             }
+
         })
 
         // 양 변경
-        selectedFoodsList.addEventListener('change', function (event) {
+        selectedFoodsList.addEventListener('change', (event) => {
             if (event.target.classList.contains('food-quantity-input') || event.target.classList.contains('food-unit-select')) {
                 calculateTotalMacros()
             }
@@ -228,138 +516,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // 매크로와 당류, 식이섬유 계산
-    const selectedFoodList = document.getElementById('selected-foods')
-    const totalCaloriesSpan = document.getElementById('total-calories')
-    const totalCarbsSpan = document.getElementById('total-carbs')
-    const totalProteinSpan = document.getElementById('total-protein')
-    const totalFatSpan = document.getElementById('total-fat')
-    const totalSugarsSpan = document.getElementById('total-sugars')
-    const totalFiberSpan = document.getElementById('total-fiber')
 
-    // 총 영양성분 계산
-    function calculateTotalMacros() {
-        let totalCalories = 0
-        let totalCarbs = 0
-        let totalProtein = 0
-        let totalFat = 0
-        let totalSugars = 0
-        let totalFiber = 0
-
-        const SelectedItems = selectedFoodList.querySelectorAll('.selected-food-item')
-        console.log('계산 시작 SelectedItems', SelectedItems)
-
-        SelectedItems.forEach(item => {
-            const caloriesPer100g = parseFloat(item.dataset.foodCalories)
-            const finalCaloriesPer100g = isNaN(caloriesPer100g) ? 0 : caloriesPer100g
-
-            const carbsPer100g = parseFloat(item.dataset.foodCarbs)
-            const finalCarbsPer100g = isNaN(carbsPer100g) ? 0 : carbsPer100g
-
-            const proteinPer100g = parseFloat(item.dataset.foodProtein)
-            const finalProteinPer100g = isNaN(proteinPer100g) ? 0 : proteinPer100g
-
-            const fatPer100g = parseFloat(item.dataset.foodFat)
-            const finalFatPer100g = isNaN(fatPer100g) ? 0 : fatPer100g
-
-            const sugarsPer100g = parseFloat(item.dataset.foodSugars)
-            const finalSugarsPer100g = isNaN(sugarsPer100g) ? 0 : sugarsPer100g
-
-            const fiberPer100g = parseFloat(item.dataset.foodFiber)
-            const finalFiberPer100g = isNaN(fiberPer100g) ? 0 : fiberPer100g
-
-            const quantityInput = item.querySelector('.food-quantity-input')
-            const quantity = parseFloat(quantityInput.value || 0)
-
-            if (quantity > 0) {
-                const ratio = quantity / 100
-
-                totalCalories += finalCaloriesPer100g * ratio
-                totalCarbs += finalCarbsPer100g * ratio
-                totalProtein += finalProteinPer100g * ratio
-                totalFat += finalFatPer100g * ratio
-                totalSugars += finalSugarsPer100g * ratio
-                totalFiber += finalFiberPer100g * ratio
-            }
-        })
-
-        // 결과값 업데이트
-        totalCaloriesSpan.textContent = totalCalories.toFixed(2)
-        totalCarbsSpan.textContent = totalCarbs.toFixed(2)
-        totalProteinSpan.textContent = totalProtein.toFixed(2)
-        totalFatSpan.textContent = totalFat.toFixed(2)
-        totalSugarsSpan.textContent = totalSugars.toFixed(2)
-        totalFiberSpan.textContent = totalFiber.toFixed(2)
-
-        console.log('계산 완료 total calories:', totalCalories)
-    }
-
-    // 페이지 로드 시 날짜와 시간 기본값 설정
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, '0')
-    const date = String(today.getDate()).padStart(2, '0')
-
-    const hours = String(today.getHours()).padStart(2, '0')
-    const minutes = String(today.getMinutes()).padStart(2, '0')
-
-    mealDateInput.value = `${year}-${month}-${date}`
-    mealTimeInput.value = `${hours}:${minutes}`
-
-    // 식사 등록 폼
+    // 식사 등록 폼 엔터 전송 prevent
     if (mealRecordForm) {
-        mealRecordForm.addEventListener('keydown', function (event) {
+        mealRecordForm.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault()
             }
         })
 
 
-        mealRecordForm.addEventListener('submit', async function (e) {
-            e.preventDefault()
-
-            console.log('식사 등록 폼 제출 완료')
-
-            // 1. 식사 정보 가져오기
-            const mealType = mealTypeSelect.value
-            const mealDate = mealDateInput.value
-            const mealTime = mealTimeInput.value
-            const mealNote = mealNoteInput.value
-
-            // 2. 선택된 음식 정보
-            const selectedFoods = []
-            const foodItems = selectedFoodsList.querySelectorAll('.selected-food-item')
-            foodItems.forEach(item => {
-                const foodId = item.dataset.foodId
-                const quantity = parseFloat(item.querySelector('.food-quantity-input').value)
-                const unit = item.querySelector('.food-unit-select').value
-
-                selectedFoods.push({
-                    food: foodId, // foodItem.food
-                    quantity: quantity, //foodItem.quantity
-                    unit: unit, // foodItem.unit
-                })
-            })
-
-            const submissionData = {
-                meal_type: mealType, // MealRecord.meal_type
-                date: mealDate, // mealRecord.date
-                time: `${mealDate}T${mealTime}:00`, // mealRecord.time
-                notes: mealNote, // mealRecord.note
-                foods: selectedFoods, // FoodItem
-            }
-            console.log('서버 전송 데이터:', submissionData)
-
-            const success = await createMealRecord(submissionData)
-
-            if (success) {
-                window.showToast('식단 기록 완료!', 'success')
-                setTimeout(function () {
-                    window.location.href = 'index.html'
-                }, 1500)
-            } else {
-                window.showToast('식단 기록 실패, 다시 시도해주세요.', 'danger')
-            }
-        })
+        mealRecordForm.addEventListener('submit', handleMealRecordSubmit)
     }
+    calculateTotalMacros()
 })
