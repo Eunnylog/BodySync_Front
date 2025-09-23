@@ -1,5 +1,7 @@
-const backend_base_url = 'http://localhost:8000'
-const frontend_base_url = "http://localhost:5500"
+// const backend_base_url = 'http://localhost:8000'
+// const frontend_base_url = "http://localhost:5500"
+const backend_base_url = 'http://127.0.0.1:8000'
+const frontend_base_url = "http://127.0.0.1:5500"
 // const backend_base_url = "https://api.body-sync.shop";
 // const frontend_base_url = "https://body-sync.shop";
 
@@ -294,10 +296,28 @@ function updateDashboardCards(data) {
     // 1. 식단 요약 카드 업데이트
     const mealData = data.meal_summary
     if (mealData) {
-        document.getElementById('meal-calories-display').innerText = `${parseFloat(mealData.today_calories).toFixed(0)}`
-        document.getElementById('meal-carbs-display').innerHTML = `${parseFloat(mealData.today_carbs).toFixed(1)}`
-        document.getElementById('meal-protein-display').innerText = `${parseFloat(mealData.today_protein).toFixed(1)}`
-        document.getElementById('meal-fat-display').innerText = `${parseFloat(mealData.today_fat).toFixed(1)}`
+        const calories = parseFloat(mealData.today_calories)
+        document.getElementById('meal-calories-display').innerText = `${isNaN(calories) ? 0 : calories.toFixed(0)}`
+
+        // 탄수화물
+        const carbs = parseFloat(mealData.today_carbs)
+        document.getElementById('meal-carbs-display').innerHTML = `${isNaN(carbs) ? 0 : carbs.toFixed(1)}`
+
+        // 단백질
+        const protein = parseFloat(mealData.today_protein)
+        document.getElementById('meal-protein-display').innerText = `${isNaN(protein) ? 0 : protein.toFixed(1)}`
+
+        // 지방
+        const fat = parseFloat(mealData.today_fat)
+        document.getElementById('meal-fat-display').innerText = `${isNaN(fat) ? 0 : fat.toFixed(1)}`
+
+        // 당류
+        const sugars = parseFloat(mealData.today_sugars)
+        document.getElementById('meal-sugars-display').innerText = `${isNaN(sugars) ? 0 : sugars.toFixed(2)}`
+
+        // 식이섬유
+        const fiber = parseFloat(mealData.today_fiber)
+        document.getElementById('meal-fiber-display').innerText = `${isNaN(fiber) ? 0 : fiber.toFixed(2)}`
     }
 
     // 2. 운동 요약 카드 업데이트
@@ -477,11 +497,16 @@ async function tokenRefresh() {
 async function handleAccessTokenExpiration(response, originalRequestFn) {
     let errorData = null
 
-    try {
-        errorData = await response.clone().json()
-    } catch (e) {
-        console.warn('handleAccessTokenExpiration 오류', e)
-        return response
+    const contentType = response.headers.get('content-type')
+    const isJson = contentType && contentType.includes('application/json')
+
+    if (isJson && response.status !== 204) {
+        try {
+            errorData = await response.clone().json()
+        } catch (e) {
+            console.warn('handleAccessTokenExpiration 오류', e)
+            return response
+        }
     }
     console.log(errorData, '응답데이터')
 
@@ -530,4 +555,170 @@ async function authFetch(url, options = {}) {
     response = await handleAccessTokenExpiration(response, actualFetchRequest)
 
     return response
+}
+
+
+// 음식 등록
+async function FoodCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+// 음식 검색
+async function foodSearchFetch(searchStr) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/?food-search=${encodeURIComponent(searchStr)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log('음식 검색 성공', data)
+            return data
+        } else {
+            const errorData = await response.json()
+            console.log('음식 검색 실패', errorData)
+            return null
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        window.showToast('네트워크 오류 발생', 'danger')
+        return null
+    }
+}
+
+// 식단 등록
+async function createMealRecord(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log('mealRecord POST 성공', response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error('mealRecord POST 실패', response_json)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+async function getMealRecords(date) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/?date=${encodeURIComponent(date)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            response_json = await response.json()
+            console.log(response_json)
+            return response_json
+        } else {
+            const errorData = await response.json()
+            console.error('getMealRecords GET 실패', errorData)
+            return null
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return null
+    }
+}
+
+
+async function getMealRecord(mealRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}`, {
+            method: 'GET'
+        })
+
+        if (response.ok) {
+            const record = await response.json()
+            data = {
+                date: record.date,
+                time: record.time,
+                meal_type: record.meal_type,
+                food_items: record.food_items,
+                notes: record.notes,
+            }
+            return data
+        } else {
+            const errorData = response.json()
+            console.log(errorData)
+            return null
+        }
+
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return null
+    }
+}
+
+
+
+// meal record Patch
+async function updateMealRecord(data, mealRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+
+// meal record delete
+async function deleteMealRecordApi(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${recordId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error(errorData.message)
+            return false
+        }
+    } catch (error) {
+        console.error(error)
+        return false
+    }
 }
