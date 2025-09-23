@@ -497,11 +497,16 @@ async function tokenRefresh() {
 async function handleAccessTokenExpiration(response, originalRequestFn) {
     let errorData = null
 
-    try {
-        errorData = await response.clone().json()
-    } catch (e) {
-        console.warn('handleAccessTokenExpiration 오류', e)
-        return response
+    const contentType = response.headers.get('content-type')
+    const isJson = contentType && contentType.includes('application/json')
+
+    if (isJson && response.status !== 204) {
+        try {
+            errorData = await response.clone().json()
+        } catch (e) {
+            console.warn('handleAccessTokenExpiration 오류', e)
+            return response
+        }
     }
     console.log(errorData, '응답데이터')
 
@@ -693,6 +698,27 @@ async function updateMealRecord(data, mealRecordId) {
         }
     } catch (error) {
         console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+
+// meal record delete
+async function deleteMealRecordApi(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${recordId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error(errorData.message)
+            return false
+        }
+    } catch (error) {
+        console.error(error)
         return false
     }
 }

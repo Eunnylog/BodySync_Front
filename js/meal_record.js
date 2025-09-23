@@ -112,7 +112,7 @@ function populateAccordionSections(mealRecordData, mealTypeSections) {
                                 onclick="window.location.href='meal_form.html?id=${recordId}'">
                                 수정 <i class="bi bi-pencil-square"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-danger btn-sm ms-1" data-record-id="${recordId}">
+                            <button type="button" class="btn btn-outline-danger btn-sm ms-1 delete-record-btn" data-record-id="${recordId}">
                                 삭제 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -181,6 +181,27 @@ function populateAccordionSections(mealRecordData, mealTypeSections) {
 }
 
 
+// 식단 기록 삭제
+async function handleDeleteRecord(recordId, recordDate) {
+    const confirmed = confirm('정말 이 식단 기록을 삭제하시겠습니까?\n복원을 원하실 경우 운영자에게 문의해야 합니다.')
+
+    if (confirmed) {
+        const success = await deleteMealRecordApi(recordId)
+
+        if (success) {
+            window.showToast('식단 기록이 삭제되었습니다.', 'success')
+            setTimeout(() => {
+                window.location.href = `meal_record.html?date=${recordDate}`
+            }, 1500)
+        } else {
+            window.showToast('식단 기록에 실패했습니다. 다시 시도해주세요.', 'danger')
+        }
+    } else {
+        window.showToast('식단 기록 삭제가 취소되었습니다.', 'info')
+        console.log('식단 기록 삭제 취소')
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const urlPrams = new URLSearchParams(window.location.search)
     const recordDateByUrl = urlPrams.get('date')
@@ -200,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
     snackHeader = document.getElementById('snack-header')
     dinnerHeader = document.getElementById('dinner-header')
     otherHeader = document.getElementById('other-header')
+
 
     // url에 date가 없을 경우 오늘날짜로
     if (recordDateByUrl) {
@@ -230,5 +252,18 @@ document.addEventListener('DOMContentLoaded', function () {
     dateInput.addEventListener('change', async function () {
         const selectedDate = new Date(this.value)
         await initializeDateInput(selectedDate)
+    })
+
+
+    document.addEventListener('click', function (event) {
+        const recordDate = dateInput.value
+        const deleteBtn = event.target.closest('.delete-record-btn')
+        if (deleteBtn) {
+            const targetId = deleteBtn.dataset.recordId
+            if (targetId) {
+                handleDeleteRecord(targetId, recordDate)
+            }
+
+        }
     })
 })
