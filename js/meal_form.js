@@ -379,7 +379,7 @@ async function handleMealRecordSubmit(e) {
         if (editSuccess) {
             window.showToast('식단 수정 성공', 'success')
             setTimeout(() => {
-                window.location.href = 'meal_record.html'
+                window.location.href = `meal_record.html?date=${mealDate}`
             }, 1500)
         } else {
             window.showToast('식단 수정 실패했습니다. 다시 시도해 주세요', 'danger')
@@ -391,7 +391,7 @@ async function handleMealRecordSubmit(e) {
         if (createSuccess) {
             window.showToast('식단 등록 성공', 'success')
             setTimeout(() => {
-                window.location.href = 'meal_record.html'
+                window.location.href = `meal_record.html?date=${mealDate}`
             }, 1500)
         } else {
             window.showToast('식단 등록 실패했습니다. 다시 시도해 주세요.', 'danger')

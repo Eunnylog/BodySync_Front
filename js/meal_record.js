@@ -1,120 +1,214 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const dateInput = document.getElementById('meal-date')
-    const prevDayBtn = document.getElementById('prev-day-btn')
-    const nextDayBtn = document.getElementById('next-day-btn')
-
-    const breakfastDiv = document.getElementById('breakfast-accordion-body')
-    const lunchDiv = document.getElementById('lunch-accordion-body')
-    const snackDiv = document.getElementById('snack-accordion-body')
-    const dinnerDiv = document.getElementById('dinner-accordion-body')
-    const otherDiv = document.getElementById('other-accordion-body')
+let dateInput, prevDayBtn, nextDayBtn
+let breakfastDiv, lunchDiv, snackDiv, dinnerDiv, otherDiv
+let recordId
 
 
-    function loadMealAccordionUI(mealRecordData) {
-        const sections = {
-            'breakfast': breakfastDiv,
-            'lunch': lunchDiv,
-            'snack': snackDiv,
-            'dinner': dinnerDiv,
-            'other': otherDiv
-        }
+// 오늘 날짜로 초기값 세팅
+async function initializeDateInput(date = new Date()) {
+    const year = String(date.getFullYear())
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const formattedDate = `${year}-${month}-${day}`
+    dateInput.value = formattedDate
 
-        Object.values(sections).forEach(div => div.innerHTML = '')
+    const mealRecordsData = await getMealRecords(formattedDate)
 
-        const mealType = ['breakfast', 'lunch', 'snack', 'dinner', 'other']
+    if (mealRecordsData) {
+        console.log('초기 식단 불러오기 성공')
+        loadMealAccordionUI(mealRecordsData)
+    } else {
+        console.log('초기 식단 불러오기 실패')
+        loadMealAccordionUI({})
+    }
+}
 
-        for (const mealTypeKey of mealType) {
-            const recordsMealType = mealRecordData[mealTypeKey]
-            if (recordsMealType && recordsMealType.length > 0) {
-                const fragment = document.createDocumentFragment()
 
-                recordsMealType.forEach(record => {
-                    console.log(record.food_items)
-                    if (mealTypeKey === record.meal_type) {
-                        const foodItems = record.food_items
-                        foodItems.forEach(item => {
-                            const mealCardDiv = document.createElement('div')
-                            mealCardDiv.classList.add('card', 'text-bg-light', 'mb-2', 'w-100')
 
-                            const cardHeader = document.createElement('div')
-                            cardHeader.classList.add('card-header', 'd-flex', 'justify-content-between', 'align-items-center')
-                            const cardTitle = document.createElement('span')
-                            cardTitle.innerHTML = `<b class="text-primary">${item.food_name}</b> (${item.quantity}${item.base_unit})`
+// 날짜 변경
+async function changeDate(offset) {
+    const currentDateStr = dateInput.value
+    const currentSelectedDate = new Date(currentDateStr)
 
-                            const btnDiv = document.createElement('div')
-                            const editBtn = document.createElement('button')
-                            editBtn.classList.add('btn', 'btn-outline-warning', 'btn-sm', 'edit-food-item-btn')
-                            editBtn.setAttribute('data-record-id', record.id)
-                            editBtn.setAttribute('data-food-item-id', item.id)
-                            editBtn.setAttribute('onclick', `window.location.href='meal_add.html?id=${record.id}'`)
+    currentSelectedDate.setDate(currentSelectedDate.getDate() + offset)
 
-                            const removeBtn = document.createElement('button')
-                            removeBtn.classList.add('btn', 'btn-outline-danger', 'btn-sm', 'remove-food-item-btn')
-                            removeBtn.setAttribute('data-record-id', record.id)
-                            removeBtn.setAttribute('data-food-item-id', item.id)
-                            removeBtn.setAttribute('style', 'margin: 5px;')
+    await initializeDateInput(currentSelectedDate)
+}
 
-                            btnDiv.appendChild(editBtn)
-                            btnDiv.appendChild(removeBtn)
-                            cardHeader.appendChild(cardTitle)
-                            cardHeader.appendChild(btnDiv)
-                            mealCardDiv.appendChild(cardHeader)
 
-                            const cardBody = document.createElement('div')
-                            cardBody.classList.add('card-body')
-                            const cardCalories = document.createElement('h6')
-                            cardCalories.classList.add('card-title', 'mb-1')
-                            cardCalories.innerHTML = `총 ${item.total_calories_for_this_item} kcal`
 
-                            const cardText = document.createElement('p')
-                            cardText.classList.add('card-text', 'text-muted', 'small')
-                            cardText.innerHTML = `탄수화물: ${item.total_carbs_for_this_item}g | 단백질: ${item.total_protein_for_this_item}g | 지방: ${item.total_fat_for_this_item}g | 당류: ${item.total_sugars_for_this_item}g | 식이섬유: ${item.total_fiber_for_this_item}g`
+function loadMealAccordionUI(mealRecordData) {
+    const mealTypeSections = {
+        'breakfast': breakfastDiv,
+        'lunch': lunchDiv,
+        'snack': snackDiv,
+        'dinner': dinnerDiv,
+        'other': otherDiv
+    }
 
-                            cardBody.appendChild(cardCalories)
-                            cardBody.appendChild(cardText)
-                            mealCardDiv.appendChild(cardBody)
+    // 초기화
+    initializeAccordion(mealTypeSections)
 
-                            // documentFragment에 추가
-                            fragment.appendChild(mealCardDiv)
-                        })
-                    }
+    // 아코디언에 동적으로 데이터 채우기
+    populateAccordionSections(mealRecordData, mealTypeSections)
+}
+
+// 기존 ui 초기화
+function initializeAccordion(mealTypeSections) {
+    Object.values(mealTypeSections).forEach(section => {
+        if (section) section.innerHTML = ''
+    })
+}
+
+
+// 아코디언 데이터로 채우기
+function populateAccordionSections(mealRecordData, mealTypeSections) {
+    const mealTypeOrder = ['breakfast', 'lunch', 'snack', 'dinner', 'other']
+
+    for (const typeKey of mealTypeOrder) {
+        const recordByType = mealRecordData[typeKey]
+        const targetSection = mealTypeSections[typeKey]
+        const currentDiv = targetSection
+
+        if (currentDiv && recordByType && recordByType.length > 0) {
+            let recordTime
+            let memo
+            let totalCalories = 0
+            let totalCarbs = 0
+            let totalProtein = 0
+            let totalFat = 0
+            let totalSugars = 0
+            let totalFiber = 0
+            const fragment = document.createDocumentFragment()
+
+            // Div 1. :  시간, 영양성분, 메모, 수정&삭제 버튼 추가
+            recordByType.forEach(record => {
+                recordId = record.id
+                totalCalories += parseFloat(record.total_meal_calories) || 0
+                totalCarbs += parseFloat(record.total_meal_carbs) || 0
+                totalProtein += parseFloat(record.total_meal_protein) || 0
+                totalFat += parseFloat(record.total_meal_fat) || 0
+                totalSugars += parseFloat(record.total_meal_sugars) || 0
+                totalFiber += parseFloat(record.total_meal_fiber) || 0
+
+                recordTime = new Date(record.time)
+                const hours = String(recordTime.getHours()).padStart(2, '0')
+                const minutes = String(recordTime.getMinutes()).padStart(2, '0')
+                recordTime = `${hours}시 ${minutes}분`
+                memo = record.notes ? record.notes.trim() : ''
+
+                const mealSummarySection = document.createElement('div')
+                mealSummarySection.classList.add('meal-summary-section', 'card', 'card-body', 'mb-3', 'p-3', 'bg-warning-subtle', 'border', 'rounded')
+
+                mealSummarySection.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <!-- 식사 시간/메모 예시 -->
+                        <h5 class="mb-0 text-dark fw-bold">
+                            ${recordTime}
+                        </h5>
+
+                        <!-- 수정/삭제 버튼 -->
+                        <div class="meal-actions btn-group">
+                            <button type="button" class="btn btn-outline-success btn-sm"
+                                onclick="window.location.href='meal_form.html?id=${recordId}'">
+                                수정 <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm ms-1" data-record-id="${recordId}">
+                                삭제 <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 전체 끼니의 총 영양성분 -->
+                    <div class="d-flex flex-column mb-3">
+                        <h5 class="text-success mb-1">
+                            총 ${totalCalories.toFixed(1) || 0} kcal
+                        </h5>
+                        <p class="text-secondary text-muted small mb-0">
+                            탄: ${totalCarbs.toFixed(1) || 0}g | 단: ${totalProtein.toFixed(1) || 0}g | 지: ${totalFat.toFixed(1) || 0}g
+                            <span class="d-block d-md-inline-block">
+                                | 당: ${totalSugars.toFixed(1) || 0}g | 섬: ${totalFiber.toFixed(1) || 0}g
+                            </span>
+                        </p>
+                    </div>
+                    <div class="meal-memo-box border border-2 rounded p-2 text-dark small bg-light-subtle">
+                        <span class="d-block mt-1">${memo}</span>
+                    </div>
+                `
+                fragment.appendChild(mealSummarySection)
+                // Div 2. food_items 렌더링
+                record.food_items.forEach(item => {
+                    const mealCardDiv = document.createElement('div')
+                    mealCardDiv.classList.add('card', 'text-bg-light', 'mb-2', 'w-100', 'food-item-card')
+
+                    const cardHeader = document.createElement('div')
+                    cardHeader.classList.add('card-header', 'd-flex', 'justify-content-between', 'align-items-center')
+
+                    const cardTitle = document.createElement('span')
+                    cardTitle.innerHTML = `
+                    <b class="text-primary">${item.food_name}</b> (${parseFloat(item.quantity).toFixed(1)}${item.unit || item.base_unit})
+                    `
+
+                    cardHeader.appendChild(cardTitle)
+                    mealCardDiv.appendChild(cardHeader)
+
+                    const cardBody = document.createElement('div')
+                    cardBody.classList.add('card-body')
+
+                    const cardCalories = document.createElement('h6')
+                    cardCalories.classList.add('card-title', 'mb-1')
+                    cardCalories.innerHTML = `
+                        총 ${parseFloat(item.total_calories_for_this_item).toFixed(1) || 0} kcal
+                    `
+                    const cardText = document.createElement('p')
+                    cardText.classList.add('card-text', 'text-muted', 'small')
+                    cardText.innerHTML = `
+                    탄수화물: ${item.total_carbs_for_this_item}g | 단백질: ${item.total_protein_for_this_item}g | 지방: ${item.total_fat_for_this_item}g | 당류: ${item.total_sugars_for_this_item}g | 식이섬유: ${item.total_fiber_for_this_item}g
+                    `
+
+                    cardBody.appendChild(cardCalories)
+                    cardBody.appendChild(cardText)
+                    mealCardDiv.appendChild(cardBody)
+
+                    fragment.appendChild(mealCardDiv)
                 })
-                // 해당 meal type div에 appendChild
-                sections[mealTypeKey].appendChild(fragment)
-            }
-        }
-    }
+            })
 
-    // 오늘 날짜로 초기값 세팅
-    async function initializeDateInput(date = new Date()) {
-        const year = String(date.getFullYear())
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const formattedDate = `${year}-${month}-${day}`
-        dateInput.value = formattedDate
-
-        const mealRecordsData = await getMealRecords(formattedDate)
-
-        if (mealRecordsData) {
-            console.log('초기 식단 불러오기 성공')
-            loadMealAccordionUI(mealRecordsData)
+            currentDiv.appendChild(fragment)
         } else {
-            console.log('초기 식단 불러오기 실패')
-            loadMealAccordionUI({})
+            currentDiv.innerHTML = '<p class="text-muted text-center pu-3">등록된 식단이 없습니다.</p>'
         }
     }
+}
 
-    initializeDateInput()
 
-    // 날짜 변경
-    async function changeDate(offset) {
-        const currentDateStr = dateInput.value
-        const currentSelectedDate = new Date(currentDateStr)
+document.addEventListener('DOMContentLoaded', function () {
+    const urlPrams = new URLSearchParams(window.location.search)
+    const recordDateByUrl = urlPrams.get('date')
 
-        currentSelectedDate.setDate(currentSelectedDate.getDate() + offset)
+    dateInput = document.getElementById('meal-date')
+    prevDayBtn = document.getElementById('prev-day-btn')
+    nextDayBtn = document.getElementById('next-day-btn')
 
-        await initializeDateInput(currentSelectedDate)
+    breakfastDiv = document.getElementById('breakfast-accordion-body')
+    lunchDiv = document.getElementById('lunch-accordion-body')
+    snackDiv = document.getElementById('snack-accordion-body')
+    dinnerDiv = document.getElementById('dinner-accordion-body')
+    otherDiv = document.getElementById('other-accordion-body')
+
+    breakfastHeader = document.getElementById('breakfast-header')
+    lunchHeader = document.getElementById('lunch-header')
+    snackHeader = document.getElementById('snack-header')
+    dinnerHeader = document.getElementById('dinner-header')
+    otherHeader = document.getElementById('other-header')
+
+    // url에 date가 없을 경우 오늘날짜로
+    if (recordDateByUrl) {
+        const parseDate = new Date(recordDateByUrl)
+        initializeDateInput(parseDate)
+    } else {
+        initializeDateInput()
     }
+
 
     // 어제
     if (prevDayBtn) {

@@ -52,13 +52,13 @@
             </a>
         </div>
         <div style="text-align: end;">
-            <button class="btn my-btn" onclick="window.location.href='meal_add.html'">식단 등록</button>
+            <button class="btn my-btn" onclick="window.location.href='meal_form.html'">식단 등록</button>
         </div>
     </h5>
     <div class="accordion" id="meal-records-container">
         <!-- 아침 시작 -->
         <div class="accordion-item">
-            <h2 class="accordion-header">
+            <h2 class="accordion-header" id="breakfast-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false"
                     aria-controls="panelsStayOpen-collapseOne">
@@ -74,7 +74,7 @@
         <!-- 아침 끝 -->
         <!-- 점심 시작 -->
         <div class="accordion-item">
-            <h2 class="accordion-header">
+            <h2 class="accordion-header" id="lunch-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
                     aria-controls="panelsStayOpen-collapseTwo">
@@ -83,14 +83,14 @@
             </h2>
             <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
                 <div class="accordion-body" id="lunch-accordion-body">
-                    <!-- record list -->
+                    <!-- 내용 -->
                 </div>
             </div>
         </div>
         <!-- 점심 끝 -->
         <!-- 간식 시작 -->
         <div class="accordion-item">
-            <h2 class="accordion-header">
+            <h2 class="accordion-header" id="snack-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
                     aria-controls="panelsStayOpen-collapseThree">
@@ -99,20 +99,14 @@
             </h2>
             <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
                 <div class="accordion-body" id="snack-accordion-body">
-                    <!-- record list -->
-                    <strong>This is the third item’s accordion body.</strong> It is hidden by default, until the
-                    collapse plugin adds the appropriate classes that we use to style each element. These classes
-                    control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                    modify any of this with custom CSS or overriding our default variables. It’s also worth noting that
-                    just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                    overflow.
+                    <!-- 내용 -->
                 </div>
             </div>
         </div>
         <!-- 간식 끝-->
         <!-- 저녁 시작 -->
         <div class="accordion-item">
-            <h2 class="accordion-header">
+            <h2 class="accordion-header" id="dinner-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
                     aria-controls="panelsStayOpen-collapseFour">
@@ -121,20 +115,14 @@
             </h2>
             <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse">
                 <div class="accordion-body" id="dinner-accordion-body">
-                    <!-- record list -->
-                    <strong>This is the third item’s accordion body.</strong> It is hidden by default, until the
-                    collapse plugin adds the appropriate classes that we use to style each element. These classes
-                    control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                    modify any of this with custom CSS or overriding our default variables. It’s also worth noting that
-                    just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                    overflow.
+                    <!-- 내용 -->
                 </div>
             </div>
         </div>
         <!-- 저녁 끝-->
         <!-- 기타 -->
         <div class="accordion-item">
-            <h2 class="accordion-header">
+            <h2 class="accordion-header" id="other-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#panelsStayOpen-collapseFive" aria-expanded="false"
                     aria-controls="panelsStayOpen-collapseFive">
@@ -143,13 +131,7 @@
             </h2>
             <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse">
                 <div class="accordion-body" id="other-accordion-body">
-                    <!-- record list -->
-                    <strong>This is the third item’s accordion body.</strong> It is hidden by default, until the
-                    collapse plugin adds the appropriate classes that we use to style each element. These classes
-                    control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                    modify any of this with custom CSS or overriding our default variables. It’s also worth noting that
-                    just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                    overflow.
+                    <!-- 내용 -->
                 </div>
             </div>
         </div>
