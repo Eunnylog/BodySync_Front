@@ -1,17 +1,15 @@
+import { formatDateTime } from "./utils.js"
 let dateInput, prevDayBtn, nextDayBtn
 let breakfastDiv, lunchDiv, snackDiv, dinnerDiv, otherDiv
 let recordId
 
-
 // 오늘 날짜로 초기값 세팅
 async function initializeDateInput(date = new Date()) {
-    const year = String(date.getFullYear())
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const formattedDate = `${year}-${month}-${day}`
-    dateInput.value = formattedDate
+    console.log('연걸')
+    const formattedDate = formatDateTime(date)
+    dateInput.value = formattedDate.date
 
-    const mealRecordsData = await getMealRecords(formattedDate)
+    const mealRecordsData = await getMealRecords(formattedDate.date)
 
     if (mealRecordsData) {
         console.log('초기 식단 불러오기 성공')
@@ -216,11 +214,11 @@ document.addEventListener('DOMContentLoaded', function () {
     dinnerDiv = document.getElementById('dinner-accordion-body')
     otherDiv = document.getElementById('other-accordion-body')
 
-    breakfastHeader = document.getElementById('breakfast-header')
-    lunchHeader = document.getElementById('lunch-header')
-    snackHeader = document.getElementById('snack-header')
-    dinnerHeader = document.getElementById('dinner-header')
-    otherHeader = document.getElementById('other-header')
+    // breakfastHeader = document.getElementById('breakfast-header')
+    // lunchHeader = document.getElementById('lunch-header')
+    // snackHeader = document.getElementById('snack-header')
+    // dinnerHeader = document.getElementById('dinner-header')
+    // otherHeader = document.getElementById('other-header')
 
 
     // url에 date가 없을 경우 오늘날짜로

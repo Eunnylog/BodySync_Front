@@ -722,3 +722,25 @@ async function deleteMealRecordApi(recordId) {
         return false
     }
 }
+
+
+// 운동 검색
+async function exerciseSearchFetch(searchStr) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/?exercise-search=${searchStr}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const query = await response.json()
+            return query
+        } else {
+            const errorData = await response.json()
+            console.error(errorData.message)
+            return null
+        }
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}

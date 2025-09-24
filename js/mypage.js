@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // 마이페이지 기존 데이터 가져오기
 async function loadUserProfile() {
-    const payload = JSON.parse(localStorage.getItem('payload'))
+    // const payload = JSON.parse(localStorage.getItem('payload'))
     if (payload) {
         if (payload.is_social_login) {
             document.getElementById('password-modal').style.display = 'none'

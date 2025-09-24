@@ -1,3 +1,4 @@
+import { formatDateTime } from "./utils.js"
 const urlPrams = new URLSearchParams(window.location.search)
 const mealRecordId = urlPrams.get('id')
 
@@ -36,20 +37,6 @@ let totalProteinSpan
 let totalFatSpan
 let totalSugarsSpan
 let totalFiberSpan
-
-
-// 페이지 로드 시 날짜 및 시간 설정
-function setMealDateTimeInputs(targetDate = new Date()) {
-    const year = targetDate.getFullYear()
-    const month = String(targetDate.getMonth() + 1).padStart(2, '0')
-    const day = String(targetDate.getDate()).padStart(2, '0')
-
-    const hours = String(targetDate.getHours()).padStart(2, '0')
-    const minutes = String(targetDate.getMinutes()).padStart(2, '0')
-
-    mealDateInput.value = `${year}-${month}-${day}`
-    mealTimeInput.value = `${hours}:${minutes}`
-}
 
 
 // 음식 검색 및 결과 렌더링
@@ -255,7 +242,13 @@ async function populateFormForEdit(recordId) {
     if (mealData) {
         mealRecordData = mealData
 
-        setMealDateTimeInputs(new Date(mealRecordData.date))
+        // setDateTimeInputs(new Date(mealRecordData.date))
+        const formatted = formatDateTime(new Date(mealRecordData.date))
+
+        if (formatted) {
+            mealDateInput.value = formatted.date
+            mealTimeInput.value = formatted.time
+        }
 
         mealNoteInput.value = mealData.notes || ''
         if (mealTypeSelect) mealTypeSelect.value = mealData.meal_type || ''
@@ -444,14 +437,21 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const success = await populateFormForEdit(mealRecordId)
 
+        const formatted = formatDateTime(new Date(mealRecordData.date))
+
+        mealDateInput.value = formatted.date
+        mealTimeInput.value = formatted.time
+
         if (!success) {
             isEdit = false
-            // pageTitle.textContent = '식단 기록 등록'
-            setMealDateTimeInputs()
         }
     } else {
         // pageTitle.textContent = '식단 기록 등록'
-        setMealDateTimeInputs()
+        // setDateTimeInputs()
+        const formatted = formatDateTime()
+        mealDateInput.value = formatted.date
+        mealTimeInput.value = formatted.time
+
     }
 
     // 음식 생성 모달
