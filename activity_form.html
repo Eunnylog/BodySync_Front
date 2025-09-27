@@ -90,21 +90,36 @@
                                 </ul>
                             </div>
                         </div>
-                    </div> <!-- 운동 검색/추가 섹션 카드 끝 -->
-
+                    </div>
+                    <!-- 운동 검색/추가 섹션 카드 끝 -->
                     <!-- 선택된 운동 항목 섹션 -->
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h5 class="mb-3">선택된 운동 항목</h5>
+                            <h5 class="mb-0">선택된 운동 항목</h5>
                         </div>
                         <div class="card-body">
-                            <div id="exerciseItemsContainer">
-                                <p class="text-muted exercise-placeholder">운동 항목을 추가해 주세요.</p>
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                <div id="exerciseItemsContainer">
+                                    <p class="text-muted exercise-placeholder">운동 항목을 추가해 주세요.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div> <!-- main card-body 끝 -->
-
+                    <!-- 총 운동 시간 / 칼로리 시작-->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">총 소모 칼로리 / 운동 시간</h5>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <p class="text-muted" id="total-minutes-display">총 칼로리 : 0kcal</p>
+                                <p class="text-muted" id="total-calories-display">총 운동 시간 : 0분</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 총 운동 시간 / 칼로리 끝-->
+                </div>
+                <!-- main card-body 끝 -->
                 <div class="card-footer d-flex justify-content-end">
                     <button class="btn btn-secondary me-2">취소</button>
                     <button type="submit" class="btn my-btn">저장</button>
@@ -128,29 +143,29 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="duration_minutes-0" class="form-label">운동 시간 (분):</label>
-                    <input type="number" class="form-control" id="duration_minutes-0"
-                        name="exercise_items_to_create[0].duration_minutes" min="1" required>
+                    <input type="number" class="form-control duration-minutes-input" id="duration_minutes-0"
+                        name="exercise_items_to_create[0].duration_minutes" value="1" min="1" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="sets-0" class="form-label">세트:</label>
-                    <input type="number" class="form-control" id="sets-0" name="exercise_items_to_create[0].sets"
-                        min="1">
+                    <input type="number" class="form-control set-input" id="sets-0"
+                        name="exercise_items_to_create[0].sets" min="1" placeholder="선택 (근력 운동 시)">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="reps-0" class="form-label">횟수 (Reps):</label>
                     <input type="number" class="form-control" id="reps-0" name="exercise_items_to_create[0].reps"
-                        min="1">
+                        min="1" placeholder="선택 (근력 운동 시)">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="weight-0" class="form-label">무게 (kg):</label>
                     <input type="number" class="form-control" id="weight-0" name="exercise_items_to_create[0].weight"
-                        step="0.01" min="0">
+                        step="0.01" min="0" placeholder="선택 (근력 운동 시)">
                 </div>
             </div>
         </div>
     </template>
 
-    <!-- 운동 등록 모달 -->
+    <!-- 운동 등록 모달 시작 -->
     <div class="modal fade" id="exercise-create-modal" tabindex="-1" aria-labelledby="exercise-create-modal-label"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -180,8 +195,8 @@
             </div>
         </div>
     </div>
+    <!-- 운동 등록 모달 끝 -->
     <!-- 운동 기록 폼 끝 -->
-
 </body>
 
 </html>

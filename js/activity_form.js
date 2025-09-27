@@ -20,10 +20,12 @@ let activityForm
 let dateInput, timeInput, memoInput
 let exerciseSearchInput, exerciseSearchResults
 let exerciseSearchBtn, addExerciseBtn, createExerciseBtn
-let selectedExercise, removeExerciseBtn
+let selectedExerciseList, removeExerciseBtn
 
 let exerciseItemsContainer, exerciseTemplate
 let exerciseIndex = 0
+
+let totalInformation
 
 // 날짜, 시간
 function initializeDateInput(date = new Date()) {
@@ -36,6 +38,7 @@ function initializeDateInput(date = new Date()) {
 // 운동 검색
 async function handleExerciseSearch() {
     const searchStr = exerciseSearchInput.value.trim()
+    exerciseSearchInput.value = ''
 
     if (!searchStr) {
         showToast('검색할 운동명을 입력해주세요.', 'warning')
@@ -67,7 +70,7 @@ function renderExerciseSearchResults(data) {
                 <div class="flex-grow-1 me-2">
                     <h6 class="mb-1"><strong>${exercise.exercise_name}</strong></h6>
                     <p class="mb-0 text-muted small">
-                        칼로리: ${exercise.calories_per_unit} kcal / ${exercise.base_unit}
+                        칼로리: ${exercise.calories_per_unit}kcal / ${exercise.base_unit}
                         <span class="mx-1">|</span>
                         카테고리: ${exercise.category_display}
                     </p>
@@ -115,39 +118,42 @@ function renderSelectedExerciseResult(exerciseData) {
         return
     }
 
+    // template clone -> 복사 후 데이터 넣기
     const clone = exerciseTemplate.content.cloneNode(true)  // true: 자식까지 클론
+    const exerciseDiv = clone.querySelector('.exercise-item') // 가장 바깥 div
+    exerciseDiv.dataset.id = exerciseData.id
 
     // 현재 항목의 인덱스 할당 및 증가
     const currentIndex = exerciseIndex++
-    const exerciseDiv = clone.querySelector('.exercise-item') // 가장 바깥 div
     exerciseDiv.dataset.index = currentIndex
-    exerciseDiv.dataset.id = exerciseData.id
 
     // name
     const selectedExerciseNameSpan = exerciseDiv.querySelector('.selected-exercise-name')
     if (selectedExerciseNameSpan) {
-        selectedExerciseNameSpan.textContent = exerciseData.name
+        selectedExerciseNameSpan.textContent = `${exerciseData.name} (${exerciseData.exerciseCalories}kcal / ${exerciseData.unit})`
     }
     // id hidden 필드
     const exerciseIdInput = exerciseDiv.querySelector('.exercise-id-input')
     if (exerciseIdInput) {
         exerciseIdInput.value = exerciseData.id
         exerciseIdInput.name = `exercise_items_to_create[${currentIndex}].exercise`
+        exerciseIdInput.dataset.caloriesPerUnit = exerciseData.exerciseCalories
     }
     // 각 input의 id, name
     const inputsToUpdate = [
-        { selector: '#duration_minutes-0', newIdPrefix: 'duration_minutes', nameSuffix: 'duration_minutes' },
-        { selector: '#sets-0', newIdPrefix: 'sets', nameSuffix: 'sets' },
-        { selector: '#reps-0', newIdPrefix: 'reps', nameSuffix: 'reps' },
-        { selector: '#weight-0', newIdPrefix: 'weight', nameSuffix: 'weight' },
+        // 셀렉터, id만들 때 접두사, name 속성 뒷부분
+        { originalSelector: '#duration_minutes-0', newIdPrefix: 'duration_minutes', nameSuffix: 'duration_minutes' },
+        { originalSelector: '#sets-0', newIdPrefix: 'sets', nameSuffix: 'sets' },
+        { originalSelector: '#reps-0', newIdPrefix: 'reps', nameSuffix: 'reps' },
+        { originalSelector: '#weight-0', newIdPrefix: 'weight', nameSuffix: 'weight' },
     ]
     inputsToUpdate.forEach(item => {
         const input = exerciseDiv.querySelector(item.originalSelector)
         if (input) {
             const newId = `${item.newIdPrefix}-${currentIndex}`
             input.id = newId
-            input.name = `exercise_item_to_create[${currentIndex}].${item.nameSuffix}`
-            const label = exerciseDiv.querySelector(`label[for="${item.selector.replace('#', '')}"]`)
+            input.name = `exercise_items_to_create[${currentIndex}].${item.nameSuffix}`
+            const label = exerciseDiv.querySelector(`label[for="${item.originalSelector.replace('#', '')}"]`)
             if (label) {
                 label.setAttribute('for', input.id)
             }
@@ -164,18 +170,65 @@ function renderSelectedExerciseResult(exerciseData) {
     } else {
         console.error('exerciseItemsContainer 요소를 찾을 수 없음')
     }
+}
 
-    // 삭제버튼
-    const removeButton = exerciseDiv.querySelector('.remove-exercise-item-btn');
-    if (removeButton) {
-        removeButton.addEventListener('click', () => {
-            exerciseDiv.remove()
-            const container = document.getElementById('exerciseItemsContainer');
-            if (container && container.children.length === 0) {
-                container.innerHTML = '<p class="text-muted exercise-placeholder">아직 선택된 운동이 없습니다.</p>';
-            }
-        });
+
+// 선택된 운동 삭제
+function deleteSelectedExercise(exerciseItemElement) {
+    if (exerciseItemElement) {
+        exerciseItemElement.remove()
+        if (exerciseItemsContainer && exerciseItemsContainer.children.length === 0) {
+            exerciseItemsContainer.innerHTML = '<p class="text-muted exercise-placeholder">운동 항목을 추가해 주세요.</p>'
+        }
+        calculateTotalExerciseInformation()
     }
+}
+
+
+// 운동 정보 계산
+function calculateTotalExerciseInformation() {
+    let totalMinutes = 0
+    let totalCalories = 0
+
+    const allExerciseItems = document.querySelectorAll('#exerciseItemsContainer .exercise-item')
+
+    allExerciseItems.forEach(item => {
+        const durationInput = item.querySelector('.duration-minutes-input')
+        const setsInput = item.querySelector('.set-input')
+        const exerciseIdInput = item.querySelector('.exercise-id-input')
+        const duration = parseFloat(durationInput.value || 0)
+        const sets = parseFloat(setsInput.value || 1)
+
+        const caloriesPerMinutes = parseFloat(exerciseIdInput?.dataset.caloriesPerUnit || 0)
+        console.log('칼', exerciseIdInput.dataset.caloriesPerUnit)
+        let itemEffectiveDuration = 0
+
+        // 세트 값이 1보다 크거나 세트에 값이 있다면 세트당 시간으로 간주
+        if (sets > 1) {
+            itemEffectiveDuration = duration * sets
+        } else {
+            itemEffectiveDuration = duration
+        }
+
+        const itemCalories = itemEffectiveDuration * caloriesPerMinutes
+
+        totalCalories += itemCalories
+        totalMinutes += itemEffectiveDuration
+
+        document.getElementById('total-minutes-display').textContent = `총 운동 시간(분) : ${totalMinutes}분`
+        document.getElementById('total-calories-display').textContent = `총 소모 칼로리 : ${totalCalories || 0}kcal`
+
+    })
+
+    if (exerciseItemsContainer && exerciseItemsContainer.children.length === 0) {
+        document.getElementById('total-minutes-display').textContent = `총 운동 시간(분) : 0분`
+        document.getElementById('total-calories-display').textContent = `총 소모 칼로리 : 0kcal`
+    }
+}
+
+
+// 운동 기록 폼 생성
+async function handleActivityRecordCreate() {
 
 }
 
@@ -190,8 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
     exerciseSearchInput = document.getElementById('exercise-search-input')
     exerciseSearchBtn = document.getElementById('exercise-search-btn')
     exerciseSearchResults = document.getElementById('exercise-search-results')
-
-
+    totalInformation = document.getElementById('total-information')
 
     const title = document.getElementById('activity-title')
     if (activityRecordId) {
@@ -226,10 +278,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 }
                 renderSelectedExerciseResult(exerciseData)
+                calculateTotalExerciseInformation(exerciseData)
+            }
+        })
+    }
+
+    // 선택된 운동
+    if (exerciseItemsContainer) {
+        exerciseItemsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-exercise-item-btn')) {
+                console.log(event.target.closest('.exercise-item'))
+                const exerciseItemElement = event.target.closest('.exercise-item')
+                deleteSelectedExercise(exerciseItemElement)
+            }
+        })
+
+        exerciseItemsContainer.addEventListener('change', (event) => {
+            if (event.target.classList.contains('duration-minutes-input') || event.target.classList.contains('set-input')) {
+                calculateTotalExerciseInformation()
             }
         })
     }
 
 
+    if (activityForm) {
+        activityForm.addEventListener('keydown', (event) => {
+            // 검색 입력창에서만 엔터 동작
+            if (event.key === 'Enter') {
+                event.preventDefault()
+                const searchStr = exerciseSearchInput.value
+                if (searchStr.length > 0) {
+                    handleExerciseSearch(searchStr)
+                }
+            }
+        })
 
+        activityForm.addEventListener('submit', handleActivityRecordCreate)
+    }
+    calculateTotalExerciseInformation()
 });
