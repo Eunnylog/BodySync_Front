@@ -17,15 +17,14 @@ let isEdit = false
 let activityRecordData = null
 
 let activityForm
-let dateInput, timeInput, memoInput
+let dateInput, timeInput, notesInput
 let exerciseSearchInput, exerciseSearchResults
 let exerciseSearchBtn, addExerciseBtn, createExerciseBtn
 let selectedExerciseList, removeExerciseBtn
+let createActivityRecordBtn
 
 let exerciseItemsContainer, exerciseTemplate
 let exerciseIndex = 0
-
-let totalInformation
 
 // 날짜, 시간
 function initializeDateInput(date = new Date()) {
@@ -194,7 +193,7 @@ function calculateTotalExerciseInformation() {
 
     allExerciseItems.forEach(item => {
         const durationInput = item.querySelector('.duration-minutes-input')
-        const setsInput = item.querySelector('.set-input')
+        const setsInput = item.querySelector('.sets-input')
         const exerciseIdInput = item.querySelector('.exercise-id-input')
         const duration = parseFloat(durationInput.value || 0)
         const sets = parseFloat(setsInput.value || 1)
@@ -228,13 +227,88 @@ function calculateTotalExerciseInformation() {
 
 
 // 운동 기록 폼 생성
-async function handleActivityRecordCreate() {
+function collectedExerciseItemsData() {
+    const collectedItems = []
+    const allExerciseItems = document.querySelectorAll('#exerciseItemsContainer .exercise-item')
+
+    // forEach 대신 for...of를 사용하면 중간에 return으로 함수를 종료시킬 수 있음
+    for (const item of allExerciseItems) {
+        const exerciseIdInput = item.querySelector('.exercise-id-input')
+        const durationInput = item.querySelector('.duration-minutes-input')
+        const setsInput = item.querySelector('.sets-input')
+        const repsInput = item.querySelector('.reps-input')
+        const weightInput = item.querySelector('.weight-input')
+
+        const exerciseId = parseInt(exerciseIdInput.value || 0)
+        const durationMinutes = parseFloat(durationInput?.value || 1)
+        const sets = parseFloat(setsInput?.value || 0)
+        const reps = parseFloat(repsInput?.value || 0)
+        const weight = parseFloat(weightInput?.value || 0)
+
+        if (exerciseId === 0) {
+            window.showToast('선택되지 않은 운동 항목이 있습니다. 목록에서 운동을 선택해주세요', 'danger')
+            return null
+        }
+
+        if (durationMinutes < 1) {
+            window.showToast('운동 시간을 입력해주세요', 'danger')
+            return null
+        }
+
+        collectedItems.push({
+            exercise: exerciseId,
+            duration_minutes: durationMinutes,
+            sets: sets,
+            reps: reps,
+            weight: weight
+        })
+    }
+    return collectedItems
+}
+
+
+async function handleActivityRecordCreate(event) {
+    event.preventDefault()
+
+    const date = dateInput.value
+    const time = timeInput.value
+    const notes = notesInput.value
+    const exerciseItemsData = collectedExerciseItemsData()
+
+    if (exerciseItemsData === null) {
+        return
+    }
+
+    if (exerciseItemsData.length === 0) {
+        window.showToast('추가된 운동 항목이 없습니다.\n최소 하나 이상의 운동을 추가해주세요.', 'warning')
+        return
+    }
+
+    activityRecordData = {
+        date: date,
+        time: `${date}T${time}:00`,
+        notes: notes,
+        exercise_items_to_create: exerciseItemsData
+    }
+    console.log(activityRecordData)
+
+    const result = await activityRecordCreateFetch(activityRecordData)
+
+    if (result) {
+        window.showToast('운동 기록 완료!', 'success')
+        setTimeout(() => {
+            window.location.href = "activity_record.html"
+        }, 1500)
+    } else {
+        window.showToast('운동 기록 실패했습니다. 다시 시도해주세요.', 'danger')
+    }
 
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('date')
     timeInput = document.getElementById('time')
+    notesInput = document.getElementById('notes')
 
     activityForm = document.getElementById('activityForm');
     exerciseItemsContainer = document.getElementById('exerciseItemsContainer');
@@ -243,7 +317,8 @@ document.addEventListener('DOMContentLoaded', function () {
     exerciseSearchInput = document.getElementById('exercise-search-input')
     exerciseSearchBtn = document.getElementById('exercise-search-btn')
     exerciseSearchResults = document.getElementById('exercise-search-results')
-    totalInformation = document.getElementById('total-information')
+
+    createActivityRecordBtn = document.getElementById('create-activity-record')
 
     const title = document.getElementById('activity-title')
     if (activityRecordId) {
@@ -257,10 +332,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 운동 검색 버튼
     if (exerciseSearchBtn) {
-        exerciseSearchBtn.addEventListener('click', async () => {
-            await handleExerciseSearch()
+        exerciseSearchBtn.addEventListener('click', () => {
+            const searchStr = exerciseSearchInput.value.trim()
+            if (searchStr.length > 0) {
+                handleExerciseSearch(searchStr)
+            }
         })
-
     }
 
     // 운동 검색 결과 UI
@@ -294,25 +371,37 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         exerciseItemsContainer.addEventListener('change', (event) => {
-            if (event.target.classList.contains('duration-minutes-input') || event.target.classList.contains('set-input')) {
+            if (event.target.classList.contains('duration-minutes-input') || event.target.classList.contains('sets-input')) {
                 calculateTotalExerciseInformation()
             }
         })
     }
 
 
-    if (activityForm) {
-        activityForm.addEventListener('keydown', (event) => {
-            // 검색 입력창에서만 엔터 동작
+    // // 운동 검색 입력창에서만 엔터
+    if (exerciseSearchInput) {
+        exerciseSearchInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault()
-                const searchStr = exerciseSearchInput.value
+                const searchStr = exerciseSearchInput.value.trim()
                 if (searchStr.length > 0) {
                     handleExerciseSearch(searchStr)
                 }
             }
         })
+    }
 
+    if (activityForm) {
+        const searchStr = exerciseSearchInput.value
+        exerciseSearchInput.addEventListener('keydown', (event) => {
+            // 검색 입력창에서만 엔터 동작
+            if (event.key === 'Enter') {
+                event.preventDefault()
+                if (searchStr.length > 0) {
+                    handleExerciseSearch(searchStr)
+                }
+            }
+        })
         activityForm.addEventListener('submit', handleActivityRecordCreate)
     }
     calculateTotalExerciseInformation()

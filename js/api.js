@@ -744,3 +744,27 @@ async function exerciseSearchFetch(searchStr) {
         return null
     }
 }
+
+
+// 운동 기록 생성
+async function activityRecordCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
