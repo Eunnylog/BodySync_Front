@@ -1,8 +1,9 @@
 import { getPayload, formatDateTime, formatErrorMessage } from "./utils.js"
 const payload = getPayload()
+let isStaff
 
 if (payload) {
-    const isStaff = payload['is_staff']
+    isStaff = payload['is_staff']
     console.log(isStaff)
 } else {
     console.log('payload 불러오기 실패(activity form)')
@@ -16,15 +17,18 @@ const activityRecordId = urlPrams.get('id')
 let isEdit = false
 let activityRecordData = null
 
-let activityForm
+let activityForm, exerciseForm
 let dateInput, timeInput, notesInput
 let exerciseSearchInput, exerciseSearchResults
-let exerciseSearchBtn, addExerciseBtn, createExerciseBtn
+let exerciseSearchBtn
 let selectedExerciseList, removeExerciseBtn
 let createActivityRecordBtn
 
 let exerciseItemsContainer, exerciseTemplate
 let exerciseIndex = 0
+
+let exerciseCreateModal, createExerciseBtn
+let exerciseNameInput, exerciseCategoryInput, exerciseBaseUnitInput, exerciseCaloriesInput
 
 // 날짜, 시간
 function initializeDateInput(date = new Date()) {
@@ -37,7 +41,6 @@ function initializeDateInput(date = new Date()) {
 // 운동 검색
 async function handleExerciseSearch() {
     const searchStr = exerciseSearchInput.value.trim()
-    exerciseSearchInput.value = ''
 
     if (!searchStr) {
         window.showToast('검색할 운동명을 입력해주세요.', 'warning')
@@ -53,6 +56,7 @@ async function handleExerciseSearch() {
         console.error(data)
         window.showToast('검색결과가 없습니다. 다시 입력해주세요.', 'danger')
     }
+    exerciseSearchInput.value = ''
 }
 
 
@@ -304,23 +308,69 @@ async function handleActivityRecordCreate(event) {
         console.log(errorMessages)
         window.showToast(errorMessages, 'danger')
     }
+}
+
+
+// 운동 항목 등록
+async function handleExerciseCreate(event) {
+    event.preventDefault()
+
+    const name = exerciseNameInput.value
+    const category = exerciseCategoryInput.value
+    const calories = exerciseCaloriesInput.value || 0
+    const baseUnit = exerciseBaseUnitInput.value || "분"
+
+    if (!name || category.length === 0 || !calories) {
+        window.showToast('운동명, 카테고리, 칼로리는 필수 입력값입니다.', 'danger')
+        return
+    }
+
+    const exerciseData = {
+        "exercise_name": name,
+        "category": parseInt(category),
+        "calories_per_unit": parseFloat(calories),
+        "base_unit": baseUnit
+    }
+    const res = await exerciseCreateFetch(exerciseData)
+
+    if (res['isSuccess']) {
+        showToast('운동 항목 등록 완료되었습니다.', 'success')
+        setTimeout(() => {
+            window.location.href = 'activity_record.html'
+        }, 1500)
+    } else {
+        let errorMessage = formatErrorMessage(res['res'])
+        if (errorMessage === "운동 종류 with this 운동 이름 already exists.") {
+            showToast('이미 등록된 운동입니다.', 'danger')
+        } else {
+            showToast(errorMessage, 'danger')
+        }
+    }
 
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('date')
     timeInput = document.getElementById('time')
     notesInput = document.getElementById('notes')
 
-    activityForm = document.getElementById('activityForm');
-    exerciseItemsContainer = document.getElementById('exerciseItemsContainer');
-    exerciseTemplate = document.getElementById('exerciseItemTemplate');
+    activityForm = document.getElementById('activityForm')
+    exerciseItemsContainer = document.getElementById('exerciseItemsContainer')
+    exerciseTemplate = document.getElementById('exerciseItemTemplate')
 
     exerciseSearchInput = document.getElementById('exercise-search-input')
     exerciseSearchBtn = document.getElementById('exercise-search-btn')
     exerciseSearchResults = document.getElementById('exercise-search-results')
-
     createActivityRecordBtn = document.getElementById('create-activity-record')
+
+    exerciseCreateModal = document.getElementById('exercise-create-modal')
+    exerciseForm = document.getElementById('exercise-create-form')
+    exerciseNameInput = document.getElementById('exercise-name-input')
+    exerciseCategoryInput = document.getElementById('exercise-category-input')
+    exerciseCaloriesInput = document.getElementById('exercise-calories-input')
+    exerciseBaseUnitInput = document.getElementById('exercise-base-unit-input')
+    createExerciseBtn = document.getElementById('create-exercise-btn')
 
     const title = document.getElementById('activity-title')
     if (activityRecordId) {
@@ -401,12 +451,67 @@ document.addEventListener('DOMContentLoaded', function () {
             // 검색 입력창에서만 엔터 동작
             if (event.key === 'Enter') {
                 event.preventDefault()
-                if (searchStr.length > 0) {
-                    handleExerciseSearch(searchStr)
-                }
+                handleExerciseSearch()
             }
         })
+        const recordInputs = [dateInput, timeInput, notesInput]
+        recordInputs.forEach(input => {
+            if (input) {
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault()
+                    }
+                })
+            }
+        })
+
         activityForm.addEventListener('submit', handleActivityRecordCreate)
     }
     calculateTotalExerciseInformation()
+
+
+    if (exerciseCreateModal) {
+        exerciseCreateModal.addEventListener('hide.bs.modal', function () {
+            if (exerciseNameInput) exerciseNameInput.value = ''
+            if (exerciseCategoryInput) exerciseCategoryInput.value = ''
+            if (exerciseCaloriesInput) exerciseCaloriesInput.value = ''
+            if (exerciseBaseUnitInput) exerciseBaseUnitInput.value = ''
+        })
+    }
+
+    if (exerciseForm) {
+        const inputs = [exerciseNameInput, exerciseCategoryInput, exerciseCaloriesInput, exerciseBaseUnitInput]
+        inputs.forEach(input => {
+            if (input) {
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault()
+                    }
+                })
+            }
+        })
+
+        exerciseForm.addEventListener('submit', handleExerciseCreate)
+    }
+
+    if (createExerciseBtn) {
+        if (isStaff === true) {
+            createExerciseBtn.style.display = 'block'
+            console.log('is_staff=true')
+        } else {
+            createExerciseBtn.style.display = 'none'
+            console.log('is_staff=false')
+        }
+    }
 });
+
+
+/**
+ * 이름 카테고리 소모칼ㄹ리
+ * 
+ * 필라테스 기타(2) 2칼로리
+ * 명상 2 1
+ * 바이셉스컬(덤벨) 1 5
+ * 케틀벨 스윙(Kettlebell Swings) 0 10
+ *
+ */

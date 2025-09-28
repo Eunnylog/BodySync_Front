@@ -49,7 +49,7 @@ export function formatErrorMessage(errorData, prefix = '') {
         })
     } else if (typeof errorData === 'object' && errorData !== null) {
         if (errorData.non_field_errors) {
-            messages = messages.contact(formatErrorMessage(errorData.non_field_errors, `${prefix ? prefix + ' : ' : ''}일반오류`))
+            messages = messages.concat(formatErrorMessage(errorData.non_field_errors, `${prefix ? prefix + ' : ' : ''}일반오류`))
             delete errorData.non_field_errors // 중복 방지
         }
         if (errorData.detail) {

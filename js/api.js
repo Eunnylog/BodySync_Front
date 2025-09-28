@@ -767,3 +767,25 @@ async function activityRecordCreateFetch(data) {
         return error
     }
 }
+
+
+// 운동 항목 생성
+async function exerciseCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            return { 'isSuccess': true, 'res': response_json }
+        } else {
+            const errorData = await response.json()
+            return { 'isSuccess': false, 'res': errorData }
+        }
+    } catch (error) {
+        return { 'isSuccess': false, 'res': error }
+
+    }
+}

@@ -80,8 +80,8 @@
                                     placeholder="운동 이름 검색">
                                 <button class="btn btn-outline-secondary" type="button"
                                     id="exercise-search-btn">검색</button>
-                                <button class="btn btn-outline-success" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#exercise-create-modal">운동 등록</button>
+                                <button class="btn btn-outline-success" id="create-exercise-btn" type="button"
+                                    data-bs-toggle="modal" data-bs-target="#exercise-create-modal">운동 등록</button>
                             </div>
                             <!-- 검색 결과 리스트 -->
                             <div style="max-height: 200px; overflow-y: auto;" class="border rounded">
@@ -177,19 +177,34 @@
                 <form id="exercise-create-form">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="new-exercise-name" class="form-label">운동 이름</label>
-                            <input type="text" class="form-control" id="new-exercise-name" name="exercise_name"
+                            <label for="exercise-name-input" class="form-label">운동 이름</label>
+                            <input type="text" class="form-control" id="exercise-name-input" name="exercise_name"
                                 required>
                         </div>
                         <div class="mb-3">
-                            <label for="new-exercise-category" class="form-label">카테고리</label>
-                            <input type="text" class="form-control" id="new-exercise-category" name="category"
-                                placeholder="예: 가슴, 하체, 유산소 등">
+                            <label for="exercise-category-input" class="form-label">카테고리</label>
+                            <select class="form-select" id="exercise-category-input" name="exercise_category" required>
+                                <option value="">선택 안 함</option>
+                                <option value="0">유산소</option>
+                                <option value="1">근력</option>
+                                <option value="2">기타</option>
+                            </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="exercise-calories-input" class="form-label">단위당 칼로리</label>
+                            <input type="number" step="0.1" class="form-control" id="exercise-calories-input"
+                                name="exercise_calories" placeholder="예) 1분당 소모 칼로리 (소수점 첫째 자리까지)" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exercise-base-unit-input" class="form-label">운동 단위</label>
+                            <input type="text" class="form-control" id="exercise-base-unit-input"
+                                name="exercise-base-unit" placeholder="미입력시 운동 단위는 '분(minutes)'으로 설정됩니다.">
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                        <button type="submit" class="btn btn-primary">등록</button>
+                        <button type="submit" class="btn my-btn">등록</button>
                     </div>
                 </form>
             </div>
