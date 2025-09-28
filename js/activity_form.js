@@ -1,4 +1,4 @@
-import { getPayload, formatDateTime } from "./utils.js"
+import { getPayload, formatDateTime, formatErrorMessage } from "./utils.js"
 const payload = getPayload()
 
 if (payload) {
@@ -40,7 +40,7 @@ async function handleExerciseSearch() {
     exerciseSearchInput.value = ''
 
     if (!searchStr) {
-        showToast('검색할 운동명을 입력해주세요.', 'warning')
+        window.showToast('검색할 운동명을 입력해주세요.', 'warning')
         exerciseSearchResults.innerHTML = '<li class="list-group-item text-muted">검색할 운동명을 입력해 주세요.</li>'
         return
     }
@@ -294,13 +294,15 @@ async function handleActivityRecordCreate(event) {
 
     const result = await activityRecordCreateFetch(activityRecordData)
 
-    if (result) {
+    if (!result) {
         window.showToast('운동 기록 완료!', 'success')
         setTimeout(() => {
             window.location.href = "activity_record.html"
         }, 1500)
     } else {
-        window.showToast('운동 기록 실패했습니다. 다시 시도해주세요.', 'danger')
+        const errorMessages = formatErrorMessage(result)
+        console.log(errorMessages)
+        window.showToast(errorMessages, 'danger')
     }
 
 }
@@ -383,10 +385,12 @@ document.addEventListener('DOMContentLoaded', function () {
         exerciseSearchInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault()
-                const searchStr = exerciseSearchInput.value.trim()
-                if (searchStr.length > 0) {
-                    handleExerciseSearch(searchStr)
-                }
+                handleExerciseSearch()
+                // const searchStr = exerciseSearchInput.value
+                // if (searchStr.length > 0) {
+                // } else {
+                //     showToast('검색창에 ')
+                // }
             }
         })
     }

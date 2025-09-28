@@ -757,14 +757,13 @@ async function activityRecordCreateFetch(data) {
         if (response.ok) {
             const response_json = await response.json()
             console.log(response_json)
-            return true
+            return null
         } else {
             const errorData = await response.json()
-            console.error(errorData)
-            return false
+            return errorData
         }
     } catch (error) {
         console.log('네트워크 오류', error)
-        return false
+        return error
     }
 }
