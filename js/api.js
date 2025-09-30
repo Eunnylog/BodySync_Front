@@ -727,21 +727,21 @@ async function deleteMealRecordApi(recordId) {
 // 운동 검색
 async function exerciseSearchFetch(searchStr) {
     try {
-        const response = await authFetch(`${backend_base_url}/activities/exercises/?exercise-search=${searchStr}`, {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/?exercise-search=${encodeURIComponent(searchStr)}`, {
             method: 'GET',
         })
 
         if (response.ok) {
-            const query = await response.json()
-            return query
+            const data = await response.json()
+            return { ok: true, data: data }
         } else {
             const errorData = await response.json()
             console.error(errorData.message)
-            return null
+            return { ok: false, error: errorData }
         }
     } catch (error) {
         console.error(error)
-        return null
+        return { ok: false, error: `네트워크오류: ${error}` }
     }
 }
 
@@ -787,5 +787,53 @@ async function exerciseCreateFetch(data) {
     } catch (error) {
         return { 'isSuccess': false, 'res': error }
 
+    }
+}
+
+// 관리자 페이지 운동 항목 조회
+async function exerciseManagementSearchFetch(searchStr = '', page = 1) {
+    try {
+        let queryStr = `?page${page}`
+        if (queryStr) {
+            queryStr += `&exercise-search=${encodeURIComponent(searchStr)}`
+        }
+
+        const response = await authFetch(`${backend_base_url}/activities/exercises/admin_list/${queryStr}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json().catch(() => ({}))
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json().catch(() => response.text())
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('exerciseManagement 네트워크오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 항목 복구
+async function ExerciseRecoverFetch(exerciseId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/recover/${exerciseId}/`, {
+            method: 'PATCH',
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return { ok: true, data: response_json }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: true, error: error }
     }
 }

@@ -136,14 +136,14 @@ function populateAccordionSections(mealRecordData, mealTypeSections) {
                 // Div 2. food_items 렌더링
                 record.food_items.forEach(item => {
                     const mealCardDiv = document.createElement('div')
-                    mealCardDiv.classList.add('card', 'text-bg-light', 'mb-2', 'w-100', 'food-item-card')
+                    mealCardDiv.classList.add('card', 'text-bg-light', 'mb-2', 'w-100', 'food-item-card', 'border-info')
 
                     const cardHeader = document.createElement('div')
                     cardHeader.classList.add('card-header', 'd-flex', 'justify-content-between', 'align-items-center')
 
                     const cardTitle = document.createElement('span')
                     cardTitle.innerHTML = `
-                    <b class="text-primary">${item.food_name}</b> (${parseFloat(item.quantity).toFixed(1)}${item.unit || item.base_unit})
+                    <b class="text-secondary">${item.food_name} (${parseFloat(item.quantity).toFixed(1)}${item.unit || item.base_unit}) </b>
                     `
 
                     cardHeader.appendChild(cardTitle)

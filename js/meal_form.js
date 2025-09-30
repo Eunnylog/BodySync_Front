@@ -45,7 +45,7 @@ async function performFoodSearch() {
 
     if (!searchStr) {
         window.showToast('검색할 음식을 입력하세요.', 'warning')
-        foodSearchResultUI.innerHTML = '<p class="text-muted">검색어를 입력해주세요.</p>'
+        foodSearchResultUI.innerHTML = '<li class="list-group-item d-flex justify-content-between align-items-center"><span>검색어를 입력해주세요.</span></li>'
         return
     }
 

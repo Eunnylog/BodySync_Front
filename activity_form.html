@@ -42,36 +42,40 @@
     <!-- Toast 끝 -->
     <!-- 운동 기록 폼 시작 -->
     <div class="container my-5">
-        <div class="card">
-            <div class="card-header">
+        <div class="card border-info">
+            <div class="card-header bg-info-subtle text-info-shade-20">
                 <h5 class="card-title text-center mb-0" id="activity-title">운동 기록 등록</h5>
             </div>
 
             <form id="activityForm">
                 <div class="card-body">
                     <!-- 기본 정보 섹션 -->
-                    <h5 class="mb-3">기본 정보</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="date" class="form-label">날짜:</label>
-                            <input type="date" class="form-control" id="date" name="date" required>
+                    <div class="card mb-3 border-info">
+                        <div class="card-header bg-white text-info">
+                            <h5 class="mb-0">기본 정보</h5>
                         </div>
-                        <div class="col-md-6">
-                            <label for="time" class="form-label">시간:</label>
-                            <input type="time" class="form-control" id="time" name="time" required>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="date" class="form-label">날짜:</label>
+                                    <input type="date" class="form-control" id="date" name="date" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="time" class="form-label">시간:</label>
+                                    <input type="time" class="form-control" id="time" name="time" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">메모:</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3"
+                                    placeholder="오늘의 운동에 대한 간단한 메모를 남겨주세요."></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">메모:</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3"
-                            placeholder="오늘의 운동에 대한 간단한 메모를 남겨주세요."></textarea>
-                    </div>
-
                     <hr class="my-4">
-
                     <!-- 운동 검색/추가 -->
-                    <div class="card mb-4">
-                        <div class="card-header">
+                    <div class="card mb-4 border-info">
+                        <div class="card-header bg-white text-info">
                             <h5 class="mb-0">운동 검색 또는 등록</h5>
                         </div>
                         <div class="card-body">
@@ -93,8 +97,8 @@
                     </div>
                     <!-- 운동 검색/추가 섹션 카드 끝 -->
                     <!-- 선택된 운동 항목 섹션 -->
-                    <div class="card mb-4">
-                        <div class="card-header">
+                    <div class="card mb-4 border-info">
+                        <div class="card-header bg-info-subtle text-info-shade-20">
                             <h5 class="mb-0">선택된 운동 항목</h5>
                         </div>
                         <div class="card-body">
@@ -106,8 +110,8 @@
                         </div>
                     </div>
                     <!-- 총 운동 시간 / 칼로리 시작-->
-                    <div class="card mb-4">
-                        <div class="card-header">
+                    <div class="card mb-4 border-info">
+                        <div class="card-header bg-info-subtle text-info-shade-20">
                             <h5 class="mb-0">총 소모 칼로리 / 운동 시간</h5>
                         </div>
                         <div class="card-body">
@@ -120,9 +124,9 @@
                     <!-- 총 운동 시간 / 칼로리 끝-->
                 </div>
                 <!-- main card-body 끝 -->
-                <div class="card-footer d-flex justify-content-end">
+                <div class="card-footer d-flex justify-content-end bg-white text-info">
                     <button class="btn btn-secondary me-2">취소</button>
-                    <button type="submit" class="btn my-btn" id="create-activity-record">저장</button>
+                    <button type="submit" class="btn btn-info" id="create-activity-record">저장</button>
                 </div>
             </form>
         </div> <!-- 전체 폼 카드 끝 -->
@@ -204,7 +208,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                        <button type="submit" class="btn my-btn">등록</button>
+                        <button type="submit" class="btn btn-info">등록</button>
                     </div>
                 </form>
             </div>

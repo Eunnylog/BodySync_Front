@@ -48,13 +48,14 @@ async function handleExerciseSearch() {
         return
     }
 
-    const data = await exerciseSearchFetch(searchStr)
-    if (data) {
-        renderExerciseSearchResults(data)
-        window.showToast(`${searchStr}에 대한 검색 결과 ${data.length}개를 찾았습니다.`, 'success')
+    const res = await exerciseSearchFetch(searchStr)
+    if (res.ok) {
+        renderExerciseSearchResults(res.data)
+        window.showToast(`${searchStr}에 대한 검색 결과 ${res.data.length}개를 찾았습니다.`, 'success')
     } else {
-        console.error(data)
-        window.showToast('검색결과가 없습니다. 다시 입력해주세요.', 'danger')
+        console.error(res.error)
+        const errorMessage = formatErrorMessage(res.error)
+        window.showToast(res.error, 'danger')
     }
     exerciseSearchInput.value = ''
 }
@@ -494,6 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
         exerciseForm.addEventListener('submit', handleExerciseCreate)
     }
 
+    // 운동 등록 버튼
     if (createExerciseBtn) {
         if (isStaff === true) {
             createExerciseBtn.style.display = 'block'
@@ -504,14 +506,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-
-
-/**
- * 이름 카테고리 소모칼ㄹ리
- * 
- * 필라테스 기타(2) 2칼로리
- * 명상 2 1
- * 바이셉스컬(덤벨) 1 5
- * 케틀벨 스윙(Kettlebell Swings) 0 10
- *
- */
