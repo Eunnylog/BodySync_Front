@@ -360,66 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1500)
     }
 
-
-
-    // // 생성 & 수정 모드 분기
-    // exerciseCreateForm.addEventListener('submit', async function (event) {
-    //     event.preventDefault()
-
-    //     const currentMode = modalModeInput.value
-
-    //     if (currentMode === 'create') {
-    //         await handleCreateExercise()
-    //     } else if (currentMode === 'edit') {
-    //         const exerciseId = editExerciseIdInput.value
-    //         if (exerciseId) {
-    //             await handleEditExercise(exerciseId)
-    //         } else {
-    //             window.showToast('수정 대상 운동 ID를 찾을 수 없습니다.')
-    //         }
-    //     }
-
-    // })
-
-    // exerciseCreateModal.addEventListener('hide.bs.modal', function () {
-    //     // if (exerciseNameInput) exerciseNameInput.value = ''
-    //     // if (exerciseCategoryInput) exerciseCategoryInput.value = ''
-    //     // if (exerciseCaloriesInput) exerciseCaloriesInput.value = ''
-    //     // if (exerciseBaseUnitInput) exerciseBaseUnitInput.value = ''
-
-    //     exerciseCreateForm.reset()
-
-    //     modalTitle.innerText = '새 운동 항목 등록'
-    //     modalModeInput.value = 'create'
-    //     editExerciseIdInput.value = ''
-    //     saveExerciseBtn.innerText = '등록'
-    // })
-
-
-
-    // exerciseCreateModal.addEventListener('show.bs.modal', (event) => {
-    //     const editBtn = event.relatedTarget
-
-    //     if (editBtn && editBtn.classList.contains('edit-exercise-btn')) {
-    //         const exerciseId = editBtn.dataset.id
-    //         console.log(exerciseId)
-    //         // 수정 모드
-    //         if (exerciseId) {
-    //             modalTitle.innerText = "운동 항목 수정"
-    //             modalModeInput.value = 'edit'
-    //             editExerciseIdInput.value = exerciseId
-    //             saveExerciseBtn.innerText = '저장'
-    //             loadExerciseDetail(exerciseId)
-    //         }
-    //     } else {
-    //         // 생성 모드
-    //         modalTitle.innerText = '새 운동 항목 등록'
-    //         modalModeInput.value = 'create'
-    //         editExerciseIdInput.value = ''
-    //         saveExerciseBtn.innerText = '등록'
-    //     }
-    // })
-
+    // 운동 항목 모달
     exerciseCreateModal.addEventListener('show.bs.modal', (event) => {
         const editBtn = event.relatedTarget
 
@@ -436,8 +377,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 saveExerciseBtn.innerText = '저장'
 
                 loadExerciseDetail(exerciseId)
-
-                // 여기에 수정 데이터 전송하는 함수 넣은면 될까???
             }
         } else {
             // 생성 모드
@@ -448,6 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
+    // 운동 항목 모달
     exerciseCreateModal.addEventListener('hide.bs.modal', function () {
         exerciseCreateForm.reset()
 
@@ -457,13 +397,14 @@ document.addEventListener('DOMContentLoaded', function () {
         saveExerciseBtn.innerText = '등록'
     })
 
-
+    // 운동 항목 모달
     exerciseCreateModal.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault()
         }
     })
 
+    // 운동 항목 폼
     exerciseCreateForm.addEventListener('submit', async function (event) {
         event.preventDefault()
 
@@ -503,27 +444,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /**
  * // =========================================================
-// 5. 수정 기능 (모달 띄우고 데이터 채우기)
-// =========================================================
-async function handleEditButtonClick(exerciseId) {
-    editingExerciseId = exerciseId; // 수정 중인 ID 저장
-
-    // 모달 타이틀 변경
-    modalTitle.innerText = '운동 항목 수정';
-    saveExerciseBtn.innerText = '수정';
-
-    // 기존 데이터 불러와서 폼 채우기
-    const result = await exerciseDetailFetch(exerciseId); // exerciseDetailFetch는 `{ok: true, data: exercise}` 반환
-    if (result.ok) {
-        const exercise = result.data;
-        exerciseNameInput.value = exercise.exercise_name;
-        exerciseCategoryInput.value = exercise.category;
-        exerciseCaloriesInput.value = exercise.calories_per_unit;
-        exerciseBaseUnitInput.value = exercise.base_unit;
-    } else {
-        window.showToast(result.error || formatErrorMessage(result.errorData), 'danger');
-    }
-}
 
 // =========================================================
 // 6. 삭제 (소프트/영구) 기능
@@ -563,138 +483,5 @@ async function handleDeleteButtonClick(exerciseId, isDeleted) { // ⭐ isDeleted
     }
 }
 
-
-// =========================================================
-// 7. 운동 생성/수정 폼 제출 처리
-// =========================================================
-async function handleExerciseFormSubmit(event) {
-    event.preventDefault();
-
-    const name = exerciseNameInput.value;
-    const category = exerciseCategoryInput.value;
-    const calories = exerciseCaloriesInput.value;
-    const baseUnit = exerciseBaseUnitInput.value;
-
-    if (!name || category.length === 0 || !calories) {
-        window.showToast('운동명, 카테고리, 칼로리는 필수 입력값입니다.', 'danger');
-        return;
-    }
-
-    const exerciseData = {
-        "exercise_name": name,
-        "category": parseInt(category),
-        "calories_per_unit": parseFloat(calories),
-        "base_unit": baseUnit // 기본값이 없다면 이 부분은 백엔드에서 처리
-    };
-
-    let result;
-    if (editingExerciseId) { // 수정 모드
-        result = await exerciseUpdateFetch(editingExerciseId, exerciseData);
-    } else { // 생성 모드
-        result = await exerciseCreateFetch(exerciseData);
-    }
-
-    if (result.ok) {
-        window.showToast(`운동 항목이 성공적으로 ${editingExerciseId ? '수정' : '등록'}되었습니다.`, 'success');
-        // 모달 닫기
-        const modal = bootstrap.Modal.getInstance(exerciseCreateModal) || new bootstrap.Modal(exerciseCreateModal);
-        modal.hide();
-
-        await loadAndRenderExerciseList(currentSearchQuery, currentPage); // 목록 새로고침
-    } else {
-        // ... 오류 처리 로직은 loadAndRenderExerciseList와 유사하게 ...
-        let displayMessage = '운동 항목 처리 중 오류가 발생했습니다.';
-        if (result.message) { 
-            displayMessage = result.message;
-        } else if (result.errorData) {
-            if (typeof result.errorData === 'object' && result.errorData !== null) {
-                let formattedMsg = formatErrorMessage(result.errorData);
-                if (formattedMsg.trim() === '') {
-                    displayMessage = result.errorData.detail || result.errorData.message || `오류 발생 (상태 코드: ${result.status})`;
-                } else {
-                    displayMessage = formattedMsg;
-                }
-            } else if (typeof result.errorData === 'string' && result.errorData.trim() !== '') {
-                console.error('Raw Error Response Data:', result.errorData);
-                displayMessage = `서버 오류 발생 (상태 코드: ${result.status}). 잠시 후 다시 시도해주세요.`;
-            } else {
-                displayMessage = `서버 응답 오류 (상태 코드: ${result.status}). 잠시 후 다시 시도해주세요.`;
-            }
-        }
-        window.showToast(displayMessage, 'danger');
-    }
-}
-
-
-// =========================================================
-// 8. 초기화 및 이벤트 리스너 등록 (DOMContentLoaded)
-// =========================================================
-document.addEventListener('DOMContentLoaded', async function () {
-    const payload = getPayload(); 
-    const isStaff = payload ? payload.is_staff : false;
-
-    // 관리자 권한 체크
-    if (!isStaff) {
-        window.showToast('관리자만 접근 가능한 페이지입니다.', 'danger');
-        setTimeout(() => {
-            window.location.href = 'activity_record.html'; // 비관리자라면 활동 기록 페이지로 리다이렉트
-        }, 1500);
-        return; // 로직 종료
-    }
-
-    // 관리자일 경우
-    await loadAndRenderExerciseList(); // ⭐ 인자 없이 호출하여 전체 목록 (1페이지) 로드 ⭐
-
-    // 검색 이벤트 리스너
-    const exerciseSearchBtn = document.getElementById('exercise-search-btn');
-    if (exerciseSearchBtn) {
-        exerciseSearchBtn.addEventListener('click', handleSearch);
-    }
-    if (exerciseSearchInput) {
-        exerciseSearchInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                handleSearch();
-            }
-        });
-    }
-
-    // 수정/삭제 버튼 클릭 이벤트를 부모 요소에 위임
-    exerciseListContainer.addEventListener('click', async (event) => {
-        // 수정 버튼 클릭
-        if (event.target.classList.contains('edit-exercise-btn')) {
-            const exerciseId = event.target.dataset.id;
-            // 모달 열기 전에 데이터를 미리 불러와서 폼에 채우기
-            await handleEditButtonClick(exerciseId);
-            const modal = new bootstrap.Modal(exerciseCreateModal); // 모달 인스턴스 생성
-            modal.show(); // 모달 표시
-        } 
-        // 삭제/영구삭제 버튼 클릭
-        else if (event.target.classList.contains('delete-exercise-btn')) {
-            const exerciseId = event.target.dataset.id;
-            const currentExercise = await exerciseDetailFetch(exerciseId); // 현재 운동 정보를 가져옴
-            if (currentExercise.ok) {
-                await handleDeleteButtonClick(exerciseId, currentExercise.data.is_deleted);
-            } else {
-                window.showToast('운동 정보 로드에 실패했습니다.', 'danger');
-            }
-        }
-    });
-
-    // 새 운동 등록 버튼 클릭 시 모달 초기화
-    const createExerciseFromManageBtn = document.getElementById('create-exercise-from-manage-btn');
-    if (createExerciseFromManageBtn) {
-        createExerciseFromManageBtn.addEventListener('click', () => {
-            editingExerciseId = null; // 생성 모드로 설정
-            modalTitle.innerText = '새 운동 등록';
-            saveExerciseBtn.innerText = '등록';
-            exerciseCreateForm.reset(); // 폼 초기화
-        });
-    }
-
-    // 모달 폼 제출 이벤트
-    if (exerciseCreateForm) {
-        exerciseCreateForm.addEventListener('submit', handleExerciseFormSubmit);
-    }
 });
  */
