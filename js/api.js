@@ -797,7 +797,7 @@ async function exerciseCreateFetch(data) {
 // 관리자 페이지 운동 항목 조회
 async function exerciseManagementSearchFetch(searchStr = '', page = 1) {
     try {
-        let queryStr = `?page${page}`
+        let queryStr = `?page=${page}`
         if (queryStr) {
             queryStr += `&exercise-search=${encodeURIComponent(searchStr)}`
         }

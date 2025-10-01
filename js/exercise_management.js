@@ -164,7 +164,7 @@ async function handleSearch() {
         return
     }
 
-    currentPage = 1
+    currentPage = 1 // 검색 시 페이지 1로 초기화
     currentSearchQuery = searchStr
     await loadAndRenderExerciseList(searchStr, currentPage)
     exerciseSearchInput.value = ''
@@ -467,52 +467,3 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
 })
-
-
-
-
-
-
-/**
- * // =========================================================
-
-// =========================================================
-// 6. 삭제 (소프트/영구) 기능
-// =========================================================
-async function handleDeleteButtonClick(exerciseId, isDeleted) { // ⭐ isDeleted 인자 추가 ⭐
-    let confirmMessage;
-    let successMessage;
-    let failMessage;
-    let apiCall;
-
-    if (isDeleted) { // 이미 삭제된 항목 (영구 삭제)
-        confirmMessage = '정말로 이 운동 항목을 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다!';
-        successMessage = '운동 항목이 영구 삭제되었습니다.';
-        failMessage = '운동 항목 영구 삭제에 실패했습니다.';
-        // 실제 영구 삭제를 위한 API 엔드포인트가 필요할 수 있음
-        // DRF는 보통 DELETE 요청 시 하드 삭제를 수행합니다.
-        apiCall = exerciseDeleteFetch(exerciseId); 
-    } else { // 삭제되지 않은 항목 (소프트 삭제)
-        confirmMessage = '정말 이 운동 항목을 삭제(비공개)하시겠습니까? 기록에는 영향을 주지 않습니다.';
-        successMessage = '운동 항목이 삭제(비공개) 처리되었습니다.';
-        failMessage = '운동 항목 삭제(비공개)에 실패했습니다.';
-        // is_deleted 필드만 true로 변경하는 PUT 또는 PATCH 요청 필요
-        apiCall = exerciseUpdateFetch(exerciseId, { is_deleted: true }); 
-    }
-
-    if (!confirm(confirmMessage)) {
-        return;
-    }
-
-    const result = await apiCall;
-    if (result.ok) {
-        window.showToast(successMessage, 'info');
-        await loadAndRenderExerciseList(currentSearchQuery, currentPage); // 목록 새로고침
-    } else {
-        window.showToast(result.error || formatErrorMessage(result.errorData), 'danger');
-        console.error(failMessage, result);
-    }
-}
-
-});
- */
