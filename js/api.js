@@ -817,7 +817,7 @@ async function exerciseManagementSearchFetch(searchStr = '', page = 1) {
 
 
 // 운동 항목 복구
-async function ExerciseRecoverFetch(exerciseId) {
+async function recoverExerciseFetch(exerciseId) {
     try {
         const response = await authFetch(`${backend_base_url}/activities/exercises/recover/${exerciseId}/`, {
             method: 'PATCH',
@@ -829,11 +829,58 @@ async function ExerciseRecoverFetch(exerciseId) {
             return { ok: true, data: response_json }
         } else {
             const errorData = await response.json()
-            console.log(errorData)
+            console.error(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
+        console.error('네트워크 오류', error)
         return { ok: true, error: error }
     }
+}
+
+
+async function getExerciseDetailFetch(exerciseId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return { ok: true, data: response_json }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크오류', error)
+        return { ok: false, error: error }
+    }
+
+}
+
+// 운동 항목 수정 전송
+async function updateExerciseFetch(exerciseId, exerciseData) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(exerciseData)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return { ok: true, data: response_json }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크오류', error)
+        return { ok: false, error: error }
+    }
+
 }

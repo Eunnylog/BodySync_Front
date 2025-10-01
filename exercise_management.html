@@ -75,11 +75,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exercise-modal-label">새 운동 등록</h5>
+                    <h5 class="modal-title" id="exercise-modal-label">새 운동 항목 등록</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="exercise-create-form">
                     <div class="modal-body">
+                        <input type="hidden" id="modal-mode" value="create">
+                        <input type="hidden" id="edit-exercise-id" value="">
                         <div class="mb-3">
                             <label for="exercise-name-input" class="form-label">운동 이름</label>
                             <input type="text" class="form-control" id="exercise-name-input" name="exercise_name"
@@ -97,7 +99,7 @@
                         <div class="mb-3">
                             <label for="exercise-calories-input" class="form-label">단위당 칼로리</label>
                             <input type="number" class="form-control" id="exercise-calories-input"
-                                name="exercise_calories" placeholder="예) 1분당 4kcal 소모 시 4 입력" required>
+                                name="exercise_calories" placeholder="예) 1분당 4kcal 소모 시 4 입력" required step="0.01">
                         </div>
                         <div class="mb-3">
                             <label for="exercise-base-unit-input" class="form-label">운동 단위</label>
