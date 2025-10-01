@@ -187,7 +187,7 @@ async function handleDeleteRecord(recordId, recordDate) {
         const success = await deleteMealRecordApi(recordId)
 
         if (success) {
-            window.showToast('식단 기록이 삭제되었습니다.', 'success')
+            window.showToast('식단 기록이 삭제되었습니다.', 'info')
             setTimeout(() => {
                 window.location.href = `meal_record.html?date=${recordDate}`
             }, 1500)

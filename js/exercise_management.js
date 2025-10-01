@@ -190,7 +190,7 @@ function createExerciseCard(exercise) {
             <div class="btn-group btn-group-sm" role="group">
                 <button type="button" class="btn btn-outline-info edit-exercise-btn" data-bs-toggle="modal"
                     data-bs-target="#exercise-modal" data-id="${exercise.id}">수정</button>
-                <button type="button" class="btn btn-outline-danger" data-id="${exercise.id}">비공개</button>
+                <button type="button" class="btn btn-outline-danger delete-exercise-btn" data-id="${exercise.id}">비공개</button>
             </div>
         `
     }
@@ -235,7 +235,7 @@ async function handleCreateExercise(event) {
     const res = await exerciseCreateFetch(exerciseData)
 
     if (res['isSuccess']) {
-        showToast('운동 항목 등록 완료되었습니다.', 'success')
+        showToast('운동 항목 등록 완료되었습니다.', 'info')
         setTimeout(() => {
             window.location.href = 'exercise_management.html'
         }, 1500)
@@ -258,7 +258,7 @@ async function handleRecoverExercise(exerciseId) {
         const res = await recoverExerciseFetch(exerciseId)
 
         if (res.ok) {
-            window.showToast('복구 되었습니다.', 'success')
+            window.showToast('복구 되었습니다.', 'info')
             setTimeout(() => {
                 window.location.reload()
             }, 1500)
@@ -308,13 +308,31 @@ async function handleEditExercise(exerciseId) {
     const res = await updateExerciseFetch(exerciseId, exerciseData)
 
     if (res.ok) {
-        window.showToast('수정 완료되었습니다.', 'success')
+        window.showToast('수정 완료되었습니다.', 'info')
         setTimeout(() => {
             window.location.reload()
         }, 1500)
     } else {
         const message = formatErrorMessage(res.error)
         window.showToast(message, 'danger')
+    }
+}
+
+async function handleDeleteExercise(exerciseId) {
+    const confirmed = confirm('정말 이 운동 항목을 삭제(비공개)하시겠습니까?\n기록에는 영향을 주지 않으며 복구 가능합니다.')
+
+    if (confirmed) {
+        const res = await deleteExerciseFetch(exerciseId)
+
+        if (res.ok) {
+            window.showToast('삭제(비공개) 처리되었습니다.', 'info')
+            setTimeout(() => {
+                window.location.reload()
+            }, 1500)
+        } else {
+            const errorMessage = formatErrorMessage(res.error)
+            showToast(errorMessage, 'danger')
+        }
     }
 }
 
@@ -353,6 +371,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
         }
+
+        // 삭제버튼(비공개)
+        exerciseListContainer.addEventListener('click', (event) => {
+            const deleteBtn = event.target
+            if (deleteBtn && deleteBtn.classList.contains('delete-exercise-btn')) {
+                const exerciseId = deleteBtn.dataset.id
+                if (exerciseId) {
+                    console.log(exerciseId)
+                    handleDeleteExercise(exerciseId)
+                }
+            }
+        })
     } else {
         window.showToast('관리자만 접근 가능한 페이지입니다.')
         setTimeout(() => {
@@ -360,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1500)
     }
 
-    // 운동 항목 모달
+    // 운동 항목 모달 -> 열림
     exerciseCreateModal.addEventListener('show.bs.modal', (event) => {
         const editBtn = event.relatedTarget
 
@@ -387,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
-    // 운동 항목 모달
+    // 운동 항목 모달 -> 숨김
     exerciseCreateModal.addEventListener('hide.bs.modal', function () {
         exerciseCreateForm.reset()
 
@@ -397,22 +427,23 @@ document.addEventListener('DOMContentLoaded', function () {
         saveExerciseBtn.innerText = '등록'
     })
 
-    // 운동 항목 모달
+    // 운동 항목 모달 -> 엔터 전송 방지
     exerciseCreateModal.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault()
         }
     })
 
-    // 운동 항목 폼
+    // 운동 항목 폼 -> 전송
     exerciseCreateForm.addEventListener('submit', async function (event) {
         event.preventDefault()
 
         const currentMode = modalModeInput.value
-
+        // 생성 모드일 떄
         if (currentMode === 'create') {
             await handleCreateExercise()
         } else if (currentMode === 'edit') {
+            // 수정 모드일 때
             const exerciseId = editExerciseIdInput.value
             await handleEditExercise(exerciseId)
         }
@@ -475,7 +506,7 @@ async function handleDeleteButtonClick(exerciseId, isDeleted) { // ⭐ isDeleted
 
     const result = await apiCall;
     if (result.ok) {
-        window.showToast(successMessage, 'success');
+        window.showToast(successMessage, 'info');
         await loadAndRenderExerciseList(currentSearchQuery, currentPage); // 목록 새로고침
     } else {
         window.showToast(result.error || formatErrorMessage(result.errorData), 'danger');

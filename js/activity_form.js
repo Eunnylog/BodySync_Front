@@ -51,7 +51,7 @@ async function handleExerciseSearch() {
     const res = await exerciseSearchFetch(searchStr)
     if (res.ok) {
         renderExerciseSearchResults(res.data)
-        window.showToast(`${searchStr}에 대한 검색 결과 ${res.data.length}개를 찾았습니다.`, 'success')
+        window.showToast(`${searchStr}에 대한 검색 결과 ${res.data.length}개를 찾았습니다.`, 'info')
     } else {
         console.error(res.error)
         const errorMessage = formatErrorMessage(res.error)
@@ -169,7 +169,7 @@ function renderSelectedExerciseResult(exerciseData) {
         if (placeholder) {
             placeholder.remove()
         }
-        window.showToast(`${exerciseData.name}(이)가 추가되었습니다.`, 'success')
+        window.showToast(`${exerciseData.name}(이)가 추가되었습니다.`, 'info')
         exerciseItemsContainer.appendChild(clone)
     } else {
         console.error('exerciseItemsContainer 요소를 찾을 수 없음')
@@ -300,7 +300,7 @@ async function handleActivityRecordCreate(event) {
     const result = await activityRecordCreateFetch(activityRecordData)
 
     if (!result) {
-        window.showToast('운동 기록 완료!', 'success')
+        window.showToast('운동 기록 완료!', 'info')
         setTimeout(() => {
             window.location.href = "activity_record.html"
         }, 1500)
@@ -335,7 +335,7 @@ async function handleExerciseCreate(event) {
     const res = await exerciseCreateFetch(exerciseData)
 
     if (res['isSuccess']) {
-        showToast('운동 항목 등록 완료되었습니다.', 'success')
+        showToast('운동 항목 등록 완료되었습니다.', 'info')
         setTimeout(() => {
             window.location.href = 'activity_record.html'
         }, 1500)

@@ -84,10 +84,14 @@ function showToast(message, type = 'info', title = '알림') {
 
     const toastElement = commonToastInstance._element // Toast DOM 접근
 
-    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning', 'text-bg-info')
+    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning')
 
-    if (type !== 'info') {
-        toastElement.classList.add(`text-bg-${type}`)
+    // if (type !== 'info') {
+    //     toastElement.classList.add(`text-bg-${type}`)
+    // }
+
+    if (type) {
+        toastElement.classList.add(`text-bg-${type}`);
     }
 
     document.getElementById('common-toast-title').innerText = title;
@@ -115,7 +119,7 @@ async function handleSignin(email = null, password = null) {
             })
         })
         if (response.status == 200) {
-            showToast('로그인 되었습니다!', 'success')
+            showToast('로그인 되었습니다!', 'info')
             const response_json = await response.json()
             localStorage.setItem('payload', JSON.stringify(response_json.payload))
             setTimeout(function () {
@@ -174,7 +178,7 @@ async function handleSignup() {
             })
         })
         if (response.status == 201) {
-            showToast('회원가입이 완료되었습니다!', 'success', '환영합니다!')
+            showToast('회원가입이 완료되었습니다!', 'info', '환영합니다!')
 
             const signupModalElement = document.getElementById('signup-modal');
             const signupModalInstance = bootstrap.Modal.getInstance(signupModalElement); // Bootstrap Modal 인스턴스 가져오기
@@ -238,7 +242,7 @@ async function handleLogout() {
             'Content-Type': 'application/json',
         },
     });
-    showToast('로그아웃 되었습니다!', 'success')
+    showToast('로그아웃 되었습니다!', 'info')
     localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
     setTimeout(function () {
         window.location.href = 'index.html'
@@ -882,5 +886,26 @@ async function updateExerciseFetch(exerciseId, exerciseData) {
         console.error('네트워크오류', error)
         return { ok: false, error: error }
     }
+}
 
+
+// 운동 항목 삭제
+async function deleteExerciseFetch(exerciseId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true, }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크오류', error)
+        return { ok: false, error: error }
+    }
 }

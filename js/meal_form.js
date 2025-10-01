@@ -71,13 +71,13 @@ async function performFoodSearch() {
 
                 foodSearchResultUI.appendChild(li)
             })
-            window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'success')
+            window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'info')
         } else {
             const li = document.createElement('li')
             li.className = 'list-group-item'
             li.textContent = `${searchStr}에 대한 검색 결과가 없습니다. 직접 등록해주세요.`
             foodSearchResultUI.appendChild(li)
-            window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'info')
+            window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
         }
     } catch (error) {
         console.error('음식 검색 중 오류 발생', error)
@@ -152,7 +152,7 @@ function addFoodItemToSelectedList(foodDetails, initialQuantity = 100, initialUn
         <button type="button" class="btn btn-outline-danger remove-food-btn btn-sm ms-2" data-food-name="${foodName}">삭제</button>`
 
     selectedFoodsList.appendChild(selectedFoodLi)
-    window.showToast(`${foodName}이(가) 선택되었습니다.`, 'success')
+    window.showToast(`${foodName}이(가) 선택되었습니다.`, 'info')
     calculateTotalMacros()
 }
 
@@ -324,7 +324,7 @@ async function handleFoodCreationSubmit(e) {
 
     const success = await FoodCreateFetch(foodData)
     if (success) {
-        window.showToast('음식 등록 완료!', 'success')
+        window.showToast('음식 등록 완료!', 'info')
         bsFoodCreateModal.hide()
     } else {
         window.showToast('음식 등록에 실패했습니다. 다시 시도해 주세요.', 'danger')
@@ -370,7 +370,7 @@ async function handleMealRecordSubmit(e) {
         const editSuccess = await updateMealRecord(submissionData, mealRecordId)
 
         if (editSuccess) {
-            window.showToast('식단 수정 성공', 'success')
+            window.showToast('식단 수정 성공', 'info')
             setTimeout(() => {
                 window.location.href = `meal_record.html?date=${mealDate}`
             }, 1500)
@@ -382,7 +382,7 @@ async function handleMealRecordSubmit(e) {
         const createSuccess = await createMealRecord(submissionData)
 
         if (createSuccess) {
-            window.showToast('식단 등록 성공', 'success')
+            window.showToast('식단 등록 성공', 'info')
             setTimeout(() => {
                 window.location.href = `meal_record.html?date=${mealDate}`
             }, 1500)

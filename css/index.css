@@ -277,3 +277,28 @@ body {
     color: var(--bs-info) !important;
     border-top-color: var(--bs-info) !important;
 }
+
+
+.toast.text-bg-info .toast-header {
+    background-color: var(--bs-body-bg, #fff);
+    /* 페이지의 기본 배경색 (또는 흰색)을 사용 */
+    color: var(--bs-info);
+    /* 글자색은 주인님의 info 색상 */
+    border-bottom: 1px solid rgba(var(--bs-info-rgb), .3);
+    /* 헤더 아래에 옅은 구분선 추가 (선택 사항) */
+}
+
+/* ⭐ 토스트 헤더 안의 닫기 버튼 (btn-close) 색상 조정 ⭐ */
+.toast.text-bg-info .toast-header .btn-close {
+    filter: invert(0) grayscale(100%) brightness(50%);
+    opacity: .7;
+}
+
+.toast.text-bg-info .toast-body {
+    background-color: var(--bs-info);
+    color: var(--bs-info-text-contrast, #fff);
+}
+
+.toast.text-bg-info {
+    border-color: var(--bs-info);
+}

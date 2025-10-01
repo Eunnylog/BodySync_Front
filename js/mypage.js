@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (confirmMessage) {
                 const success = await deleteUser()
                 if (success) {
-                    showToast('회원 탈퇴가 완료되었습니다. 이용해주셔서 감사합니다.', 'success')
+                    showToast('회원 탈퇴가 완료되었습니다. 이용해주셔서 감사합니다.', 'info')
                     localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
                     setTimeout(function () {
                         window.location.href = 'index.html'
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (success) {
                 // localStorage.removeItem('payload')
                 await handleLogout()
-                showToast('비밀번호 변경이 완료되었습니다. 다시 로그인해주세요.', 'success')
+                showToast('비밀번호 변경이 완료되었습니다. 다시 로그인해주세요.', 'info')
                 setTimeout(function () {
                     window.location.href = 'index.html'
                 }, 1500)
@@ -142,7 +142,7 @@ async function handleProfileSubmit(event) {
     const success = await updateProfile(userData)
 
     if (success) {
-        showToast('프로필 정보가 수정되었습니다.', 'success')
+        showToast('프로필 정보가 수정되었습니다.', 'info')
 
         setTimeout(function () {
             window.location.href = 'index.html'
