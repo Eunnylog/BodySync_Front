@@ -512,7 +512,6 @@ async function handleAccessTokenExpiration(response, originalRequestFn) {
             return response
         }
     }
-    console.log(errorData, '응답데이터')
 
     const expired = response.status === 401 && (
         errorData?.detail === "Authentication credentials were not provided." || // 브라우저: 쿠키 없음
@@ -842,7 +841,7 @@ async function recoverExerciseFetch(exerciseId) {
     }
 }
 
-
+// 운동 항목 디테일 조회
 async function getExerciseDetailFetch(exerciseId) {
     try {
         const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
@@ -868,7 +867,7 @@ async function getExerciseDetailFetch(exerciseId) {
 // 운동 항목 수정 전송
 async function updateExerciseFetch(exerciseId, exerciseData) {
     try {
-        const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${encodeURIComponent(exerciseId)}/`, {
             method: 'PATCH',
             body: JSON.stringify(exerciseData)
         })
@@ -900,12 +899,36 @@ async function deleteExerciseFetch(exerciseId) {
             return { ok: true, }
         } else {
             const errorData = await response.json()
-            console.log(errorData)
+            console.error(errorData)
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.log('네트워크오류', error)
+        console.error('네트워크오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 기록 조회
+async function getActivityRecordFetch(date) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/?date=${encodeURIComponent(date)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.error('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }

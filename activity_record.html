@@ -40,8 +40,8 @@
         </div>
     </div>
     <!-- Toast 끝 -->
-    <!-- 날짜 시작 -->
-    <div class="container">
+    <!-- summary 시작 -->
+    <div class="container" id="activity-summary-container">
         <h5 style="margin: 2em;">
             <div style="text-align: center;">
                 <a href="#" id="prev-day-btn" class="text-decoration-none text-dark">
@@ -61,79 +61,114 @@
                 </button>
             </div>
         </h5>
-
     </div>
-    <!-- 날짜 끝 -->
-    <!-- 운동 기록 목록 시작 -->
-    <!-- 오늘의 총 운동 요약-->
-    <div class="container">
+    <!-- summary 끝 -->
+    <!-- 운동 기록 리스트 -->
+    <div class="container mt-4">
         <div class="card record-card mb-4 border-info">
             <div class="card-body">
                 <h5 class="card-title text-center mb-3">오늘의 운동 요약</h5>
                 <div class="d-flex justify-content-around text-center">
                     <div>
                         <p class="mb-0 text-muted">총 운동 시간</p>
-                        <h4 class="fw-bold" id="total-exercise-time">0분</h4>
+                        <h4 class="fw-bold" id="total-daily-exercise-time">0분</h4>
                     </div>
                     <div>
                         <p class="mb-0 text-muted">총 소모 칼로리</p>
-                        <h4 class="fw-bold" id="total-calories-burned">0 kcal</h4>
+                        <h4 class="fw-bold" id="total-daily-calories-burned">0 kcal</h4>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- 운동 기록 리스트 -->
-        <div id="exercise-records-list">
-            <!-- 운동 기록 카드 -->
-            <div class="card record-card mb-4 border-info">
-                <div class="card-header card-header-custom d-flex justify-content-between align-items-center ">
-                    <h6 class="mb-0">벤치프레스 <span class="badge bg-primary ms-2">근력</span></h6>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1 btn-outline-info">수정</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger">삭제</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <p class="card-text mb-1"><small class="text-muted">시간/횟수:</small> 30분</p>
-                        </div>
-                        <div class="col-6 text-end">
-                            <p class="card-text mb-1"><small class="text-muted">소모 칼로리:</small> 150 kcal</p>
-                        </div>
-                    </div>
-                    <p class="card-text mt-2 mb-0"><small class="text-muted">메모:</small> 가슴 운동. 가볍게 시작함.</p>
-                </div>
-            </div>
-
-            <div class="card record-card mb-4 border-info">
-                <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">달리기 <span class="badge bg-info ms-2">유산소</span></h6>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-1 btn-outline-info">수정</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger">삭제</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <p class="card-text mb-1"><small class="text-muted">시간/횟수:</small> 60분</p>
-                        </div>
-                        <div class="col-6 text-end">
-                            <p class="card-text mb-1"><small class="text-muted">소모 칼로리:</small> 450 kcal</p>
-                        </div>
-                    </div>
-                    <p class="card-text mt-2 mb-0"><small class="text-muted">메모:</small> 공원에서 조깅. 페이스 유지.</p>
-                </div>
-            </div>
-
-            <!-- 운동 기록이 없는 경우 메시지 -->
-            <div id="no-exercise-message" class="text-center text-muted mt-5" style="display: none;">
-                <p>오늘의 운동 기록이 없습니다. 새로운 운동을 등록해 보세요!</p>
             </div>
         </div>
     </div>
+
+    <!--  ActivityRecord를 렌더링할 컨테이너 -->
+    <div id="activity-records-list-container" class="container mb-5">
+        <!-- ActivityRecord가 여기에 동적으로 렌더링 -->
+
+        <!-- ⭐⭐ ActivityRecord가 없는 경우 메시지 -->
+        <div id="no-activity-records-message" class="text-center text-muted mt-5">
+            <p>선택하신 날짜의 운동 기록이 없습니다. 새로운 운동 기록을 등록해 보세요!</p>
+        </div>
+    </div>
+
+    <!-- ActivityRecord 렌더링 -->
+    <!-- 이 템플릿 안에 'exercise-item-template'의 클론들이 들어감-->
+    <template id="activity-record-template">
+        <div class="card record-card mb-4 border-info activity-record mb-lg-5" data-id="">
+            <!-- data-id에 ActivityRecord.id -->
+            <div
+                class="card-header card-header-custom d-flex justify-content-between align-items-center bg-info-subtle text-info-shade-20">
+                <!-- ActivityRecord의 시간과 메모를 표시 -->
+                <h6 class="mb-0">
+                    <span class="activity-record-time">--:--</span>
+                </h6>
+                <div>
+                    <!-- ActivityRecord 수정/삭제 -->
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1 edit-activity-record-btn"
+                        data-id="">기록
+                        편집</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-activity-record-btn" data-id="">기록
+                        삭제</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- ExerciseItem들이 렌더링 -->
+                <div class="exercise-items-for-record">
+                    <!-- exercise-item-template으로부터 클론된 운동 항목 카드들 -->
+                    <p class="text-muted text-center no-exercise-items-in-record" style="display: none;">이 기록에는 운동
+                        항목이 없습니다.</p>
+                </div>
+                <!-- activity record 메모, 소모 시간, 칼로리-->
+                <p
+                    class="card-text mt-2 mb-0 text-muted d-none activity-record-notes-display border border-info rounded p-2">
+                    <small>메모: <span class="activity-record-notes-text"></span></small>
+                </p>
+                <hr class="my-3">
+                <div class="d-flex justify-content-end align-items-center">
+                    <span class="me-2 text-muted">기록 내 총 시간: <strong class="total-record-duration">0분</strong></span>
+                    <span class="text-muted">총 소모 칼로리: <strong class="total-record-calories">0 kcal</strong></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ExerciseItem 하나를 렌더링 -->
+    <!-- 각 '활동 기록' 안에 들어갈 개별 '운동 항목' -->
+    <template id="exercise-item-template">
+        <div class="card bg-light mb-2 exercise-item" data-id="">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <span class="exercise-name">운동 이름</span>
+                    <span class="badge ms-2 exercise-category">카테고리</span>
+                </h6>
+                <div>
+                    <!-- ExerciseItem 수정 버튼 -->
+                    <button type="button" class="btn btn-sm btn-outline-info me-1 edit-exercise-item-btn"
+                        data-activity-id="" data-exercise-item-id="">수정</button>
+                    <!-- ExerciseItem 삭제 버튼 -->
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-exercise-item-btn"
+                        data-activity-id="" data-exercise-item-id="">삭제</button>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <div class="row gx-2">
+                    <div class="col-6">
+                        <p class="card-text mb-1"><small class="text-muted">시간:</small> <span
+                                class="exercise-duration">0분</span></p>
+                        <p class="card-text mb-1"><small class="text-muted">세트:</small> <span
+                                class="exercise-sets">0</span></small></p>
+                    </div>
+                    <div class="col-6">
+                        <p class="card-text mb-1"><small class="text-muted">중량:</small> <span
+                                class="exercise-weight">0kg</span></p>
+                        <p class="card-text mb-1"><small class="text-muted">횟수:</small> <span
+                                class="exercise-reps">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
     <!-- 운동 기록 목록 끝 -->
 </body>
 

@@ -447,7 +447,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (activityForm) {
-        const searchStr = exerciseSearchInput.value
         exerciseSearchInput.addEventListener('keydown', (event) => {
             // 검색 입력창에서만 엔터 동작
             if (event.key === 'Enter') {
@@ -455,12 +454,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 handleExerciseSearch()
             }
         })
-        const recordInputs = [dateInput, timeInput, notesInput]
-        recordInputs.forEach(input => {
+        const formInputs = activityForm.querySelectorAll('input:not([type="submit"]), textarea:not(#notes)')
+        formInputs.forEach(input => {
             if (input) {
                 input.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
-                        event.preventDefault()
+                        if (input.tagName === 'TEXTAREA' && input.id === 'notes') {
+                            // 엔터 허용
+                        } else {
+                            event.preventDefault()
+                        }
                     }
                 })
             }
@@ -504,5 +507,16 @@ document.addEventListener('DOMContentLoaded', function () {
             createExerciseBtn.style.display = 'none'
             console.log('is_staff=false')
         }
+    }
+
+
+    if (exerciseItemsContainer) {
+        exerciseItemsContainer.addEventListener('keydown', (event) => {
+            if (event.target.tagName === 'INPUT') {
+                if (event.key === 'Enter') {
+                    event.preventDefault()
+                }
+            }
+        })
     }
 });

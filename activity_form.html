@@ -48,7 +48,7 @@
             </div>
 
             <form id="activityForm">
-                <div class="card-body">
+                <div class="card-body" style="background-color: antiquewhite;">
                     <!-- 기본 정보 섹션 -->
                     <div class="card mb-3 border-info">
                         <div class="card-header bg-white text-info">
@@ -125,7 +125,8 @@
                 </div>
                 <!-- main card-body 끝 -->
                 <div class="card-footer d-flex justify-content-end bg-white text-info">
-                    <button class="btn btn-secondary me-2">취소</button>
+                    <button class="btn btn-secondary me-2"
+                        onclick="window.location.href='activity_record.html'">취소</button>
                     <button type="submit" class="btn btn-info" id="create-activity-record">저장</button>
                 </div>
             </form>
@@ -136,10 +137,10 @@
     <template id="exerciseItemTemplate">
         <div class="exercise-item border p-3 mb-3 rounded shadow-sm position-relative" data-index="0">
             <h5 class="mb-3">
-                <span class="selected-exercise-name text-primary"></span>
+                <span class="selected-exercise-name text-info"></span>
             </h5>
             <button type="button"
-                class="remove-exercise-item-btn btn btn-sm btn-danger position-absolute top-0 end-0 mt-2 me-2">X</button>
+                class="remove-exercise-item-btn btn btn-sm btn-outline-danger position-absolute top-0 end-0 mt-2 me-2">X</button>
 
             <!-- 실제 백엔드에 전송될 Exercise ID를 저장할 hidden 필드 -->
             <input type="hidden" class="exercise-id-input" name="exercise_items_to_create[0].exercise">
