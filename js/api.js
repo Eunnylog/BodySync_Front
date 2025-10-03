@@ -932,3 +932,48 @@ async function getActivityRecordFetch(date) {
         return { ok: false, error: error }
     }
 }
+
+
+// 운동 기록 삭제
+async function deleteActivityRecordFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 기록 디테일 불러오기
+async function getActivityRecordDetail(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}

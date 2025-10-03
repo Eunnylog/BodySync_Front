@@ -10,12 +10,14 @@ if (payload) {
 }
 
 const urlPrams = new URLSearchParams(window.location.search)
-const activityRecordId = urlPrams.get('id')
+const recordDateByUrl = urlPrams.get('date')
+
 let dateInput, prevDayBtn, nextDayBtn
-let noActivityRecordsMessage, summaryContainer
+let noActivityRecordsMessage, summaryContainer, manageExerciseBtn
 let exerciseItemTemplate, activityRecordTemplate, activityRecordsListContainer
 let totalDailyExerciseTime, totalDailyCaloriesBurned
 let noExerciseItemsInRecord
+let editActivityRecordBtn, deleteActivityRecordBtn
 
 // 날짜, 시간
 function initializeDateInput(date = new Date()) {
@@ -25,6 +27,16 @@ function initializeDateInput(date = new Date()) {
     handleLoadActivityRecord()
 }
 
+
+// 날짜 변경
+async function changeDate(offset) {
+    const currentDateStr = dateInput.value
+    const currentSelectedDate = new Date(currentDateStr)
+
+    currentSelectedDate.setDate(currentSelectedDate.getDate() + offset)
+
+    initializeDateInput(currentSelectedDate)
+}
 
 // 운동 기록 불러오기
 async function handleLoadActivityRecord() {
@@ -157,10 +169,31 @@ function renderSingleExerciseItem(recordId, item) {
 
 }
 
+
+// 운동 기록 삭제
+async function handleDeleteActivityRecord(recordId) {
+    const confirmed = confirm('운동 기록을 삭제하시겠습니까?')
+
+    if (confirmed) {
+        const res = await deleteActivityRecordFetch(recordId)
+
+        if (res.ok) {
+            window.showToast('운동 기록 삭제 완료', 'info')
+            setTimeout(() => {
+                window.location.reload()
+            }, 1500)
+        } else {
+            const errorMessage = formatErrorMessage(res.error)
+            window.showToast(errorMessage, 'danger')
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('activity-date')
     prevDayBtn = document.getElementById('prev-day-btn')
     nextDayBtn = document.getElementById('next-day-btn')
+    manageExerciseBtn = document.getElementById('manage-exercises-button')
 
     noActivityRecordsMessage = document.getElementById('no-activity-records-message')
     summaryContainer = document.getElementById('activity-summary-container')
@@ -174,12 +207,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initializeDateInput()
 
-    if (summaryContainer) {
-        if (activityRecordId) {
-            // 해당 날짜로 렌더
-        } else {
-            handleLoadActivityRecord()
-            console.log('g')
-        }
+    if (!isStaff) {
+        manageExerciseBtn.style.display = 'none'
+    }
+
+    // url에 date가 없을 경우 오늘날짜로
+    if (recordDateByUrl) {
+        const parseDate = new Date(recordDateByUrl)
+        initializeDateInput(parseDate)
+    } else {
+        initializeDateInput()
+    }
+
+
+    // 어제
+    if (prevDayBtn) {
+        prevDayBtn.addEventListener('click', async function (event) {
+            event.preventDefault()
+            await changeDate(-1)
+        })
+    }
+
+    // 내일
+    if (nextDayBtn) {
+        nextDayBtn.addEventListener('click', async function (event) {
+            event.preventDefault()
+            await changeDate(1)
+        })
+    }
+
+    // date input에서 직접 변경
+    dateInput.addEventListener('change', async function () {
+        const selectedDate = new Date(this.value)
+        initializeDateInput(selectedDate)
+    })
+
+    if (activityRecordsListContainer) {
+        activityRecordsListContainer.addEventListener('click', (event) => {
+            const target = event.target
+
+            // 기록 수정 버튼
+            if (target.classList.contains('edit-activity-record-btn')) {
+                const recordId = target.dataset.id
+                if (recordId) {
+                    window.location.href = `activity_form.html?id=${recordId}`
+                }
+            } else if (target.classList.contains('delete-activity-record-btn')) {
+                // 기록 삭제 버튼
+                console.log('기록삭제버튼')
+                const recordId = target.dataset.id
+                if (recordId) {
+                    handleDeleteActivityRecord(recordId)
+                }
+            }
+        })
     }
 })

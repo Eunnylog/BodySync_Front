@@ -214,13 +214,6 @@ document.addEventListener('DOMContentLoaded', function () {
     dinnerDiv = document.getElementById('dinner-accordion-body')
     otherDiv = document.getElementById('other-accordion-body')
 
-    // breakfastHeader = document.getElementById('breakfast-header')
-    // lunchHeader = document.getElementById('lunch-header')
-    // snackHeader = document.getElementById('snack-header')
-    // dinnerHeader = document.getElementById('dinner-header')
-    // otherHeader = document.getElementById('other-header')
-
-
     // url에 date가 없을 경우 오늘날짜로
     if (recordDateByUrl) {
         const parseDate = new Date(recordDateByUrl)

@@ -351,6 +351,83 @@ async function handleExerciseCreate(event) {
 }
 
 
+// 수정 record의 exercise items 렌더
+function renderEditExerciseItems(exerciseItems) {
+    if (exerciseItems && exerciseItems.length > 0) {
+        exerciseItemsContainer.innerHTML = ''
+
+        exerciseItems.forEach(item => {
+            const clone = exerciseTemplate.content.cloneNode(true)
+            const exerciseItemDiv = clone.querySelector('.exercise-item')
+            exerciseItemDiv.dataset.id = item.id
+            exerciseItemDiv.querySelector('.selected-exercise-name').textContent = `${item.exercise_name} (${item.exercise_calories_per_unit}kcal / ${item.exercise_base_unit})`
+
+            const exerciseIdInput = exerciseItemDiv.querySelector('.exercise-id-input')
+            exerciseIdInput.name = `exercise_items_to_update[${item.id}].exercise`
+            exerciseIdInput.value = item.exercise
+            exerciseIdInput.dataset.caloriesPerUnit = item.exercise_calories_per_unit
+
+            const durationInput = exerciseItemDiv.querySelector('.duration-minutes-input')
+            durationInput.id = `duration_minutes-${item.id}`
+            durationInput.name = `exercise_items_to_update[${item.id}].duration_minutes`
+            durationInput.value = item.duration_minutes
+            const durationLabel = exerciseItemDiv.querySelector(`label[for^="duration_minutes-"]`) // 'duration_minutes-'로 시작하는 for 속성을 가진 label을 찾음
+            if (durationLabel) {
+                durationLabel.setAttribute('for', durationInput.id);
+            }
+
+            const setsInput = exerciseItemDiv.querySelector('.sets-input')
+            setsInput.id = `sets-${item.id}`
+            setsInput.name = `exercise_items_to_update[${item.id}].sets`
+            setsInput.value = item.sets
+            const setsLabel = exerciseItemDiv.querySelector(`label[for^="sets-"]`)
+            if (setsLabel) {
+                setsLabel.setAttribute('for', setsInput.id);
+            }
+
+            const repsInput = exerciseItemDiv.querySelector('.reps-input')
+            repsInput.id = `reps-${item.id}`
+            repsInput.name = `exercise_items_to_update[${item.id}].reps`
+            repsInput.value = item.reps
+            const repsLabel = exerciseItemDiv.querySelector(`label[for^="reps-"]`)
+            if (repsLabel) {
+                repsLabel.setAttribute('for', repsInput.id);
+            }
+
+
+            const weightInput = exerciseItemDiv.querySelector('.weight-input')
+            weightInput.id = `weight-${item.id}`
+            weightInput.name = `exercise_items_to_update[${item.id}].weight`
+            weightInput.value = item.weight
+            const weightLabel = exerciseItemDiv.querySelector(`label[for^="weight-"]`)
+            if (weightLabel) {
+                weightLabel.setAttribute('for', setsInput.id);
+            }
+            exerciseItemsContainer.appendChild(clone)
+        })
+    }
+    calculateTotalExerciseInformation()
+}
+
+// 수정할 데이터 로드
+async function loadEditActivityRecord(recordId) {
+    const res = await getActivityRecordDetail(recordId)
+
+    if (res.ok) {
+        const record = await res.data
+        if (record) {
+            initializeDateInput(new Date(record.time))
+            notesInput.value = record.notes
+            renderEditExerciseItems(record.exercise_items)
+            console.log('record', record)
+        }
+    } else {
+        const errorMessage = formatErrorMessage(res.error)
+        window.showToast(errorMessage, 'danger')
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('date')
     timeInput = document.getElementById('time')
@@ -372,16 +449,21 @@ document.addEventListener('DOMContentLoaded', function () {
     exerciseCaloriesInput = document.getElementById('exercise-calories-input')
     exerciseBaseUnitInput = document.getElementById('exercise-base-unit-input')
     createExerciseBtn = document.getElementById('create-exercise-btn')
+    console.log('isEdit 확인 전', isEdit)
 
     const title = document.getElementById('activity-title')
     if (activityRecordId) {
         isEdit = true
+        console.log('isEdit 확인 후', isEdit)
         title.innerText = '운동 기록 수정'
+        loadEditActivityRecord(activityRecordId)
+    } else {
+        isEdit = false
+        console.log('isEdit 확인 후', isEdit)
+        initializeDateInput()
 
-        // 겟요청 로직 나중에 짜기
     }
 
-    initializeDateInput()
 
     // 운동 검색 버튼
     if (exerciseSearchBtn) {
