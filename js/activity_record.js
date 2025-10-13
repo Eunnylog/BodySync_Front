@@ -161,9 +161,10 @@ function renderSingleExerciseItem(recordId, item) {
         deleteBtn.dataset.exerciseItemId = item.id
     }
     exerciseItemDiv.querySelector('.exercise-duration').innerText = `${item.duration_minutes}분`
-    exerciseItemDiv.querySelector('.exercise-sets').innerText = `${item.sets}`
-    exerciseItemDiv.querySelector('.exercise-weight').innerText = `${item.weight}kg`
-    exerciseItemDiv.querySelector('.exercise-reps').innerText = `${item.reps}`
+    exerciseItemDiv.querySelector('.exercise-sets').innerText = `${item.sets || 0}`
+    const weightDisplay = parseFloat(item.weight || 0).toFixed(2)
+    exerciseItemDiv.querySelector('.exercise-weight').innerText = `${weightDisplay}kg`
+    exerciseItemDiv.querySelector('.exercise-reps').innerText = `${item.reps || 0}`
 
     return itemClone
 

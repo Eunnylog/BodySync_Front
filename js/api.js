@@ -977,3 +977,27 @@ async function getActivityRecordDetail(recordId) {
         return { ok: false, error: error }
     }
 }
+
+
+// 운동 기록 수정
+async function activityRecordEditFetch(activityRecordData, activityRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${activityRecordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(activityRecordData)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
