@@ -1025,3 +1025,24 @@ async function editExerciseItemFetch(recordId, itemId, data) {
         return { ok: true, error: error }
     }
 }
+
+
+// 운동 아이템 삭제
+async function deleteExerciseItemFetch(recordId, itemId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/exercise-items/${itemId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}

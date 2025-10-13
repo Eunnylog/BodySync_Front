@@ -227,6 +227,7 @@ function EditExerciseItemModal(btnEvent) {
     editExerciseItemModalInstance.show()
 }
 
+// 운동 아이템 수정 요청
 async function handleEditExerciseItemSubmit(event) {
     event.preventDefault()
 
@@ -261,6 +262,25 @@ async function handleEditExerciseItemSubmit(event) {
     }
 }
 
+
+// 운동 아이템 삭제
+async function handleDeleteExerciseItem(recordId, itemId) {
+    const confirmed = confirm('운동 항목을 삭제하시겠습니까?')
+
+    if (confirmed) {
+        const res = await deleteExerciseItemFetch(recordId, itemId)
+
+        if (res.ok) {
+            window.showToast('삭제 완료', 'info')
+            setTimeout(() => {
+                window.location.reload()
+            }, 1500)
+        } else {
+            const errorMessage = formatErrorMessage(res.error)
+            window.showToast(errorMessage, 'danger')
+        }
+    }
+}
 document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('activity-date')
     prevDayBtn = document.getElementById('prev-day-btn')
@@ -355,6 +375,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     EditExerciseItemModal(target)
                 } else {
                     console.error('EditExerciseItemModal 오류')
+                }
+            } else if (target.classList.contains('delete-exercise-item-btn')) {
+                const exerciseItemDiv = target.closest('.exercise-item')
+
+                if (exerciseItemDiv) {
+                    const recordId = exerciseItemDiv.dataset.recordId
+                    const itemId = exerciseItemDiv.dataset.itemId
+                    handleDeleteExerciseItem(recordId, itemId)
+                } else {
+                    console.error('삭제할 운동 항목의 부모 DIV를 찾을 수 없습니다.')
                 }
             }
         })
