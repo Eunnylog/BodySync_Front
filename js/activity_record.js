@@ -17,7 +17,8 @@ let noActivityRecordsMessage, summaryContainer, manageExerciseBtn
 let exerciseItemTemplate, activityRecordTemplate, activityRecordsListContainer
 let totalDailyExerciseTime, totalDailyCaloriesBurned
 let noExerciseItemsInRecord
-let editActivityRecordBtn, deleteActivityRecordBtn
+let editExerciseItemModalInstance, itemDurationMinutesInput, itemSetsInput, itemRepsInput, itemWeightInput
+let modalExerciseNameInput, modalActivityRecordIdInput, modalExerciseItemIdInput, modalExerciseItemExerciseIdInput
 
 // 날짜, 시간
 function initializeDateInput(date = new Date()) {
@@ -74,10 +75,10 @@ function renderActivityRecordsPage(records) {
     }
 
     if (totalDailyCaloriesBurned) {
-        totalDailyCaloriesBurned.innerText = `${totalDayCalories}분`
+        totalDailyCaloriesBurned.innerText = `${totalDayCalories} kcal`
     }
     if (totalDailyExerciseTime) {
-        totalDailyExerciseTime.innerText = `${totalDayCalories} kcal`
+        totalDailyExerciseTime.innerText = `${totalDayDuration}분`
     }
 }
 
@@ -135,6 +136,9 @@ function renderSingleExerciseItem(recordId, item) {
     }
     const itemClone = exerciseItemTemplate.content.cloneNode(true)
     const exerciseItemDiv = itemClone.querySelector('.exercise-item')
+    exerciseItemDiv.dataset.recordId = recordId
+    exerciseItemDiv.dataset.itemId = item.id
+    exerciseItemDiv.dataset.exerciseId = item.exercise
     exerciseItemDiv.querySelector('.exercise-name').innerText = item.exercise_name
     exerciseItemDiv.querySelector('.exercise-category').innerHTML = item.exercise_category_name
     const categoryBadge = itemClone.querySelector('.exercise-category')
@@ -190,6 +194,73 @@ async function handleDeleteActivityRecord(recordId) {
     }
 }
 
+
+// 운동 항목 수정 모달
+function EditExerciseItemModal(btnEvent) {
+    const exerciseItemDiv = btnEvent.closest('.exercise-item')
+    const recordId = exerciseItemDiv.dataset.recordId
+    const itemId = exerciseItemDiv.dataset.itemId
+    const exerciseId = exerciseItemDiv.dataset.exerciseId
+
+    if (!exerciseItemDiv) {
+        window.showToast('수정할 운동 항목을 찾을 수 없습니다.', 'danger')
+        console.error('Cannot find exercise item with ID:', itemId)
+        return
+    }
+
+    const exerciseName = exerciseItemDiv.querySelector('.exercise-name')?.textContent.split('(')[0].trim()
+    const duration = exerciseItemDiv.querySelector('.exercise-duration')?.textContent.split('분')[0].trim()
+    const sets = exerciseItemDiv.querySelector('.exercise-sets')?.textContent.split('(')[0].trim()
+    const reps = exerciseItemDiv.querySelector('.exercise-reps')?.textContent.split('(')[0].trim()
+    const weight = exerciseItemDiv.querySelector('.exercise-weight')?.textContent.split('kg')[0].trim()
+
+    modalExerciseNameInput.innerText = exerciseName
+    itemDurationMinutesInput.value = duration
+    itemSetsInput.value = sets
+    itemRepsInput.value = reps
+    itemWeightInput.value = weight
+    modalActivityRecordIdInput.value = recordId
+    modalExerciseItemIdInput.value = itemId
+    modalExerciseItemExerciseIdInput.value = exerciseId
+
+
+    editExerciseItemModalInstance.show()
+}
+
+async function handleEditExerciseItemSubmit(event) {
+    event.preventDefault()
+
+    const recordId = parseInt(modalActivityRecordIdInput.value)
+    const itemId = parseInt(modalExerciseItemIdInput.value)
+    const exerciseId = parseInt(modalExerciseItemExerciseIdInput.value)
+
+    const duration = parseFloat(itemDurationMinutesInput.value)
+    const sets = parseFloat(itemSetsInput.value || 0)
+    const reps = parseFloat(itemRepsInput.value || 0)
+    const weight = parseFloat(itemWeightInput.value || 0)
+
+    const data = {
+        "exercise": exerciseId,
+        "duration_minutes": duration,
+        "sets": sets,
+        "reps": reps,
+        "weight": weight
+    }
+    console.log(data)
+
+    const res = await editExerciseItemFetch(recordId, itemId, data)
+
+    if (res.ok) {
+        window.showToast('수정 완료!', 'info')
+        setTimeout(() => {
+            window.location.reload()
+        }, 1500)
+    } else {
+        const errorMessage = formatErrorMessage(res.error)
+        window.showToast(errorMessage, 'danger')
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('activity-date')
     prevDayBtn = document.getElementById('prev-day-btn')
@@ -205,6 +276,23 @@ document.addEventListener('DOMContentLoaded', function () {
     totalDailyExerciseTime = document.getElementById('total-daily-exercise-time')
     noExerciseItemsInRecord = document.getElementsByClassName('no-exercise-items-in-record')
 
+    const editExerciseItemModalElement = document.getElementById('editExerciseItemModal');
+    if (editExerciseItemModalElement) {
+        editExerciseItemModalInstance = new bootstrap.Modal(editExerciseItemModalElement);
+        modalExerciseNameInput = document.getElementById('modalExerciseName');
+        itemDurationMinutesInput = document.getElementById('modalDurationMinutes');
+        itemSetsInput = document.getElementById('modalSets');
+        itemRepsInput = document.getElementById('modalReps');
+        itemWeightInput = document.getElementById('modalWeight');
+        modalActivityRecordIdInput = document.getElementById('modalActivityRecordId');
+        modalExerciseItemIdInput = document.getElementById('modalExerciseItemId');
+        modalExerciseItemExerciseIdInput = document.getElementById('modalExerciseItemExerciseId');
+
+        document.getElementById('editExerciseItemForm').addEventListener('submit', handleEditExerciseItemSubmit);
+    } else {
+        // ⭐⭐ 이 오류는 모달 HTML 자체가 없는 경우 (HTML 구조 문제) ⭐⭐
+        console.error('editExerciseItemModal 오류.');
+    }
 
     initializeDateInput()
 
@@ -260,7 +348,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (recordId) {
                     handleDeleteActivityRecord(recordId)
                 }
+            } else if (target.classList.contains('edit-exercise-item-btn')) {
+                // 운동 아이템 수정 버튼
+                const target = event.target
+                if (editExerciseItemModalInstance) {
+                    EditExerciseItemModal(target)
+                } else {
+                    console.error('EditExerciseItemModal 오류')
+                }
             }
         })
+
+
     }
+
 })

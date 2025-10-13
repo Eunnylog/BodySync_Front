@@ -170,6 +170,70 @@
         </div>
     </template>
     <!-- 운동 기록 목록 끝 -->
+    <!-- ExerciseItem 수정 모달 시작 -->
+    <div class="modal fade" id="editExerciseItemModal" tabindex="-1" aria-labelledby="editExerciseItemModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-muted" id="editExerciseItemModalLabel">운동 항목 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editExerciseItemForm">
+                        <!-- 현재 ActivityRecord ID와 ExerciseItem ID를 저장할 Hidden Input -->
+                        <input type="hidden" id="modalActivityRecordId" name="activityRecordId">
+                        <input type="hidden" id="modalExerciseItemId" name="exerciseItemId">
+                        <input type="hidden" id="modalExerciseItemExerciseId" name="exerciseItemExerciseId">
+                        <!-- Exercise 모델의 ID 저장 -->
+
+                        <!-- 운동명 -->
+                        <div class="mb-3">
+                            <h5 class="form-control-plaintext fw-bold text-info" id="modalExerciseName"></h5>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalDurationMinutes" class="form-label text-muted">운동 시간 (분):</label>
+                                    <input type="number" class="form-control" id="modalDurationMinutes"
+                                        name="duration_minutes" min="1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalSets" class="form-label text-muted">세트:</label>
+                                    <input type="number" class="form-control" id="modalSets" name="sets" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalReps" class="form-label text-muted">횟수 (Reps):</label>
+                                    <input type="number" class="form-control" id="modalReps" name="reps" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalWeight" class="form-label text-muted">무게 (kg):</label>
+                                    <input type="number" class="form-control" id="modalWeight" name="weight" step="0.01"
+                                        min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            <button type="submit" class="btn btn-info">수정 완료</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ExerciseItem 수정 모달 끝-->
 </body>
 
 </html>
