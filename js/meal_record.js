@@ -1,17 +1,15 @@
+import { formatDateTime } from "./utils.js"
 let dateInput, prevDayBtn, nextDayBtn
 let breakfastDiv, lunchDiv, snackDiv, dinnerDiv, otherDiv
 let recordId
 
-
 // 오늘 날짜로 초기값 세팅
 async function initializeDateInput(date = new Date()) {
-    const year = String(date.getFullYear())
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const formattedDate = `${year}-${month}-${day}`
-    dateInput.value = formattedDate
+    console.log('연걸')
+    const formattedDate = formatDateTime(date)
+    dateInput.value = formattedDate.date
 
-    const mealRecordsData = await getMealRecords(formattedDate)
+    const mealRecordsData = await getMealRecords(formattedDate.date)
 
     if (mealRecordsData) {
         console.log('초기 식단 불러오기 성공')
@@ -138,14 +136,14 @@ function populateAccordionSections(mealRecordData, mealTypeSections) {
                 // Div 2. food_items 렌더링
                 record.food_items.forEach(item => {
                     const mealCardDiv = document.createElement('div')
-                    mealCardDiv.classList.add('card', 'text-bg-light', 'mb-2', 'w-100', 'food-item-card')
+                    mealCardDiv.classList.add('card', 'text-bg-light', 'mb-2', 'w-100', 'food-item-card', 'border-info')
 
                     const cardHeader = document.createElement('div')
                     cardHeader.classList.add('card-header', 'd-flex', 'justify-content-between', 'align-items-center')
 
                     const cardTitle = document.createElement('span')
                     cardTitle.innerHTML = `
-                    <b class="text-primary">${item.food_name}</b> (${parseFloat(item.quantity).toFixed(1)}${item.unit || item.base_unit})
+                    <b class="text-secondary">${item.food_name} (${parseFloat(item.quantity).toFixed(1)}${item.unit || item.base_unit}) </b>
                     `
 
                     cardHeader.appendChild(cardTitle)
@@ -189,7 +187,7 @@ async function handleDeleteRecord(recordId, recordDate) {
         const success = await deleteMealRecordApi(recordId)
 
         if (success) {
-            window.showToast('식단 기록이 삭제되었습니다.', 'success')
+            window.showToast('식단 기록이 삭제되었습니다.', 'info')
             setTimeout(() => {
                 window.location.href = `meal_record.html?date=${recordDate}`
             }, 1500)
@@ -215,13 +213,6 @@ document.addEventListener('DOMContentLoaded', function () {
     snackDiv = document.getElementById('snack-accordion-body')
     dinnerDiv = document.getElementById('dinner-accordion-body')
     otherDiv = document.getElementById('other-accordion-body')
-
-    breakfastHeader = document.getElementById('breakfast-header')
-    lunchHeader = document.getElementById('lunch-header')
-    snackHeader = document.getElementById('snack-header')
-    dinnerHeader = document.getElementById('dinner-header')
-    otherHeader = document.getElementById('other-header')
-
 
     // url에 date가 없을 경우 오늘날짜로
     if (recordDateByUrl) {

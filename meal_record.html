@@ -16,7 +16,8 @@
         crossorigin="anonymous"></script>
     <script src="js/loader.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/meal_record.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/meal_record.js"></script>
 </head>
 
 <body>
@@ -52,7 +53,7 @@
             </a>
         </div>
         <div style="text-align: end;">
-            <button class="btn my-btn" onclick="window.location.href='meal_form.html'">식단 등록</button>
+            <button class="btn btn-info" onclick="window.location.href='meal_form.html'">식단 등록</button>
         </div>
     </h5>
     <div class="accordion" id="meal-records-container">

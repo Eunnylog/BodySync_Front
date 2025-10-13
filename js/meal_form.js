@@ -1,3 +1,4 @@
+import { formatDateTime } from "./utils.js"
 const urlPrams = new URLSearchParams(window.location.search)
 const mealRecordId = urlPrams.get('id')
 
@@ -38,27 +39,13 @@ let totalSugarsSpan
 let totalFiberSpan
 
 
-// 페이지 로드 시 날짜 및 시간 설정
-function setMealDateTimeInputs(targetDate = new Date()) {
-    const year = targetDate.getFullYear()
-    const month = String(targetDate.getMonth() + 1).padStart(2, '0')
-    const day = String(targetDate.getDate()).padStart(2, '0')
-
-    const hours = String(targetDate.getHours()).padStart(2, '0')
-    const minutes = String(targetDate.getMinutes()).padStart(2, '0')
-
-    mealDateInput.value = `${year}-${month}-${day}`
-    mealTimeInput.value = `${hours}:${minutes}`
-}
-
-
 // 음식 검색 및 결과 렌더링
 async function performFoodSearch() {
     const searchStr = foodSearchInput.value.trim()
 
     if (!searchStr) {
         window.showToast('검색할 음식을 입력하세요.', 'warning')
-        foodSearchResultUI.innerHTML = '<p class="text-muted">검색어를 입력해주세요.</p>'
+        foodSearchResultUI.innerHTML = '<li class="list-group-item d-flex justify-content-between align-items-center"><span>검색어를 입력해주세요.</span></li>'
         return
     }
 
@@ -84,13 +71,13 @@ async function performFoodSearch() {
 
                 foodSearchResultUI.appendChild(li)
             })
-            window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'success')
+            window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'info')
         } else {
             const li = document.createElement('li')
             li.className = 'list-group-item'
             li.textContent = `${searchStr}에 대한 검색 결과가 없습니다. 직접 등록해주세요.`
             foodSearchResultUI.appendChild(li)
-            window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'info')
+            window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
         }
     } catch (error) {
         console.error('음식 검색 중 오류 발생', error)
@@ -165,7 +152,7 @@ function addFoodItemToSelectedList(foodDetails, initialQuantity = 100, initialUn
         <button type="button" class="btn btn-outline-danger remove-food-btn btn-sm ms-2" data-food-name="${foodName}">삭제</button>`
 
     selectedFoodsList.appendChild(selectedFoodLi)
-    window.showToast(`${foodName}이(가) 선택되었습니다.`, 'success')
+    window.showToast(`${foodName}이(가) 선택되었습니다.`, 'info')
     calculateTotalMacros()
 }
 
@@ -255,7 +242,13 @@ async function populateFormForEdit(recordId) {
     if (mealData) {
         mealRecordData = mealData
 
-        setMealDateTimeInputs(new Date(mealRecordData.date))
+        // setDateTimeInputs(new Date(mealRecordData.date))
+        const formatted = formatDateTime(new Date(mealRecordData.date))
+
+        if (formatted) {
+            mealDateInput.value = formatted.date
+            mealTimeInput.value = formatted.time
+        }
 
         mealNoteInput.value = mealData.notes || ''
         if (mealTypeSelect) mealTypeSelect.value = mealData.meal_type || ''
@@ -331,7 +324,7 @@ async function handleFoodCreationSubmit(e) {
 
     const success = await FoodCreateFetch(foodData)
     if (success) {
-        window.showToast('음식 등록 완료!', 'success')
+        window.showToast('음식 등록 완료!', 'info')
         bsFoodCreateModal.hide()
     } else {
         window.showToast('음식 등록에 실패했습니다. 다시 시도해 주세요.', 'danger')
@@ -377,7 +370,7 @@ async function handleMealRecordSubmit(e) {
         const editSuccess = await updateMealRecord(submissionData, mealRecordId)
 
         if (editSuccess) {
-            window.showToast('식단 수정 성공', 'success')
+            window.showToast('식단 수정 성공', 'info')
             setTimeout(() => {
                 window.location.href = `meal_record.html?date=${mealDate}`
             }, 1500)
@@ -389,7 +382,7 @@ async function handleMealRecordSubmit(e) {
         const createSuccess = await createMealRecord(submissionData)
 
         if (createSuccess) {
-            window.showToast('식단 등록 성공', 'success')
+            window.showToast('식단 등록 성공', 'info')
             setTimeout(() => {
                 window.location.href = `meal_record.html?date=${mealDate}`
             }, 1500)
@@ -444,14 +437,21 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const success = await populateFormForEdit(mealRecordId)
 
+        const formatted = formatDateTime(new Date(mealRecordData.date))
+
+        mealDateInput.value = formatted.date
+        mealTimeInput.value = formatted.time
+
         if (!success) {
             isEdit = false
-            // pageTitle.textContent = '식단 기록 등록'
-            setMealDateTimeInputs()
         }
     } else {
         // pageTitle.textContent = '식단 기록 등록'
-        setMealDateTimeInputs()
+        // setDateTimeInputs()
+        const formatted = formatDateTime()
+        mealDateInput.value = formatted.date
+        mealTimeInput.value = formatted.time
+
     }
 
     // 음식 생성 모달
