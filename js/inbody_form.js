@@ -3,8 +3,11 @@ import { getPayload, formatDateTime, formatErrorMessage } from "./utils.js"
 const payload = getPayload()
 let isEdit = false
 
+const urlPrams = new URLSearchParams(window.location.search)
+const inbodyRecordId = urlPrams.get('id')
+
 let measuredAtInput, heightInput, weightInput, muscleMassInput, fatMassInput
-let inbodyRecordForm, inbodyFormTitle
+let inbodyRecordForm, inbodyFormTitle, submitBtn
 let dateInput, timeInput
 
 
@@ -56,7 +59,18 @@ async function handelInbodySubmit() {
     }
 
     if (isEdit) {
-        console.log('수정')
+        const res = await EditInbodyRecordFetch(data, inbodyRecordId)
+
+        if (res.ok) {
+            window.showToast('인바디 수정 완료', 'info')
+            setTimeout(() => {
+                window.location.href = `inbody_record.html`
+            }, 1500)
+        } else {
+            const errorMessage = formatErrorMessage(res.error)
+            window.showToast(errorMessage, 'danger')
+        }
+
     } else {
         const res = await createInbodyFetch(data)
 
@@ -72,6 +86,24 @@ async function handelInbodySubmit() {
     }
 }
 
+
+// 인바디 디테일 조회
+async function loadInbodyRecord(recordId) {
+    const res = await getInbodyRecordFetch(recordId)
+
+    if (res.ok) {
+        const record = res.data
+        initializeDateInput(new Date(record.measured_at))
+        heightInput.value = record.height
+        weightInput.value = record.weight
+        muscleMassInput.value = record.skeletal_muscle_mass_kg
+        fatMassInput.value = record.body_fat_mass_kg
+    } else {
+        const errorMessage = formatErrorMessage(res.error)
+        window.showToast(errorMessage, 'danger')
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     inbodyRecordForm = document.getElementById('inbodyRecordForm')
     inbodyFormTitle = document.getElementById('inbody-form-title')
@@ -81,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fatMassInput = document.getElementById('bodyFatMassKg')
     dateInput = document.getElementById('date')
     timeInput = document.getElementById('time')
+    submitBtn = document.getElementById('submit-btn')
 
     initializeDateInput()
 
@@ -91,11 +124,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
 
-        if (isEdit) {
+        if (inbodyRecordId) {
             // 수정 모드
+            isEdit = true
             inbodyFormTitle.innerText = '인바디 기록 수정'
+            submitBtn.innerText = '인바디 기록 수정'
+            loadInbodyRecord(inbodyRecordId)
         } else {
             inbodyFormTitle.innerText = '인바디 기록 입력'
+            submitBtn.innerText = '인바디 기록 추가'
         }
 
         inbodyRecordForm.addEventListener('submit', (event) => {
@@ -104,4 +141,5 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
     }
+
 })

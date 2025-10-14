@@ -1070,3 +1070,97 @@ async function createInbodyFetch(data) {
         return { ok: false, error: error }
     }
 }
+
+
+// 인바디 조회
+async function getInbodyRecordsFetch() {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 삭제
+async function deleteInbodyRecordFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/${recordId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 디테일 조회
+async function getInbodyRecordFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/${recordId}/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 수정
+async function EditInbodyRecordFetch(data, recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/${recordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}

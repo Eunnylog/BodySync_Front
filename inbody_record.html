@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/inbody_record.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/inbody_record.js"></script>
+</head>
+
+<body>
+    <!-- navbar 시작 -->
+    <header class="site-header">
+        <div id="dynamic-navbar-insert-point">
+            <!-- navbar -->
+        </div>
+    </header>
+    <!-- navbar 끝 -->
+    <!-- Toast 시작 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1081;">
+        <div id="common-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto" id="common-toast-title">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="common-toast-body">
+            </div>
+        </div>
+    </div>
+    <!-- Toast 끝 -->
+    <!-- 인바디 그래프 시작 -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <!-- 그래프 영역 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">인바디 추이 그래프</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="inbodyChart"></canvas>
+                            <p id="noChartDataMessage" class="text-center text-muted mt-3" style="display: none;">
+                                아직 인바디 기록이 없습니다. 새로운 기록을 추가해보세요!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 최근 기록 목록 영역 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">최근 인바디 기록</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>날짜</th>
+                                        <th>체중(kg)</th>
+                                        <th>골격근량(kg)</th>
+                                        <th>체지방률(%)</th>
+                                        <th>BMI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentInbodyRecordsBody">
+                                    <!-- JavaScript로 동적 추가 -->
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">기록이 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="noRecentRecordsMessage" class="text-center text-muted mt-3" style="display: none;">
+                            최근 기록이 없습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 하단 버튼들 -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                    <a href="inbody_form.html" class="btn btn-info btn-lg px-4 me-md-2">
+                        새 인바디 기록 추가 <i class="bi bi-plus-circle-fill"></i>
+                    </a>
+                    <button type="button" class="btn btn-outline-info btn-lg px-4" onclick="window.history.back()">
+                        뒤로가기 <i class="bi bi-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 인바디 상세 기록 모달 -->
+    <div class="modal fade" id="inbodyDetailModal" tabindex="-1" aria-labelledby="inbodyDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="inbodyDetailModalLabel">인바디 상세 기록</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">측정 일시</dt>
+                        <dd class="col-sm-8" id="modalMeasuredAt"></dd>
+
+                        <dt class="col-sm-4">신장</dt>
+                        <dd class="col-sm-8" id="modalHeight"></dd>
+
+                        <dt class="col-sm-4">체중</dt>
+                        <dd class="col-sm-8" id="modalWeight"></dd>
+
+                        <dt class="col-sm-4">골격근량</dt>
+                        <dd class="col-sm-8" id="modalSkeletalMuscleMass"></dd>
+
+                        <dt class="col-sm-4">체지방량</dt>
+                        <dd class="col-sm-8" id="modalBodyFatMass"></dd>
+
+                        <dt class="col-sm-4">체지방률</dt>
+                        <dd class="col-sm-8" id="modalBodyFatPercentage"></dd>
+
+                        <dt class="col-sm-4">BMI</dt>
+                        <dd class="col-sm-8" id="modalBMI"></dd>
+
+                        <dt class="col-sm-4">BMI 상태</dt>
+                        <dd class="col-sm-8" id="modalBMIStatus"></dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal" id="edit-inbody-btn"
+                        data-record-id="">수정</button>
+                    <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal" id="delete-inbody-btn"
+                        data-record-id="">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 인바디 상세 기록 모달 끝 -->
+
+</body>
+
+</html>
