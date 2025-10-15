@@ -1073,11 +1073,17 @@ async function createInbodyFetch(data) {
 
 
 // 인바디 조회
-async function getInbodyRecordsFetch() {
+async function getInbodyRecordsFetch(startDate, endDate) {
     try {
-        const response = await authFetch(`${backend_base_url}/inbody/`, {
-            method: 'GET',
-        })
+        let apiUrl = `${backend_base_url}/inbody/`
+        const params = new URLSearchParams()
+        if (startDate) params.append('from_date', startDate)
+        if (endDate) params.append('to_date', endDate)
+        if (params.toString()) {
+            apiUrl += `?${params.toString()}`
+        }
+
+        const response = await authFetch(apiUrl, { method: 'GET' })
 
         if (response.ok) {
             const data = await response.json()

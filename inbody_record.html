@@ -48,6 +48,39 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12">
+                <!-- 날짜 필터 -->
+                <div class="card mb-4 p-3 bg-light">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-3 col-sm-6">
+                            <label for="startDate" class="form-label visually-hidden">시작일</label>
+                            <input type="date" class="form-control" id="startDate" aria-label="시작일">
+                        </div>
+                        <div class="col-auto text-center">
+                            ~
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <label for="endDate" class="form-label visually-hidden">종료일</label>
+                            <input type="date" class="form-control" id="endDate" aria-label="종료일">
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <button type="button" class="btn btn-outline-secondary w-100"
+                                id="filterByDateBtn">조회</button>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mt-md-0 mt-2 text-md-end">
+                            <!-- 빠른 선택 버튼들 -->
+                            <div class="btn-group w-100" role="group" aria-label="기간 선택">
+                                <button type="button" class="btn btn-outline-info btn-sm quick-filter-btn"
+                                    data-range="1month">1개월</button>
+                                <button type="button" class="btn btn-outline-info btn-sm quick-filter-btn"
+                                    data-range="3month">3개월</button>
+                                <button type="button" class="btn btn-outline-info btn-sm quick-filter-btn"
+                                    data-range="6month">6개월</button>
+                                <button type="button" class="btn btn-outline-info btn-sm quick-filter-btn"
+                                    data-range="all">전체</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- 그래프 영역 -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -96,10 +129,10 @@
 
                 <!-- 하단 버튼들 -->
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-                    <a href="inbody_form.html" class="btn btn-info btn-lg px-4 me-md-2">
+                    <a href="inbody_form.html" class="btn btn-info px-4 me-md-2">
                         새 인바디 기록 추가 <i class="bi bi-plus-circle-fill"></i>
                     </a>
-                    <button type="button" class="btn btn-outline-info btn-lg px-4" onclick="window.history.back()">
+                    <button type="button" class="btn btn-outline-info px-4" onclick="window.history.back()">
                         뒤로가기 <i class="bi bi-arrow-left"></i>
                     </button>
                 </div>

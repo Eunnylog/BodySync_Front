@@ -9,6 +9,7 @@ const inbodyRecordId = urlPrams.get('id')
 let measuredAtInput, heightInput, weightInput, muscleMassInput, fatMassInput
 let inbodyRecordForm, inbodyFormTitle, submitBtn
 let dateInput, timeInput
+let startDateInput, endDateInput, filterByDateBtn, quickFilterBtns
 
 
 // 날짜, 시간
@@ -114,6 +115,10 @@ document.addEventListener('DOMContentLoaded', function () {
     dateInput = document.getElementById('date')
     timeInput = document.getElementById('time')
     submitBtn = document.getElementById('submit-btn')
+    startDateInput = document.getElementById('startDate')
+    endDateInput = document.getElementById('endDate')
+    filterByDateBtn = document.getElementById('filterByDateBtn')
+    quickFilterBtns = document.querySelectorAll('.quick-filter-btn')
 
     initializeDateInput()
 

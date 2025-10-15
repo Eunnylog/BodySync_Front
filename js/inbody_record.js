@@ -7,12 +7,10 @@ let recentInbodyRecordsBody
 let noRecentRecordsMessage
 let noChartDataMessage, ctx
 let editBtn, deleteBtn
+let startDateInput, endDateInput, filterByDateBtn, quickFilterBtns
 
-async function handleLoadInbodyRecord() {
-    // const noChartDataMessage = document.getElementById('noChartDataMessage')
-    // const ctx = document.getElementById('inbodyChart').getContext('2d')
-
-    const res = await getInbodyRecordsFetch()
+async function handleLoadInbodyRecord(start = null, end = null) {
+    const res = await getInbodyRecordsFetch(start, end)
 
     if (res.ok) {
         const inbodyRecords = res.data
@@ -26,14 +24,12 @@ async function handleLoadInbodyRecord() {
             window.showToast('아직 인바디 기록이 없습니다. 새로운 기록울 추가해보세요!', 'warning')
             noChartDataMessage.style.display = 'block'
             if (inbodyChartInstance) { // 이전에 인스턴스가 만들어졌다면 파괴
-                inbodyChartInstance.destroy();
-                inbodyChartInstance = null;
+                inbodyChartInstance.destroy()
+                inbodyChartInstance = null
             }
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 캔버스 자체를 깨끗하게 지움
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height) // 캔버스 자체를 깨끗하게 지움
 
             renderRecentRecords(inbodyRecords, 5)
-            // document.getElementById('inbodyChart').getContext('2d').font = '20px Arial'
-            // document.getElementById('inbodyChart').getContext('2d').fillText('기록된 데이터가 없습니다.', 10, 50)
         }
 
     } else {
@@ -41,32 +37,30 @@ async function handleLoadInbodyRecord() {
         window.showToast(errorMessage, 'danger')
         noChartDataMessage.style.display = 'block'
         if (inbodyChartInstance) {
-            inbodyChartInstance.destroy();
-            inbodyChartInstance = null;
+            inbodyChartInstance.destroy()
+            inbodyChartInstance = null
         }
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 캔버스 지움
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height) // 캔버스 지움
         renderRecentRecords([], 5)
     }
 
 }
 
-// 인바디 기록을 그래프 데이터 형식으로 가공
+// 인바디 기록 -> 그래프 데이터 형식으로 가공
 function prepareChartData(records) {
-    // 날짜 순으로 정렬 (measured_at은 ISO 문자열이므로 직접 비교 가능)
-    records.sort((a, b) => new Date(a.measured_at) - new Date(b.measured_at));
+    // 날짜 순으로 정렬
+    records.sort((a, b) => new Date(a.measured_at) - new Date(b.measured_at))
 
     const labels = records.map(record => new Date(record.measured_at)); // 날짜/시간 객체
-    const weights = records.map(record => record.weight);
-    const skeletalMuscleMasses = records.map(record => record.skeletal_muscle_mass_kg);
-    const bodyFatPercentages = records.map(record => record.body_fat_percentage);
+    const weights = records.map(record => record.weight)
+    const skeletalMuscleMasses = records.map(record => record.skeletal_muscle_mass_kg)
+    const bodyFatPercentages = records.map(record => record.body_fat_percentage)
 
-    return { labels, weights, skeletalMuscleMasses, bodyFatPercentages };
+    return { labels, weights, skeletalMuscleMasses, bodyFatPercentages }
 }
 
 // 그래프 그리기
 function drawChart(chartData) {
-    // const ctx = document.getElementById('inbodyChart').getContext('2d');
-
     if (inbodyChartInstance) { // 이전에 그린 차트가 있으면 파괴하고 새로 그림 (갱신 시)
         inbodyChartInstance.destroy();
     }
@@ -201,7 +195,6 @@ function showInbodyDetailModal(record, recordId) {
     document.getElementById('modalBodyFatPercentage').innerText = `${record.body_fat_percentage || '-'} %`;
     document.getElementById('modalBMI').innerText = `${record.bmi || '-'}`;
     document.getElementById('modalBMIStatus').innerText = record.bmi_status || '-';
-
     document.getElementById('edit-inbody-btn').dataset.recordId = recordId
     document.getElementById('delete-inbody-btn').dataset.recordId = recordId
 
@@ -212,29 +205,26 @@ function showInbodyDetailModal(record, recordId) {
 
 
 function renderRecentRecords(records, count = 5) { // 최근 5개 기록 표시
-    // const recentInbodyRecordsBody = document.getElementById('recentInbodyRecordsBody');
-    // const noRecentRecordsMessage = document.getElementById('noRecentRecordsMessage');
-
-    recentInbodyRecordsBody.innerHTML = ''; // 기존 내용 지우기
+    recentInbodyRecordsBody.innerHTML = '' // 기존 내용 지우기
 
     if (records.length === 0) {
-        noRecentRecordsMessage.style.display = 'block';
+        noRecentRecordsMessage.style.display = 'block'
         return;
     } else {
-        noRecentRecordsMessage.style.display = 'none';
+        noRecentRecordsMessage.style.display = 'none'
     }
 
     // 날짜 최신 순으로 정렬
-    const sortedRecords = [...records].sort((a, b) => new Date(b.measured_at) - new Date(a.measured_at));
-    const recentRecords = sortedRecords.slice(0, count); // 최신 N개 기록 가져오기
+    const sortedRecords = [...records].sort((a, b) => new Date(b.measured_at) - new Date(a.measured_at))
+    const recentRecords = sortedRecords.slice(0, count) // 최신 N개 기록 가져오기
 
     recentRecords.forEach(record => {
-        const row = document.createElement('tr');
-        row.classList.add('inbody-record-item'); // 클릭 이벤트용 클래스 추가
+        const row = document.createElement('tr')
+        row.classList.add('inbody-record-item') // 클릭 이벤트용 클래스 추가
         row.dataset.recordId = record.id; // 나중에 필요할 경우를 대비해 ID 저장
 
         // 클릭 이벤트 리스너 추가: 모달 띄우기
-        row.addEventListener('click', () => showInbodyDetailModal(record, record.id));
+        row.addEventListener('click', () => showInbodyDetailModal(record, record.id))
 
         row.innerHTML = `
             <td>${record.measured_at.split('T')[0]}</td>
@@ -243,7 +233,7 @@ function renderRecentRecords(records, count = 5) { // 최근 5개 기록 표시
             <td>${(record.body_fat_percentage ? parseFloat(record.body_fat_percentage) : '-')}</td>
             <td>${(record.bmi ? parseFloat(record.bmi).toFixed(2) : '-')} (${record.bmi_status || '-'})</td>
         `;
-        recentInbodyRecordsBody.appendChild(row);
+        recentInbodyRecordsBody.appendChild(row)
     });
 }
 
@@ -273,16 +263,55 @@ async function handelDeleteInbodyRecord(recordId) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    handleLoadInbodyRecord()
+// 특정 기간 계싼 후 input에 설정
+function setDateRange(rangeType) {
+    const today = new Date()
+    let startDateForInput, startDateForFetch
 
-    inbodyDetailModal = new bootstrap.Modal(document.getElementById('inbodyDetailModal'));
-    recentInbodyRecordsBody = document.getElementById('recentInbodyRecordsBody');
-    noRecentRecordsMessage = document.getElementById('noRecentRecordsMessage');
+    switch (rangeType) {
+        case '1month':
+            startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())).date
+            startDateForFetch = startDateForInput
+            break
+        case '3month':
+            startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth() - 3, today.getDate())).date
+            startDateForFetch = startDateForInput
+            break
+        case '6month':
+            startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth() - 6, today.getDate())).date
+            startDateForFetch = startDateForInput
+            break
+        case 'all':
+            startDateForInput = ''
+            startDateForFetch = null
+            break
+        default:
+            startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth(), today.getDate())).date
+            startDateForFetch = startDateForInput
+            break
+    }
+
+    startDateInput.value = startDateForInput
+    endDateInput.value = formatDateTime(today).date
+}
+
+// 
+
+document.addEventListener('DOMContentLoaded', async () => {
+    inbodyDetailModal = new bootstrap.Modal(document.getElementById('inbodyDetailModal'))
+    recentInbodyRecordsBody = document.getElementById('recentInbodyRecordsBody')
+    noRecentRecordsMessage = document.getElementById('noRecentRecordsMessage')
     noChartDataMessage = document.getElementById('noChartDataMessage')
     ctx = document.getElementById('inbodyChart').getContext('2d')
     editBtn = document.getElementById('edit-inbody-btn');
     deleteBtn = document.getElementById('delete-inbody-btn')
+    startDateInput = document.getElementById('startDate')
+    endDateInput = document.getElementById('endDate')
+    filterByDateBtn = document.getElementById('filterByDateBtn')
+    quickFilterBtns = document.querySelectorAll('.quick-filter-btn')
+
+    setDateRange('3month')
+    await handleLoadInbodyRecord(startDateInput.value, endDateInput.value)
 
     if (editBtn) {
         editBtn.addEventListener('click', () => {
@@ -297,6 +326,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         deleteBtn.addEventListener('click', () => {
             const idToDelete = deleteBtn.dataset.recordId
             handelDeleteInbodyRecord(idToDelete)
+        })
+    }
+
+    // 조회 버튼
+    if (filterByDateBtn) {
+        filterByDateBtn.addEventListener('click', async () => {
+            await handelDeleteInbodyRecord(startDateInput.value, endDateInput.value)
+        })
+    }
+
+
+    // 빠른 선택 버튼
+    if (quickFilterBtns) {
+        quickFilterBtns.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const rangeType = event.target.dataset.range
+                setDateRange(rangeType)
+                await handleLoadInbodyRecord(startDateInput.value, endDateInput.value)
+            })
         })
     }
 });
