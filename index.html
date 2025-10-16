@@ -15,6 +15,8 @@
         crossorigin="anonymous"></script>
     <script src="js/loader.js"></script>
     <script src="js/api.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/index.js"></script>
 </head>
 
 <body>
@@ -88,16 +90,27 @@
                     <div class="card-body text-center">
                         <img src="assert/icons/no1.png" class="img-fluid mb-3" alt="단식 아이콘" style="max-height: 80px;">
                         <h5 class="card-title">⏱️현재 단식</h5>
-                        <p class="card-text fs-5 text-info">상태: <span id="fasting-status-display"></span></p>
-                        <p class="card-text fs-5 text-info">경과: <span id="fasting-duration-display"></span></p>
-                        <p class="card-text fs-5 text-info">남은시간: <span id="fasting-remaining-display"></span></p>
-                        <!-- <p class="card-text fs-4 text-info">14시간 30분 경과</p>
-                        <p class="card-text"><small class="text-muted">⏱️ 16시간 단식 중</small></p> -->
+                        <p class="card-text text-info"><span id="fasting-status-display">시작 전</span></p>
+                        <div id='fasting-information'>
+                            <p class="card-text text-info"><span id="fasting-goal-display"></span></p>
+                            <p class="card-text text-info">경과: <span id="fasting-duration-display">0분</span></p>
+                            <p class="card-text text-info">남은시간: <span id="fasting-remaining-display">측정 전</span></p>
+                            <p class="card-text text-info">목표 시간: <span id="fasting-goal-time-display"></span></p>
+
+                        </div>
                     </div>
                     <div class="card-footer text-center d-flex justify-content-center align-items-center">
-                        <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-start-btn">단식 시작</a>
-                        <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-end-btn">단식 중단</a>
-                        <a href="/fasting/history.html" class="btn btn-outline-info btn-sm mx-1">모든 기록</a>
+                        <button type="button" class="btn btn-info btn-sm mx-1" id="fast-start-btn"
+                            data-bs-toggle="modal" data-bs-target="#startFastingModal">단식 시작</button>
+                        <!-- <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-end-btn">단식 중단</a> -->
+                        <button type="button" class="btn btn-warning btn-sm mx-1 d-none" id="fast-complete-btn"
+                            data-bs-toggle="modal" data-bs-target="#endFastingModal" data-fasting-action="complete">
+                            완료</button>
+                        <button type="button" class="btn btn-danger btn-sm mx-1 d-none" id="fast-stop-btn"
+                            data-fasting-action="stop">
+                            중단</button>
+                        <a href="/fasting/history.html" class="btn btn-outline-info btn-sm mx-1"
+                            id="fast-all-records-btn">모든 기록</a>
                     </div>
                 </div>
             </div>
@@ -112,8 +125,6 @@
                         <p class="card-text fs-5 text-warning">체중: <span id="inbody-weight-display">0</span> kg</p>
                         <p class="card-text fs-5 text-warning">골격근량: <span id="inbody-muscle-display">0</span> kg</p>
                         <p class="card-text fs-5 text-warning">체지방률: <span id="inbody-fat-display">0</span> %</p>
-                        <!-- <p class="card-text fs-4 text-warning">55 kg / 골격근 24 kg</p>
-                        <p class="card-text"><small class="text-muted">📈 목표 체중 -5kg</small></p> -->
                     </div>
                     <div class="card-footer text-center">
                         <a href="inbody_form.html" class="btn btn-warning btn-sm">인바디 기록</a>
@@ -213,6 +224,86 @@
         </div>
     </div>
     <!-- 로그인 모달창 끝 -->
+    <!-- 단식 시작 모달 시작 -->
+    <div class="modal fade" id="startFastingModal" tabindex="-1" aria-labelledby="startFastingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="startFastingModalLabel">⏱️ 단식 시작</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="startFastingForm">
+                        <div class="mb-3">
+                            <label for="start-time-input" class="form-label">시작 시간</label>
+                            <input type="datetime-local" class="form-control" id="start-time-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="target-duration-input" class="form-label">목표 시간 (시간 단위)</label>
+                            <input type="number" class="form-control" id="target-duration-input" min="1" max="72"
+                                value="16" required sep="0.1">
+                            <div class="form-text">예: 16시간, 18시간 (최대 72시간)</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-info" id="start-fasting-submit-btn">단식 시작</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 단식 시작 모달  끝-->
+    <!-- 단식 종료/중단 모달 시작 -->
+    <div class="modal fade" id="endFastingModal" tabindex="-1" aria-labelledby="endFastingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endFastingModalLabel">📝 단식 기록 수정</h5>
+                    <!-- JS로 '단식 완료' 또는 '단식 중단'으로 변경 예정 -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card p-2 border-info border-2 mb-3">
+                        <div class="text-muted">🔥 목표 시간: <span id="goal-minutes"></span> </div>
+                        <div class="text-muted">🔥 <span id="current-minutes"></span> 동안 단식 중</div>
+                        <div class="text-muted">🔥 <span id="remaining-time"></span> 후 목표 시간을 달성해요!</div>
+                        <div class="text-muted">🔥 목표 종료 시간: <span id="estimated-time"></span> </div>
+                    </div>
+                    <form id="endFastingForm">
+                        <div class="mb-3">
+                            <label for="edit-start-time-input" class="form-label">시작 시간</label>
+                            <input type="datetime-local" class="form-control" id="edit-start-time-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end-time-input" class="form-label">종료 시간</label>
+                            <input type="datetime-local" class="form-control" id="end-time-input" required>
+                            <div class="form-text">종료 시간을 입력하면 단식이 종료됩니다. <br>
+                                다른 항목만 수정할 경우 이 필드를 비워두세요.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-target-duration-input" class="form-label">목표 시간 (시간 단위)</label>
+                            <input type="number" class="form-control" id="edit-target-duration-input" min="1" max="72"
+                                value="16" required sep="0.1">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes-input" class="form-label">메모 (선택 사항)</label>
+                            <textarea class="form-control" id="notes-input" rows="3"></textarea>
+                        </div>
+                    </form>
+                    <input type="hidden" id="hidden-fasting-id" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-info" id="end-fasting-submit-btn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 단식 종료/중단 모달 종료 -->
     <!-- footer-->
     <footer class="bg-light text-center py-3 mt-5">
         <div class="container">
