@@ -59,28 +59,9 @@ async function updateDashboardCards() {
 
         // 3. 단식 요약 카드 업데이트
         const fastingData = dashboardData.fasting_summary
-        if (fastingData.status == "진행 중") {
-            fastStartBtn.classList.add('d-none');
-            fastCompleteBtn.classList.remove('d-none'); // '완료' 버튼 보이게
-            fastCompleteBtn.setAttribute('data-id', fastingData.id)
-            fastStopBtn.classList.remove('d-none');   // '중단' 버튼 보이게
-            fastStopBtn.setAttribute('data-id', fastingData.id)
-            fastingInformation.classList.remove('d-none')
-            fastingGoalDisplay.textContent = `${fastingData.target_duration_minutes / 60}시간 단식 목표`
-            fastingGoalTimeDisplay.textContent = `${(fastingData.estimated_end_time_display).split('월 ')[1]}`
 
-        } else {
-            fastStartBtn.classList.remove('d-none');
-            fastCompleteBtn.classList.add('d-none');
-            fastStopBtn.classList.add('d-none');
-            fastingInformation.classList.add('d-none')
-            // fastingGoalDisplay.classList.add('d-none');
-            // fastingGoalTimeDisplay.classList.add('d-none');
-        }
         if (fastingData) {
             fastingStatusDisplay.innerText = `${fastingData.status}`
-            fastingDurationDisplay.innerText = `${fastingData.current_elapsed_minutes_display}`
-            fastingRemainingDisplay.innerText = `${fastingData.remaining_minutes}`
 
             fastingStatusDisplay.className = ''
             fastingStatusDisplay.classList.add('badge', 'fs-6')
@@ -88,18 +69,49 @@ async function updateDashboardCards() {
             switch (fastingData.status) {
                 case '시작 전':
                     fastingStatusDisplay.classList.add('bg-secondary')
+                    fastStartBtn.classList.remove('d-none')
+                    fastCompleteBtn.classList.add('d-none')
+                    fastStopBtn.classList.add('d-none')
+                    fastingInformation.classList.add('d-none')
                     break
                 case '진행 중':
                     fastingStatusDisplay.classList.add('bg-info')
+                    fastStartBtn.classList.add('d-none');
+                    fastCompleteBtn.classList.remove('d-none'); // '완료' 버튼 보이게
+                    fastCompleteBtn.setAttribute('data-id', fastingData.id)
+                    fastStopBtn.classList.remove('d-none');   // '중단' 버튼 보이게
+                    fastStopBtn.setAttribute('data-id', fastingData.id)
+                    fastingInformation.classList.remove('d-none')
+                    fastingGoalDisplay.textContent = `${fastingData.target_duration_minutes / 60}시간 단식 목표`
+                    fastingGoalTimeDisplay.textContent = `목표 시간: ${(fastingData.estimated_end_time_display).split('월 ')[1]}`
+                    fastingDurationDisplay.innerText = `단식 시간: ${fastingData.current_elapsed_minutes_display}`
+                    fastingRemainingDisplay.innerText = `남은 시간: ${fastingData.remaining_minutes}`
                     break;
                 case '완료':
                     fastingStatusDisplay.classList.add('bg-primary')
+                    fastStartBtn.classList.remove('d-none')
+                    fastCompleteBtn.classList.add('d-none')
+                    fastStopBtn.classList.add('d-none')
+                    fastingInformation.classList.remove('d-none')
+                    fastingGoalDisplay.textContent = `${fastingData.target_duration_minutes / 60}시간 단식 목표`
+                    fastingDurationDisplay.innerText = `단식 시간: ${fastingData.current_elapsed_minutes_display}`
+
                     break
                 case '중단':
                     fastingStatusDisplay.classList.add('bg-danger')
+                    fastStartBtn.classList.remove('d-none')
+                    fastCompleteBtn.classList.add('d-none')
+                    fastStopBtn.classList.add('d-none')
+                    fastingInformation.classList.remove('d-none')
+                    fastingGoalDisplay.textContent = `${fastingData.target_duration_minutes / 60}시간 단식 목표`
+                    fastingDurationDisplay.innerText = `단식 시간: ${fastingData.current_elapsed_minutes_display}`
                     break
                 default:
-                    fastingStatusDisplay.classList.add('bg-info')
+                    fastingStatusDisplay.classList.add('bg-secondary')
+                    fastStartBtn.classList.remove('d-none')
+                    fastCompleteBtn.classList.add('d-none')
+                    fastStopBtn.classList.add('d-none')
+                    fastingInformation.classList.add('d-none')
             }
         }
 
