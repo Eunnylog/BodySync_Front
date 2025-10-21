@@ -66,16 +66,14 @@
             </div>
 
             <!-- 2. 운동 카드 -->
-            <div class="col-12 col-md-6 col-lg-3 mb-4"> <!-- lg-3 (큰 화면에서 한 줄에 4개 배치) 또는 md-6 (중간 화면에서 한 줄에 2개 배치) -->
-                <div class="card h-100 border-info"> <!-- h-100: 높이를 동일하게 유지 -->
-                    <div class="card-body text-center"> <!-- 텍스트 중앙 정렬 -->
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 border-info">
+                    <div class="card-body text-center">
                         <img src="assert/icons/excercise.png" class="img-fluid mb-3" alt="운동 아이콘"
                             style="max-height: 80px;">
                         <h5 class="card-title">🏃‍♀️오늘 운동</h5>
                         <p class="card-text fs-4 text-primary"><span id="activity-duration-display">0</span>분 / <span
                                 id="activity-calories-display">0</span> kcal</p>
-                        <!-- <p class="card-text fs-4 text-primary">30분 / 250 kcal</p>
-                        <p class="card-text"><small class="text-muted">🏃‍♀️ 현재 주4회 달성중</small></p> -->
                     </div>
                     <div class="card-footer text-center">
                         <a href="activity_form.html" class="btn btn-primary btn-sm">운동 기록</a>
@@ -102,14 +100,13 @@
                     <div class="card-footer text-center d-flex justify-content-center align-items-center">
                         <button type="button" class="btn btn-info btn-sm mx-1" id="fast-start-btn"
                             data-bs-toggle="modal" data-bs-target="#startFastingModal">단식 시작</button>
-                        <!-- <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-end-btn">단식 중단</a> -->
                         <button type="button" class="btn btn-warning btn-sm mx-1 d-none" id="fast-complete-btn"
                             data-bs-toggle="modal" data-bs-target="#endFastingModal" data-fasting-action="complete">
                             완료</button>
                         <button type="button" class="btn btn-danger btn-sm mx-1 d-none" id="fast-stop-btn"
                             data-fasting-action="stop">
                             중단</button>
-                        <a href="/fasting/history.html" class="btn btn-outline-info btn-sm mx-1"
+                        <a href="fasting_record.html" class="btn btn-outline-info btn-sm mx-1"
                             id="fast-all-records-btn">모든 기록</a>
                     </div>
                 </div>
@@ -210,10 +207,6 @@
                         </button>
                     </div>
                     <div style="text-align: center;">
-                        <!-- <a href="" data-bs-toggle="modal" data-bs-target="#findPassword" id="find-password"
-                        class="findpassword"
-                        style="text-decoration: none; font-size: 18px; color: #7a7f83; margin: 5px;">
-                        비밀번호를 잃어버리셨나요? </a> -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -262,7 +255,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="endFastingModalLabel">📝 단식 기록 수정</h5>
-                    <!-- JS로 '단식 완료' 또는 '단식 중단'으로 변경 예정 -->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -293,8 +285,8 @@
                             <label for="notes-input" class="form-label">메모 (선택 사항)</label>
                             <textarea class="form-control" id="notes-input" rows="3"></textarea>
                         </div>
+                        <input type="hidden" id="hidden-fasting-id" value="">
                     </form>
-                    <input type="hidden" id="hidden-fasting-id" value="">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>

@@ -1202,3 +1202,52 @@ async function abortFastingStart(id) {
         return { ok: false, error: error }
     }
 }
+
+
+
+// 단식 기록 조회
+async function getFastingRecords(from_date, to_date) {
+    try {
+        let apiUrl = `${backend_base_url}/fasting/`
+        const params = new URLSearchParams()
+        if (from_date) params.append('from_date', from_date)
+        if (to_date) params.append('to_date', to_date)
+        if (params.toString()) apiUrl += `?${params.toString()}`
+
+        const response = await authFetch(apiUrl, { method: 'GET' })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 삭제 
+async function deleteFastingFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${recordId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}

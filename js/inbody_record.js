@@ -273,11 +273,11 @@ function setDateRange(rangeType) {
             startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())).date
             startDateForFetch = startDateForInput
             break
-        case '3month':
+        case '3months':
             startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth() - 3, today.getDate())).date
             startDateForFetch = startDateForInput
             break
-        case '6month':
+        case '6months':
             startDateForInput = formatDateTime(new Date(today.getFullYear(), today.getMonth() - 6, today.getDate())).date
             startDateForFetch = startDateForInput
             break
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     filterByDateBtn = document.getElementById('filterByDateBtn')
     quickFilterBtns = document.querySelectorAll('.quick-filter-btn')
 
-    setDateRange('3month')
+    setDateRange('3months')
     await handleLoadInbodyRecord(startDateInput.value, endDateInput.value)
 
     if (editBtn) {

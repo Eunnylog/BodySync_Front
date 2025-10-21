@@ -1,4 +1,7 @@
-import { formatDateTime, formatErrorMessage } from "./utils.js"
+import {
+    formatDateTime, handleStartFasting,
+    handleAbortFasting, handleEditFasting, handleLoadFasting
+} from "./utils.js"
 
 let fastStartBtn
 let fastCompleteBtn
@@ -95,7 +98,6 @@ async function updateDashboardCards() {
                     fastingInformation.classList.remove('d-none')
                     fastingGoalDisplay.textContent = `${fastingData.target_duration_minutes / 60}시간 단식 목표`
                     fastingDurationDisplay.innerText = `단식 시간: ${fastingData.current_elapsed_minutes_display}`
-
                     break
                 case '중단':
                     fastingStatusDisplay.classList.add('bg-danger')
@@ -127,133 +129,6 @@ async function updateDashboardCards() {
         window.showToast(errorMessage, 'danger')
     }
 
-}
-
-
-// 단식 시작
-async function handleStartFasting() {
-    const dateTime = startTimeInput.value
-    const targetHours = parseInt(targetDurationInput.value)
-    const targetMinutes = Math.round(targetHours * 60)
-
-    const data = {
-        "start_time": `${dateTime}:00`,
-        "target_duration_minutes": targetMinutes
-    }
-
-    console.log(data)
-    const res = await createFastingRecord(data)
-
-    if (res.ok) {
-        window.showToast('단식을 시작합니다', 'info')
-        setTimeout(() => {
-            window.location.reload()
-        }, 1500);
-    } else {
-        const errorMessage = formatErrorMessage(res.error)
-        window.showToast(errorMessage, 'danger')
-    }
-}
-
-// 단식 중단
-async function handleAbortFasting(event) {
-    const confirmed = confirm('현재 단식을 중단하겠습니까?')
-
-    if (!confirmed) {
-        return
-    }
-    const id = event.target.dataset.id
-    const res = await abortFastingStart(id)
-
-    if (res.ok) {
-        window.showToast('단식을 중단했습니다.', 'info')
-        setTimeout(() => {
-            window.location.reload()
-        }, 1500)
-    } else {
-        const errorMessage = formatErrorMessage(res.error)
-        window.showToast(errorMessage, 'danger')
-    }
-}
-
-
-async function handleLoadFasting() {
-    const fastingId = hiddenFastingId.value
-    if (!fastingId) {
-        window.showToast('단식 id 불러오기에 실패했습니다.', 'danger')
-        return
-    }
-
-    const res = await getFastingDetail(fastingId)
-
-    if (res.ok) {
-        const data = res.data
-
-        editGoalMinutes.innerText = `${Math.round(data.target_duration_minutes / 60)}시간`
-        editCurrentMinutes.innerText = data.current_elapsed_minutes_display
-        editEstimatedTime.innerText = (data.estimated_end_time_display).split('월 ')[1]
-
-        if (data.remaining_minutes === 0) {
-            editRemainingTime.innerText = `${data.remaining_minutes}분`
-        } else {
-            const hours = Math.floor(data.remaining_minutes / 60)
-            const minutes = data.remaining_minutes % 60
-
-            if (hours > 0) {
-                editRemainingTime.innerText = `${hours}시간 ${minutes}분`
-            } else {
-                editRemainingTime.innerText = `${minutes}분`
-            }
-        }
-
-        editStartTimeInput.value = data.start_time
-        editTargetDurationInput.value = Math.round(data.target_duration_minutes / 60)
-        fastingNotesInput.value = data.notes
-
-    }
-}
-
-
-// 단식 수정
-async function handleEditFasting() {
-    const id = hiddenFastingId.value
-    const startTimeValue = editStartTimeInput.value
-    console.log(startTimeValue)
-    const endTimeValue = endTimeInput.value
-    const targetHours = parseFloat(editTargetDurationInput.value)
-    const notes = fastingNotesInput.value
-
-    const data = {
-        "start_time": `${startTimeValue}:00`,
-        "target_duration_minutes": Math.round(targetHours * 60),
-        "notes": notes
-    }
-
-    // 단식 종료
-    if (endTimeValue) {
-        const confirmed = confirm('종료 시각을 입력했습니다.\n단식을 종료하시겠습니까?')
-
-        if (confirmed) {
-            data.end_time = `${endTimeValue}:00`
-            data.status = 2
-        }
-    }
-
-    const res = await editFastingFetch(data, id)
-
-    if (res.ok) {
-        if (endTimeValue) {
-            window.showToast('단식을 성공적으로 마무리했습니다. 축하합니다!', 'info')
-        } else {
-            window.showToast('단식 기록 수정 완료!', 'info')
-        }
-        setTimeout(() => {
-            window.location.reload()
-        }, 1500);
-    } else {
-        const errorMessage = formatErrorMessage(res.error)
-        window.showToast(errorMessage, 'danger')
-    }
 }
 
 
@@ -319,5 +194,11 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
-    fastStopBtn.addEventListener('click', handleAbortFasting)
+    if (fastStopBtn) {
+        fastStopBtn.addEventListener('click', (event) => {
+            const btn = event.target
+            const recordId = btn.dataset.id
+            handleAbortFasting(recordId)
+        })
+    }
 })
