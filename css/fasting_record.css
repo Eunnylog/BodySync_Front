@@ -1,0 +1,61 @@
+.fasting-card .btn-action-group .btn {
+    display: none;
+}
+
+/* 상태 0 (시작 전): 시작, 수정, 삭제 버튼만 보임 */
+.fasting-status-0 .btn-start,
+.fasting-status-0 .btn-edit,
+.fasting-status-0 .btn-delete {
+    display: inline-flex;
+}
+
+/* inline-flex로 아이콘+텍스트 정렬 */
+
+/* 상태 1 (진행 중): 수정, 완료, 중단, 초기화 버튼만 보임 */
+.fasting-status-1 .btn-edit,
+.fasting-status-1 .btn-complete,
+.fasting-status-1 .btn-abort,
+.fasting-status-1 .btn-revert {
+    display: inline-flex;
+}
+
+/* 상태 2 (완료): 상세보기, 수정, 삭제 버튼만 보임 */
+.fasting-status-2 .btn-view,
+.fasting-status-2 .btn-edit,
+.fasting-status-2 .btn-delete {
+    display: inline-flex;
+}
+
+/* 상태 3 (중단): 상세보기, 수정, 삭제 버튼만 보임 */
+.fasting-status-3 .btn-view,
+.fasting-status-3 .btn-edit,
+.fasting-status-3 .btn-delete {
+    display: inline-flex;
+}
+
+/* ⭐⭐ 빠른 선택 버튼 active 상태 ⭐⭐ */
+.quick-filter-btn.active {
+    background-color: var(--bs-info);
+    color: var(--bs-white);
+    border-color: var(--bs-info);
+}
+
+
+
+@media (max-width: 768px) {
+
+    /* 모바일에서 필터 요소 간 간격 추가 */
+    .filter-section .row>div {
+        margin-top: 0.5rem !important;
+    }
+
+    /* '~' 기호 숨김 */
+    .filter-section .col-auto.text-center {
+        display: none;
+    }
+
+    /* 빠른 선택 버튼이 공간 채우도록 */
+    .btn-group.w-100 .btn {
+        flex: 1 1 auto;
+    }
+}

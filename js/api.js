@@ -280,77 +280,17 @@ async function loadDashboardData() {
             method: 'GET',
         })
 
-        if (!response.ok) {
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
             const errorData = await response.json()
-            throw new Error(`Failed to load dashboard data: ${errorData.detail || JSON.stringify(errorData)}`)
+            return { ok: false, error: errorData }
         }
 
-        const dashboardData = await response.json()
-        console.log('대시보드 수신 성공', dashboardData)
-
-        // UI 업데이트
-        updateDashboardCards(dashboardData)
-    } catch (e) {
-        console.error('대시보드 데이터 로딩 중 오류 발생', e)
-    }
-}
-
-
-function updateDashboardCards(data) {
-    // 1. 식단 요약 카드 업데이트
-    const mealData = data.meal_summary
-    if (mealData) {
-        const calories = parseFloat(mealData.today_calories)
-        document.getElementById('meal-calories-display').innerText = `${isNaN(calories) ? 0 : calories.toFixed(0)}`
-
-        // 탄수화물
-        const carbs = parseFloat(mealData.today_carbs)
-        document.getElementById('meal-carbs-display').innerHTML = `${isNaN(carbs) ? 0 : carbs.toFixed(1)}`
-
-        // 단백질
-        const protein = parseFloat(mealData.today_protein)
-        document.getElementById('meal-protein-display').innerText = `${isNaN(protein) ? 0 : protein.toFixed(1)}`
-
-        // 지방
-        const fat = parseFloat(mealData.today_fat)
-        document.getElementById('meal-fat-display').innerText = `${isNaN(fat) ? 0 : fat.toFixed(1)}`
-
-        // 당류
-        const sugars = parseFloat(mealData.today_sugars)
-        document.getElementById('meal-sugars-display').innerText = `${isNaN(sugars) ? 0 : sugars.toFixed(2)}`
-
-        // 식이섬유
-        const fiber = parseFloat(mealData.today_fiber)
-        document.getElementById('meal-fiber-display').innerText = `${isNaN(fiber) ? 0 : fiber.toFixed(2)}`
-    }
-
-    // 2. 운동 요약 카드 업데이트
-    const activityData = data.activity_summary
-    if (activityData) {
-        document.getElementById('activity-duration-display').innerText = `${activityData.today_duration_minutes}`
-        document.getElementById('activity-calories-display').innerText = `${parseFloat(activityData.today_calories_burned).toFixed(0)}` // 소수점 버리고 정수 표시
-    }
-
-    // 3. 단식 요약 카드 업데이트
-    const fastingData = data.fasting_summary
-    if (fastingData.status == "진행 중") {
-        document.getElementById('fast-start-btn').style.display = 'none'
-        document.getElementById('fast-end-btn').style.display = 'block'
-    } else {
-        document.getElementById('fast-start-btn').style.display = 'block'
-        document.getElementById('fast-end-btn').style.display = 'none'
-    }
-    if (fastingData) {
-        document.getElementById('fasting-status-display').innerText = `${fastingData.status}`
-        document.getElementById('fasting-duration-display').innerText = `${fastingData.duration_time}`
-        document.getElementById('fasting-remaining-display').innerText = `${fastingData.remaining_time}`
-    }
-
-    const inbodyData = data.inbody_summary
-    if (inbodyData) {
-        document.getElementById('inbody-weight-display').innerText = `${parseFloat(inbodyData.weight).toFixed(1)}`
-        document.getElementById('inbody-muscle-display').innerText = `${parseFloat(inbodyData.skeletal_muscle_mass_kg).toFixed(1)}`
-        document.getElementById('inbody-fat-display').innerText = `${parseFloat(inbodyData.body_fat_percentage).toFixed(1)}`
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
     }
 }
 
@@ -1165,6 +1105,147 @@ async function EditInbodyRecordFetch(data, recordId) {
             return { ok: false, error: errorData }
         }
 
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 시작
+async function createFastingRecord(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+// 단식 디테일 불러오기
+async function getFastingDetail(id) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${id}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 수정
+async function editFastingFetch(data, id) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+// 단식 되돌리기
+async function abortFastingStart(id) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${id}/abort/`, {
+            method: 'PATCH',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+
+// 단식 기록 조회
+async function getFastingRecords(from_date, to_date) {
+    try {
+        let apiUrl = `${backend_base_url}/fasting/`
+        const params = new URLSearchParams()
+        if (from_date) params.append('from_date', from_date)
+        if (to_date) params.append('to_date', to_date)
+        if (params.toString()) apiUrl += `?${params.toString()}`
+
+        const response = await authFetch(apiUrl, { method: 'GET' })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 삭제 
+async function deleteFastingFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${recordId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
     } catch (error) {
         console.log('네트워크 오류', error)
         return { ok: false, error: error }
