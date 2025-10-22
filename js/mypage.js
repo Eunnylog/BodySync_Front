@@ -1,3 +1,6 @@
+import { getPayload } from "./utils.js"
+const payload = getPayload()
+
 document.addEventListener('DOMContentLoaded', function () {
     loadUserProfile()
 
@@ -60,14 +63,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const success = await changePassword(data)
             if (success) {
-                // localStorage.removeItem('payload')
                 await handleLogout()
                 showToast('비밀번호 변경이 완료되었습니다. 다시 로그인해주세요.', 'info')
                 setTimeout(function () {
                     window.location.href = 'index.html'
                 }, 1500)
             } else {
-                // api에서 로직 처리됨
             }
 
         })
@@ -77,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // 마이페이지 기존 데이터 가져오기
 async function loadUserProfile() {
-    // const payload = JSON.parse(localStorage.getItem('payload'))
     if (payload) {
         if (payload.is_social_login) {
             document.getElementById('password-modal').style.display = 'none'
