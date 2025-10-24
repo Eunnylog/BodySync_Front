@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" class="h-100">
 
 <head>
     <meta charset="UTF-8">
@@ -21,7 +21,7 @@
     <script type="module" src="js/exercise_management.js"></script>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <!-- navbar 시작 -->
     <header class="site-header">
         <div id="dynamic-navbar-insert-point">
@@ -44,7 +44,7 @@
     <!-- Toast 끝 -->
     <div class="container mt-4">
         <h2 class="mb-4">운동 항목 관리</h2>
-        <!-- 검색 및 새로운 운동 등록 버튼 섹션 -->
+        <!-- 검색 및 새로운 운동 등록 버튼 -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div class="input-group" style="max-width: 300px;">
                 <input type="text" id="exercise-search-input" class="form-control" placeholder="운동 이름 검색">
@@ -56,17 +56,16 @@
             </button>
         </div>
 
-        <!-- 운동 항목 리스트가 표시될 컨테이너 -->
+        <!-- 운동 항목 리스트 -->
         <div id="exercise-list-container">
             <div id="no-exercise-message" class="text-center text-muted mt-5" style="display: none;">
                 <p>등록된 운동 항목이 없습니다.</p>
             </div>
         </div>
 
-        <!-- 페이지네이션 (옵션) -->
+        <!-- 페이지네이션 -->
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center" id="pagination-controls">
-                <!-- JavaScript로 페이지네이션 링크가 동적으로 추가됩니다 -->
             </ul>
         </nav>
     </div>
@@ -116,6 +115,36 @@
             </div>
         </div>
     </div>
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+        </div>
+    </footer>
     <script type="module" src="js/websocket-alerts.js" defer></script>
 </body>
 

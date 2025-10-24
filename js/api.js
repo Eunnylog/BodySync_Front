@@ -29,6 +29,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (loginEmailField) loginEmailField.value = "";
             if (loginPasswordField) loginPasswordField.value = "";
         });
+        loginModal.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleSignin()
+            }
+        })
     }
 
     // 회원가입 모달 닫을 때 초기화
@@ -105,6 +110,10 @@ function showToast(message, type = 'info', title = '알림') {
 async function handleSignin(email = null, password = null) {
     let emailInput = document.getElementById("login-email").value
     let passwordInput = document.getElementById("login-password").value
+
+    if (emailInput === '' || passwordInput === '') {
+        window.showToast('아이디 또는 비밀번호를 입력해주세요', 'danger')
+    }
 
     try {
         const response = await fetch(`${backend_base_url}/users/login/`, {

@@ -469,6 +469,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         foodSearchBtn.addEventListener('click', async () => {
             await performFoodSearch()
         })
+
+        foodSearchBtn.addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter') {
+                await performFoodSearch()
+            }
+        })
     }
 
     // 음식 추가 버튼
@@ -519,9 +525,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // 식사 등록 폼 엔터 전송 prevent
     if (mealRecordForm) {
-        mealRecordForm.addEventListener('keydown', (event) => {
+        mealRecordForm.addEventListener('keydown', async (event) => {
             if (event.key === 'Enter') {
-                event.preventDefault()
+                if (event.target.id === 'food-search-input') {
+                    event.preventDefault()
+                    await performFoodSearch()
+                }
             }
         })
 

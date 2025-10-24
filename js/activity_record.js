@@ -60,9 +60,12 @@ function renderActivityRecordsPage(records) {
     let totalDayDuration = 0
 
     if (records.length === 0) {
-        if (noActivityRecordsMessage) {
-            noActivityRecordsMessage.style.display = 'block'
-        }
+
+        activityRecordsListContainer.innerHTML = `
+            <div id="no-activity-records-message" class="text-center text-muted mt-5">
+                <p>선택하신 날짜의 운동 기록이 없습니다. 새로운 운동 기록을 등록해 보세요!</p>
+            </div>
+            `
     } else {
         records.forEach(record => {
             const activityRecordElement = renderSingleActivityRecord(record)

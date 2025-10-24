@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" class="h-100">
 
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,7 @@
 </head>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <header class="site-header">
         <div id="dynamic-navbar-insert-point">
             <!-- navbar -->
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    <!-- ✨ 비밀번호 변경 모달 -->
+    <!-- 비밀번호 변경 모달 -->
     <div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -118,6 +118,36 @@
             </div>
         </div>
     </div>
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+        </div>
+    </footer>
     <script type="module" src="js/websocket-alerts.js" defer></script>
 </body>
 

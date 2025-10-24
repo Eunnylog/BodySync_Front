@@ -4,7 +4,7 @@ import { formatDateTime, getPayload, formatErrorMessage } from './utils.js'
 const WEBSOCKET_URL = `ws://127.0.0.1:8000/ws/fasting-alerts/`
 let fastingAlertSocket = null
 
-const payload = getPayload()
+let payload = getPayload()
 let bellIcon
 let notificationBadge
 let notificationDropdown
@@ -30,17 +30,18 @@ function connectFastingAlertWebSocket() {
     }
 
     // 웹소켓 연결
+    // isConnecting = true
     fastingAlertSocket = new WebSocket(WEBSOCKET_URL)
 
     // websocket open
     fastingAlertSocket.onopen = (event) => {
-        console.log('[WebSocket] 알림 서비스 연결 성공!', event);
+        console.log('[WebSocket] 알림 서비스 연결 성공!', event)
     }
 
     // 메시지 받았을 때 message
     fastingAlertSocket.onmessage = (event) => {
-        console.log('[WebSocket] 메시지 수신:', event.data);
-        const data = JSON.parse(event.data);
+        console.log('[WebSocket] 메시지 수신:', event.data)
+        const data = JSON.parse(event.data)
 
         if (data.type === 'fasting_start_alert') {
             window.showToast(data.message, 'info')
@@ -51,18 +52,18 @@ function connectFastingAlertWebSocket() {
 
     // 에러 났을 때 onerror
     fastingAlertSocket.onerror = (error) => {
-        console.error('[WebSocket] 에러 발생:', error);
-        window.showToast('알림 서비스 연결 중 문제가 생겼어요! 재연결해볼게요!', 'danger');
-        setTimeout(connectFastingAlertWebSocket, 5000);
+        console.error('[WebSocket] 에러 발생:', error)
+        window.showToast('알림 서비스 연결 중 문제가 생겼어요! 재연결해볼게요!', 'danger')
+        setTimeout(connectFastingAlertWebSocket, 5000)
     }
 
     // 연결이 끊어졌을 때 onclose
     fastingAlertSocket.onclose = (event) => {
-        console.warn('[WebSocket] 연결이 끊어졌어요:', event.code, event.reason);
-        window.showToast('알림 서비스 연결이 끊어졌어요!', 'warning');
+        console.warn('[WebSocket] 연결이 끊어졌어요:', event.code, event.reason)
+        window.showToast('알림 서비스 연결이 끊어졌어요!', 'warning')
         if (event.code !== 1000) {
-            console.log('[WebSocket] 다시 연결해볼게요...');
-            setTimeout(connectFastingAlertWebSocket, 1500);
+            console.log('[WebSocket] 다시 연결해볼게요...')
+            setTimeout(connectFastingAlertWebSocket, 5000)
         }
     }
 
@@ -212,6 +213,9 @@ async function handleDeleteNotification(notiId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (!payload) {
+        return
+    }
     waitForElement('#bellIcon', (el) => {
         bellIcon = el
         console.log('✅ bellIcon element 발견:', el)
@@ -259,17 +263,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         })
 
-        if (payload) {
-            console.log('닉네임: ', payload.nickname)
-            // ⭐ connectFastingAlertWebSocket 함수는 여기에 호출 (별도로 구현되어 있다고 가정)
-            connectFastingAlertWebSocket()
-            const notificationAreaLi = document.getElementById('notification-area-li');
-            if (notificationAreaLi) {
-                notificationAreaLi.style.display = 'block'
-            }
-
-            bellIcon.addEventListener('click', loadNotification)
-
+        connectFastingAlertWebSocket()
+        const notificationAreaLi = document.getElementById('notification-area-li');
+        if (notificationAreaLi) {
+            notificationAreaLi.style.display = 'block'
         }
     })
 })

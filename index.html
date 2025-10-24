@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" class="h-100">
 
 <head>
     <meta charset="UTF-8">
@@ -20,7 +20,7 @@
     <script type="module" src="js/index.js"></script>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <!-- nav start -->
     <header class="site-header">
         <div id="dynamic-navbar-insert-point">
@@ -40,8 +40,8 @@
         </div>
     </div>
     <!-- 메인 페이지 -->
-    <div>
-        <img src="assert/icons/main.jpg" style="max-width: -webkit-fill-available;">
+    <div class="container my-4">
+        <img src="assert/icons/main.jpg" class="img-fluid" alt="메인 이미지">
     </div>
     <div class="container-fluid" style="margin-top: 2em; margin-bottom: 2em;" id="dashboard-cards">
         <div class="row justify-content-center">
@@ -151,14 +151,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input class="form-control mb-3" id="signup-email" type="text" placeholder="이메일"
-                        aria-label="default input example">
+                    <input class="form-control mb-3" id="signup-email" type="email" placeholder="이메일"
+                        aria-label="default input example" required>
                     <input class="form-control mb-3" id="signup-nickname" type="text"
                         placeholder="닉네임(미 입력 시 이메일 아이디로 설정됩니다.)" aria-label="default input example">
                     <input class="form-control mb-3" id="signup-password" type="password" placeholder="비밀번호"
-                        aria-label="default input example">
+                        aria-label="default input example" required>
                     <input class="form-control mb-3" id="signup-password2" type="password" placeholder="비밀번호 확인"
-                        aria-label="default input example">
+                        aria-label="default input example" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -180,9 +180,9 @@
                     <div class="sign-in-up">
                         <form class="sign-in-form active">
                             <input name="email" id="login-email" type="email" class="form-control login-input"
-                                placeholder="이메일">
+                                placeholder="이메일" required>
                             <input name="password" id="login-password" type="password" class="form-control login-input"
-                                placeholder="비밀번호" style="margin-bottom: 10px;">
+                                placeholder="비밀번호" style="margin-bottom: 10px;" required>
 
                             <span>
                                 <button type="button" onclick="handleSignin()" class="mybtn"
@@ -298,7 +298,7 @@
     </div>
     <!-- 단식 종료/중단 모달 종료 -->
     <!-- footer-->
-    <footer class="bg-light text-center py-3 mt-5">
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
         <div class="container">
             <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
             <p class="mb-0">Developed by 김정은</p>
