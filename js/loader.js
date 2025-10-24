@@ -25,6 +25,7 @@ async function injectNavbar() {
         let nav_meal = document.getElementById("nav-meal")
         let nav_logout = document.getElementById("nav-logout-li")
         let nav_intro = document.getElementById("nav-intro")
+        let notificationLi = document.getElementById('notification-area-li')
 
         // 로그인 전 갈 수 없는 항목들 숨겨주기
         if (nav_mypage) nav_mypage.style.display = "none"
@@ -33,6 +34,7 @@ async function injectNavbar() {
         if (nav_inbody) nav_inbody.style.display = "none"
         if (nav_meal) nav_meal.style.display = "none"
         if (nav_intro) nav_intro.style.display = "none"
+        if (notificationLi) notificationLi.style.display = "none"
 
         // 이메일을 넣어주기 위해서 payload 불러오기
         let payload = localStorage.getItem("payload")
@@ -63,6 +65,7 @@ async function injectNavbar() {
                 if (nav_logout) nav_logout.style = "block"
                 if (nav_intro) nav_intro.style = "block"
                 if (nav_intro) nav_intro.innerText = `환영합니다! ${payload_parse.nickname}님`
+                if (notificationLi) notificationLi.style.display = "block"
             }
 
         }
@@ -74,4 +77,4 @@ async function injectNavbar() {
 
 
 
-document.addEventListener('DOMContentLoaded', injectNavbar) 
+document.addEventListener('DOMContentLoaded', injectNavbar)
