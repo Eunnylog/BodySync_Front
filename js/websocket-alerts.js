@@ -2,7 +2,7 @@
 import { formatDateTime, getPayload, formatErrorMessage } from './utils.js'
 
 // const WEBSOCKET_URL = `ws://127.0.0.1:8000/ws/fasting-alerts/`
-const WEBSOCKET_URL = `ws://api.body-sync.shop/ws/fasting-alerts/`
+const WEBSOCKET_URL = `wss://api.body-sync.shop/ws/fasting-alerts/`
 let fastingAlertSocket = null
 
 let payload = getPayload()
