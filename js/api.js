@@ -1,5 +1,7 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
+// const backend_base_url = 'http://127.0.0.1:8000'
+// const frontend_base_url = "http://127.0.0.1:5500"
 const backend_base_url = "https://api.body-sync.shop";
 const frontend_base_url = "https://body-sync.shop";
 
@@ -21,12 +23,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 로그인 모달 닫을 때 초기화
     if (loginModal) {
+        const loginEmailField = document.getElementById('login-email')
+        const loginPasswordField = document.getElementById('login-password')
         loginModal.addEventListener('hide.bs.modal', function () {
-            const loginEmailField = document.getElementById('login-email');
-            const loginPasswordField = document.getElementById('login-password');
             if (loginEmailField) loginEmailField.value = "";
             if (loginPasswordField) loginPasswordField.value = "";
         });
+        loginModal.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleSignin()
+            }
+        })
     }
 
     // 회원가입 모달 닫을 때 초기화
@@ -82,10 +89,14 @@ function showToast(message, type = 'info', title = '알림') {
 
     const toastElement = commonToastInstance._element // Toast DOM 접근
 
-    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning', 'text-bg-info')
+    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning')
 
-    if (type !== 'info') {
-        toastElement.classList.add(`text-bg-${type}`)
+    // if (type !== 'info') {
+    //     toastElement.classList.add(`text-bg-${type}`)
+    // }
+
+    if (type) {
+        toastElement.classList.add(`text-bg-${type}`);
     }
 
     document.getElementById('common-toast-title').innerText = title;
@@ -100,6 +111,10 @@ async function handleSignin(email = null, password = null) {
     let emailInput = document.getElementById("login-email").value
     let passwordInput = document.getElementById("login-password").value
 
+    if (emailInput === '' || passwordInput === '') {
+        window.showToast('아이디 또는 비밀번호를 입력해주세요', 'danger')
+    }
+
     try {
         const response = await fetch(`${backend_base_url}/users/login/`, {
             headers: {
@@ -113,7 +128,7 @@ async function handleSignin(email = null, password = null) {
             })
         })
         if (response.status == 200) {
-            showToast('로그인 되었습니다!', 'success')
+            showToast('로그인 되었습니다!', 'info')
             const response_json = await response.json()
             localStorage.setItem('payload', JSON.stringify(response_json.payload))
             setTimeout(function () {
@@ -172,7 +187,7 @@ async function handleSignup() {
             })
         })
         if (response.status == 201) {
-            showToast('회원가입이 완료되었습니다!', 'success', '환영합니다!')
+            showToast('회원가입이 완료되었습니다!', 'info', '환영합니다!')
 
             const signupModalElement = document.getElementById('signup-modal');
             const signupModalInstance = bootstrap.Modal.getInstance(signupModalElement); // Bootstrap Modal 인스턴스 가져오기
@@ -236,7 +251,7 @@ async function handleLogout() {
             'Content-Type': 'application/json',
         },
     });
-    showToast('로그아웃 되었습니다!', 'success')
+    showToast('로그아웃 되었습니다!', 'info')
     localStorage.removeItem('payload'); // 만약 저장해뒀다면 지움
     setTimeout(function () {
         window.location.href = 'index.html'
@@ -274,59 +289,17 @@ async function loadDashboardData() {
             method: 'GET',
         })
 
-        if (!response.ok) {
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
             const errorData = await response.json()
-            throw new Error(`Failed to load dashboard data: ${errorData.detail || JSON.stringify(errorData)}`)
+            return { ok: false, error: errorData }
         }
 
-        const dashboardData = await response.json()
-        console.log('대시보드 수신 성공', dashboardData)
-
-        // UI 업데이트
-        updateDashboardCards(dashboardData)
-    } catch (e) {
-        console.error('대시보드 데이터 로딩 중 오류 발생', e)
-    }
-}
-
-
-function updateDashboardCards(data) {
-    // 1. 식단 요약 카드 업데이트
-    const mealData = data.meal_summary
-    if (mealData) {
-        document.getElementById('meal-calories-display').innerText = `${parseFloat(mealData.today_calories).toFixed(0)}`
-        document.getElementById('meal-carbs-display').innerHTML = `${parseFloat(mealData.today_carbs).toFixed(1)}`
-        document.getElementById('meal-protein-display').innerText = `${parseFloat(mealData.today_protein).toFixed(1)}`
-        document.getElementById('meal-fat-display').innerText = `${parseFloat(mealData.today_fat).toFixed(1)}`
-    }
-
-    // 2. 운동 요약 카드 업데이트
-    const activityData = data.activity_summary
-    if (activityData) {
-        document.getElementById('activity-duration-display').innerText = `${activityData.today_duration_minutes}`
-        document.getElementById('activity-calories-display').innerText = `${parseFloat(activityData.today_calories_burned).toFixed(0)}` // 소수점 버리고 정수 표시
-    }
-
-    // 3. 단식 요약 카드 업데이트
-    const fastingData = data.fasting_summary
-    if (fastingData.status == "진행 중") {
-        document.getElementById('fast-start-btn').style.display = 'none'
-        document.getElementById('fast-end-btn').style.display = 'block'
-    } else {
-        document.getElementById('fast-start-btn').style.display = 'block'
-        document.getElementById('fast-end-btn').style.display = 'none'
-    }
-    if (fastingData) {
-        document.getElementById('fasting-status-display').innerText = `${fastingData.status}`
-        document.getElementById('fasting-duration-display').innerText = `${fastingData.duration_time}`
-        document.getElementById('fasting-remaining-display').innerText = `${fastingData.remaining_time}`
-    }
-
-    const inbodyData = data.inbody_summary
-    if (inbodyData) {
-        document.getElementById('inbody-weight-display').innerText = `${parseFloat(inbodyData.weight).toFixed(1)}`
-        document.getElementById('inbody-muscle-display').innerText = `${parseFloat(inbodyData.skeletal_muscle_mass_kg).toFixed(1)}`
-        document.getElementById('inbody-fat-display').innerText = `${parseFloat(inbodyData.body_fat_percentage).toFixed(1)}`
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
     }
 }
 
@@ -477,13 +450,17 @@ async function tokenRefresh() {
 async function handleAccessTokenExpiration(response, originalRequestFn) {
     let errorData = null
 
-    try {
-        errorData = await response.clone().json()
-    } catch (e) {
-        console.warn('handleAccessTokenExpiration 오류', e)
-        return response
+    const contentType = response.headers.get('content-type')
+    const isJson = contentType && contentType.includes('application/json')
+
+    if (isJson && response.status !== 204) {
+        try {
+            errorData = await response.clone().json()
+        } catch (e) {
+            console.warn('handleAccessTokenExpiration 오류', e)
+            return response
+        }
     }
-    console.log(errorData, '응답데이터')
 
     const expired = response.status === 401 && (
         errorData?.detail === "Authentication credentials were not provided." || // 브라우저: 쿠키 없음
@@ -530,4 +507,815 @@ async function authFetch(url, options = {}) {
     response = await handleAccessTokenExpiration(response, actualFetchRequest)
 
     return response
+}
+
+
+// 음식 등록
+async function FoodCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+// 음식 검색
+async function foodSearchFetch(searchStr) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/?food-search=${encodeURIComponent(searchStr)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log('음식 검색 성공', data)
+            return data
+        } else {
+            const errorData = await response.json()
+            console.log('음식 검색 실패', errorData)
+            return null
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        window.showToast('네트워크 오류 발생', 'danger')
+        return null
+    }
+}
+
+// 식단 등록
+async function createMealRecord(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log('mealRecord POST 성공', response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error('mealRecord POST 실패', response_json)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+async function getMealRecords(date) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/?date=${encodeURIComponent(date)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            response_json = await response.json()
+            console.log(response_json)
+            return response_json
+        } else {
+            const errorData = await response.json()
+            console.error('getMealRecords GET 실패', errorData)
+            return null
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return null
+    }
+}
+
+
+async function getMealRecord(mealRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}`, {
+            method: 'GET'
+        })
+
+        if (response.ok) {
+            const record = await response.json()
+            data = {
+                date: record.date,
+                time: record.time,
+                meal_type: record.meal_type,
+                food_items: record.food_items,
+                notes: record.notes,
+            }
+            return data
+        } else {
+            const errorData = response.json()
+            console.log(errorData)
+            return null
+        }
+
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return null
+    }
+}
+
+
+
+// meal record Patch
+async function updateMealRecord(data, mealRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return true
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return false
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return false
+    }
+}
+
+
+// meal record delete
+async function deleteMealRecordApi(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/meal-records/${recordId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return true
+        } else {
+            const errorData = await response.json()
+            console.error(errorData.message)
+            return false
+        }
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
+
+
+// 운동 검색
+async function exerciseSearchFetch(searchStr) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/?exercise-search=${encodeURIComponent(searchStr)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData.message)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error(error)
+        return { ok: false, error: `네트워크오류: ${error}` }
+    }
+}
+
+
+// 운동 기록 생성
+async function activityRecordCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return null
+        } else {
+            const errorData = await response.json()
+            return errorData
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return error
+    }
+}
+
+
+// 운동 항목 생성
+async function exerciseCreateFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            return { 'isSuccess': true, 'res': response_json }
+        } else {
+            const errorData = await response.json()
+            return { 'isSuccess': false, 'res': errorData }
+        }
+    } catch (error) {
+        return { 'isSuccess': false, 'res': error }
+
+    }
+}
+
+// 관리자 페이지 운동 항목 조회
+async function exerciseManagementSearchFetch(searchStr = '', page = 1) {
+    try {
+        let queryStr = `?page=${page}`
+        if (queryStr) {
+            queryStr += `&exercise-search=${encodeURIComponent(searchStr)}`
+        }
+
+        const response = await authFetch(`${backend_base_url}/activities/exercises/admin_list/${queryStr}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json().catch(() => ({}))
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json().catch(() => response.text())
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('exerciseManagement 네트워크오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 항목 복구
+async function recoverExerciseFetch(exerciseId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/recover/${exerciseId}/`, {
+            method: 'PATCH',
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return { ok: true, data: response_json }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: true, error: error }
+    }
+}
+
+// 운동 항목 디테일 조회
+async function getExerciseDetailFetch(exerciseId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return { ok: true, data: response_json }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크오류', error)
+        return { ok: false, error: error }
+    }
+
+}
+
+// 운동 항목 수정 전송
+async function updateExerciseFetch(exerciseId, exerciseData) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${encodeURIComponent(exerciseId)}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(exerciseData)
+        })
+
+        if (response.ok) {
+            const response_json = await response.json()
+            console.log(response_json)
+            return { ok: true, data: response_json }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 항목 삭제
+async function deleteExerciseFetch(exerciseId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/exercises/${exerciseId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true, }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.error('네트워크오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 기록 조회
+async function getActivityRecordFetch(date) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/?date=${encodeURIComponent(date)}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 기록 삭제
+async function deleteActivityRecordFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 기록 디테일 불러오기
+async function getActivityRecordDetail(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 기록 수정
+async function activityRecordEditFetch(activityRecordData, activityRecordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${activityRecordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(activityRecordData)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 운동 항목 수정
+async function editExerciseItemFetch(recordId, itemId, data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/exercise-items/${itemId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: true, error: error }
+    }
+}
+
+
+// 운동 아이템 삭제
+async function deleteExerciseItemFetch(recordId, itemId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/activities/activity-records/${recordId}/exercise-items/${itemId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 생성
+async function createInbodyFetch(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 조회
+async function getInbodyRecordsFetch(startDate, endDate) {
+    try {
+        let apiUrl = `${backend_base_url}/inbody/`
+        const params = new URLSearchParams()
+        if (startDate) params.append('from_date', startDate)
+        if (endDate) params.append('to_date', endDate)
+        if (params.toString()) {
+            apiUrl += `?${params.toString()}`
+        }
+
+        const response = await authFetch(apiUrl, { method: 'GET' })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 삭제
+async function deleteInbodyRecordFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/${recordId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            console.log(errorData)
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 디테일 조회
+async function getInbodyRecordFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/${recordId}/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 인바디 수정
+async function EditInbodyRecordFetch(data, recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/inbody/${recordId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 시작
+async function createFastingRecord(data) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+// 단식 디테일 불러오기
+async function getFastingDetail(id) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${id}`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 수정
+async function editFastingFetch(data, id) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+// 단식 되돌리기
+async function abortFastingStart(id) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${id}/abort/`, {
+            method: 'PATCH',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.log((errorData))
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+
+// 단식 기록 조회
+async function getFastingRecords(from_date, to_date) {
+    try {
+        let apiUrl = `${backend_base_url}/fasting/`
+        const params = new URLSearchParams()
+        if (from_date) params.append('from_date', from_date)
+        if (to_date) params.append('to_date', to_date)
+        if (params.toString()) apiUrl += `?${params.toString()}`
+
+        const response = await authFetch(apiUrl, { method: 'GET' })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            console.error(errorData)
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 단식 삭제 
+async function deleteFastingFetch(recordId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/fasting/${recordId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+async function getNotificationFetch() {
+    try {
+        const response = await authFetch(`${backend_base_url}/notifications/`, {
+            method: 'GET'
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+async function NotificationMarkAsRead(notiId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/notifications/${notiId}/read/`, {
+            method: 'PATCH'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+async function DeleteNotificationFetch(notiId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/notifications/${notiId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
 }

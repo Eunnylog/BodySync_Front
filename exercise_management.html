@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/exercise_management.css">
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/exercise_management.js"></script>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <!-- navbar 시작 -->
+    <header class="site-header">
+        <div id="dynamic-navbar-insert-point">
+            <!-- navbar -->
+        </div>
+    </header>
+    <!-- navbar 끝 -->
+    <!-- Toast 시작 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1081;">
+        <div id="common-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto" id="common-toast-title">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="common-toast-body">
+            </div>
+        </div>
+    </div>
+    <!-- Toast 끝 -->
+    <div class="container mt-4">
+        <h2 class="mb-4">운동 항목 관리</h2>
+        <!-- 검색 및 새로운 운동 등록 버튼 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" id="exercise-search-input" class="form-control" placeholder="운동 이름 검색">
+                <button class="btn btn-outline-info" type="button" id="exercise-search-btn">검색</button>
+            </div>
+            <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#exercise-modal"
+                id="create-exercise-from-manage-btn">
+                새 운동 등록
+            </button>
+        </div>
+
+        <!-- 운동 항목 리스트 -->
+        <div id="exercise-list-container">
+            <div id="no-exercise-message" class="text-center text-muted mt-5" style="display: none;">
+                <p>등록된 운동 항목이 없습니다.</p>
+            </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination-controls">
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 운동 등록/수정 모달  -->
+    <div class="modal fade" id="exercise-modal" tabindex="-1" aria-labelledby="exercise-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exercise-modal-label">새 운동 항목 등록</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="exercise-create-form">
+                    <div class="modal-body">
+                        <input type="hidden" id="modal-mode" value="create">
+                        <input type="hidden" id="edit-exercise-id" value="">
+                        <div class="mb-3">
+                            <label for="exercise-name-input" class="form-label">운동 이름</label>
+                            <input type="text" class="form-control" id="exercise-name-input" name="exercise_name"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exercise-category-input" class="form-label">카테고리</label>
+                            <select class="form-select" id="exercise-category-input" name="exercise_category" required>
+                                <option value="">선택 안 함</option>
+                                <option value="0">유산소</option>
+                                <option value="1">근력</option>
+                                <option value="2">기타</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exercise-calories-input" class="form-label">단위당 칼로리</label>
+                            <input type="number" class="form-control" id="exercise-calories-input"
+                                name="exercise_calories" placeholder="예) 1분당 4kcal 소모 시 4 입력" required step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="exercise-base-unit-input" class="form-label">운동 단위</label>
+                            <input type="text" class="form-control" id="exercise-base-unit-input"
+                                name="exercise-base-unit" placeholder="미입력시 운동 단위는 '분(minutes)'으로 설정됩니다.">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                        <button type="submit" class="btn btn-info" id="save-exercise-btn">등록</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+        </div>
+    </footer>
+    <script type="module" src="js/websocket-alerts.js" defer></script>
+</body>
+
+</html>

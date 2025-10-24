@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/inbody_form.js"></script>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <!-- navbar 시작 -->
+    <header class="site-header">
+        <div id="dynamic-navbar-insert-point">
+            <!-- navbar -->
+        </div>
+    </header>
+    <!-- navbar 끝 -->
+    <!-- Toast 시작 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1081;">
+        <div id="common-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto" id="common-toast-title">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="common-toast-body">
+            </div>
+        </div>
+    </div>
+    <!-- Toast 끝 -->
+    <!-- 인바디 폼 시작 -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0" id="inbody-form-title">인바디 기록 입력</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="inbodyRecordForm">
+                            <!-- 측정 일시 (measured_at) -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="date" class="form-label">측정 날짜</label>
+                                    <input type="date" class="form-control" id="date" name="date">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="time" class="form-label">측정 시간</label>
+                                    <input type="time" class="form-control" id="time" name="time">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <!-- 신장 (height) -->
+                                <div class="col-md-6">
+                                    <label for="height" class="form-label">신장 (cm)</label>
+                                    <input type="number" class="form-control" id="height" name="height"
+                                        placeholder="예: 170.5" step="0.1" min="30.0" max="250.0" required>
+                                    <div class="form-text">최대 소수점 1자리까지 입력 가능</div>
+                                </div>
+
+                                <!-- 체중 (weight) -->
+                                <div class="col-md-6">
+                                    <label for="weight" class="form-label">체중 (kg)</label>
+                                    <input type="number" class="form-control" id="weight" name="weight"
+                                        placeholder="예: 65.30" step="0.01" min="10.0" max="300.0" required>
+                                    <div class="form-text">최대 소수점 2자리까지 입력 가능</div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <!-- 골격근량 (skeletal_muscle_mass_kg) -->
+                                <div class="col-md-6">
+                                    <label for="skeletalMuscleMassKg" class="form-label">골격근량 (kg)</label>
+                                    <input type="number" class="form-control" id="skeletalMuscleMassKg"
+                                        name="skeletal_muscle_mass_kg" placeholder="예: 30.50" step="0.01" min="0.0"
+                                        max="200.0">
+                                    <div class="form-text">최대 소수점 2자리까지 입력 가능 (선택 사항)</div>
+                                </div>
+
+                                <!-- 체지방량 (body_fat_mass_kg) -->
+                                <div class="col-md-6">
+                                    <label for="bodyFatMassKg" class="form-label">체지방량 (kg)</label>
+                                    <input type="number" class="form-control" id="bodyFatMassKg" name="body_fat_mass_kg"
+                                        placeholder="예: 15.20" step="0.01" min="0.0" max="150.0">
+                                    <div class="form-text">최대 소수점 2자리까지 입력 가능 (선택 사항)</div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-info" id="submit-btn">인바디 기록 추가</button>
+                                <button type="button" class="btn btn-outline-info"
+                                    onclick="window.history.back()">뒤로가기</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 인바디 폼 끝-->
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+        </div>
+    </footer>
+    <script type="module" src="js/websocket-alerts.js" defer></script>
+</body>
+
+</html>

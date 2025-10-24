@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" class="h-100">
 
 <head>
     <meta charset="UTF-8">
@@ -14,13 +14,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
         crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="js/api.js"></script>
     <script src="js/loader.js"></script>
-    <script src="js/mypage.js"></script>
+    <script type="'module" src="js/utils.js"></script>
+    <script type="module" src="js/mypage.js"></script>
 </head>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <header class="site-header">
         <div id="dynamic-navbar-insert-point">
             <!-- navbar -->
@@ -66,7 +68,7 @@
 
                 <!-- 수정하기 버튼 -->
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn my-btn">수정하기</button>
+                    <button type="submit" class="btn btn-info">수정하기</button>
                 </div>
             </form>
 
@@ -83,7 +85,7 @@
         </div>
     </div>
 
-    <!-- ✨ 비밀번호 변경 모달 -->
+    <!-- 비밀번호 변경 모달 -->
     <div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -110,12 +112,43 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" class="btn my-btn" id="change-password"
+                    <button type="submit" class="btn btn-info" id="change-password"
                         form="password-change-form">변경하기</button>
                 </div>
             </div>
         </div>
     </div>
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+        </div>
+    </footer>
+    <script type="module" src="js/websocket-alerts.js" defer></script>
 </body>
 
 </html>

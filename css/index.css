@@ -1,5 +1,41 @@
+:root {
+    --bs-info: #fd6f22;
+    --bs-info-rgb: 253, 111, 34;
+
+    --bs-white: #fff;
+    --bs-white-rgb: 255, 255, 255;
+
+    /* 어두분 버전*/
+    --bs-info-shade-10: #e25e1b;
+    --bs-info-shade-20: #c75114;
+
+    /* 채도 낮은 버전*/
+    --bs-info-subtle: rgba(var(--bs-info-rgb), 0.2);
+    --bs-info-subtle-rgb: 253, 111, 34;
+
+    --bs-link-color: var(--bs-info);
+    --bs-link-hover-color: var(--bs-info);
+    /* 보더 컬러*/
+    --bs-border-color: var(--bs-info);
+    --bs-pagination-color: var(--bs-info);
+    --bs-pagination-bg: var(--bs-body-bg);
+    --bs-pagination-border-color: var(--bs-info);
+    --bs-pagination-hover-color: var(--bs-link-hover-color);
+    --bs-pagination-hover-bg: rgba(var(--bs-info-rgb), 0.1);
+    --bs-pagination-hover-border-color: var(--bs-info);
+    --bs-pagination-active-color: var(--bs-white);
+    --bs-pagination-active-bg: var(--bs-info);
+    --bs-pagination-active-border-color: var(--bs-info);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-info-rgb), .25);
+    --bs-pagination-disabled-color: var(--bs-secondary-color);
+    --bs-pagination-disabled-bg: var(--bs-body-bg);
+    --bs-pagination-disabled-border-color: var(--bs-info);
+}
+
+
 body {
     color: #7a7f83;
+    background-color: blanchedalmond;
 }
 
 .nav-mid {
@@ -31,23 +67,23 @@ body {
     color: #fd6f22;
 }
 
-.my-btn {
+.mybtn {
     background-color: #fd6f22;
     border: #fd6f22;
     color: #ffff;
-    padding: 10px 12px;
+    /* padding: 10px 12px; */
     border-radius: 5px;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    /* margin-top: 15px;
+    margin-bottom: 15px; */
 }
 
-.my-btn:hover {
+.mybtn:hover {
     background-color: #e8530e;
     border: #e8530e;
     color: #fff;
 }
 
-.my-btn:active {
+.mybtn:active {
     background-color: #e8530e;
     border: #e8530e;
     color: #ffff;
@@ -129,4 +165,141 @@ body {
     font-size: 18px;
     border-radius: 0px;
     font-weight: 500;
+}
+
+.mybtn-outline {
+    background-color: #ffff;
+    border-color: #fd6f22;
+    color: #fd6f22;
+    border-width: 2px;
+    margin-left: calc(-1 * var(--bs-border-width));
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
+.mybtn-outline:hover {
+    background-color: #fd6f22;
+    border: #fd6f22;
+    color: #fff;
+    border-width: 2px;
+}
+
+.mybtn-outline:active {
+    background-color: #e8530e !important;
+    border: #e8530e !important;
+    color: #ffff !important;
+    /* transform: translateY(1px); */
+    border-width: 2px;
+}
+
+
+
+.btn-info {
+    --bs-btn-color: var(--bs-white);
+    --bs-btn-bg: var(--bs-info);
+    --bs-btn-border-color: var(--bs-info);
+
+    --bs-btn-hover-color: var(--bs-white);
+    --bs-btn-hover-bg: var(--bs-info-shade-10);
+    --bs-btn-hover-border-color: var(--bs-info-shade-10);
+
+    --bs-btn-active-color: var(--bs-white);
+    --bs-btn-active-bg: var(--bs-info-shade-20);
+    --bs-btn-active-border-color: var(--bs-info-shade-20);
+
+    --bs-btn-focus-shadow-rgb: var(--bs-info-rgb);
+
+    color: var(--bs-btn-color) !important;
+    background-color: var(--bs-btn-bg) !important;
+    border-color: var(--bs-btn-border-color) !important;
+}
+
+.btn-info:hover {
+    color: var(--bs-btn-hover-color) !important;
+    background-color: var(--bs-btn-hover-bg) !important;
+    border-color: var(--bs-btn-hover-border-color) !important;
+}
+
+.btn-info:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-info-rgb), .5) !important;
+}
+
+.btn-info:active {
+    color: var(--bs-btn-active-color) !important;
+    background-color: var(--bs-btn-active-bg) !important;
+    border-color: var(--bs-btn-active-border-color) !important;
+}
+
+
+.btn-outline-info {
+    border-color: var(--bs-info) !important;
+    color: var(--bs-info) !important;
+}
+
+.btn-outline-info:hover {
+    background-color: var(--bs-info) !important;
+    color: #fff !important;
+    border-color: var(--bs-info) !important;
+}
+
+
+.btn-outline-info:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-info-rgb), .5) !important;
+}
+
+
+.btn-outline-info:active {
+    background-color: var(--bs-info) !important;
+    color: #fff !important;
+    border-color: var(--bs-info) !important;
+}
+
+.text-info-shade-20 {
+    color: var(--bs-info-shade-20) !important;
+}
+
+.bg-info-subtle {
+    background-color: var(--bs-info-subtle) !important;
+}
+
+.mycolor {
+    background-color: #fd6f22;
+}
+
+.card-header {
+    background-color: var(--bs-white) !important;
+    color: var(--bs-info) !important;
+    border-bottom-color: var(--bs-info) !important;
+}
+
+.card-footer {
+    background-color: var(--bs-white) !important;
+    color: var(--bs-info) !important;
+    border-top-color: var(--bs-info) !important;
+}
+
+
+.toast.text-bg-info .toast-header {
+    background-color: var(--bs-body-bg, #fff);
+    /* 페이지의 기본 배경색 (또는 흰색)을 사용 */
+    color: var(--bs-info);
+    /* 글자색은 주인님의 info 색상 */
+    border-bottom: 1px solid rgba(var(--bs-info-rgb), .3);
+    /* 헤더 아래에 옅은 구분선 추가 (선택 사항) */
+}
+
+/* ⭐ 토스트 헤더 안의 닫기 버튼 (btn-close) 색상 조정 ⭐ */
+.toast.text-bg-info .toast-header .btn-close {
+    filter: invert(0) grayscale(100%) brightness(50%);
+    opacity: .7;
+}
+
+.toast.text-bg-info .toast-body {
+    background-color: var(--bs-info);
+    color: var(--bs-info-text-contrast, #fff);
+}
+
+.toast.text-bg-info {
+    border-color: var(--bs-info);
 }

@@ -1,0 +1,32 @@
+.container {
+    margin-top: 50px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chart-container {
+    position: relative;
+    height: 50vh;
+    width: 80vw;
+    margin: auto;
+}
+
+#inbodyChart {
+    max-height: 500px;
+}
+
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 50vh;
+    }
+}
+
+
+.table-hover tbody tr:hover {
+    cursor: pointer;
+    background-color: #e6ffe6;
+    /* 마우스 오버 시 연한 초록색 */
+}

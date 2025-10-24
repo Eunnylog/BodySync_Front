@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" class="h-100">
 
 <head>
     <meta charset="UTF-8">
@@ -13,11 +13,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
         crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="js/loader.js"></script>
     <script src="js/api.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/index.js"></script>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <!-- nav start -->
     <header class="site-header">
         <div id="dynamic-navbar-insert-point">
@@ -37,14 +40,14 @@
         </div>
     </div>
     <!-- 메인 페이지 -->
-    <div>
-        <img src="assert/icons/main.jpg" style="max-width: -webkit-fill-available;">
+    <div class="container my-4">
+        <img src="assert/icons/main.jpg" class="img-fluid" alt="메인 이미지">
     </div>
     <div class="container-fluid" style="margin-top: 2em; margin-bottom: 2em;" id="dashboard-cards">
         <div class="row justify-content-center">
             <!-- 1. 식단 카드 -->
             <div class="col-12 col-md-6 col-lg-3 mb-4">
-                <div class="card h-100">
+                <div class="card h-100 border-info">
                     <div class="card-body text-center">
                         <img src="assert/icons/nutrition-plan1.png" class="img-fluid mb-3" alt="식단 아이콘"
                             style="max-height: 80px;">
@@ -53,58 +56,66 @@
                         <p class="card-text fs-6">탄수화물: <span id="meal-carbs-display">0</span>g</p>
                         <p class="card-text fs-6">단백질: <span id="meal-protein-display">0</span>g</p>
                         <p class="card-text fs-6">지방: <span id="meal-fat-display">0</span>g</p>
-                        <!-- <p class="card-text fs-4 text-success">1200 / 1800 kcal</p>
-                        <p class="card-text"><small class="text-muted">🍽️ 목표 60% 달성</small></p> -->
+                        <p class="card-text fs-6">당류: <span id="meal-sugars-display">0</span>g</p>
+                        <p class="card-text fs-6">식이섬유: <span id="meal-fiber-display">0</span>g</p>
                     </div>
                     <div class="card-footer text-center">
-                        <a href="/meals/history.html" class="btn btn-success btn-sm">식단 기록</a>
-                        <a href="/meals/history.html" class="btn btn-outline-success btn-sm">모든 기록</a>
+                        <a href="/meal_form.html" class="btn btn-success btn-sm">식단 기록</a>
+                        <a href="/meal_record.html" class="btn btn-outline-success btn-sm">모든 기록</a>
                     </div>
                 </div>
             </div>
 
             <!-- 2. 운동 카드 -->
-            <div class="col-12 col-md-6 col-lg-3 mb-4"> <!-- lg-3 (큰 화면에서 한 줄에 4개 배치) 또는 md-6 (중간 화면에서 한 줄에 2개 배치) -->
-                <div class="card h-100"> <!-- h-100: 높이를 동일하게 유지 -->
-                    <div class="card-body text-center"> <!-- 텍스트 중앙 정렬 -->
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 border-info">
+                    <div class="card-body text-center">
                         <img src="assert/icons/excercise.png" class="img-fluid mb-3" alt="운동 아이콘"
                             style="max-height: 80px;">
                         <h5 class="card-title">🏃‍♀️오늘 운동</h5>
                         <p class="card-text fs-4 text-primary"><span id="activity-duration-display">0</span>분 / <span
                                 id="activity-calories-display">0</span> kcal</p>
-                        <!-- <p class="card-text fs-4 text-primary">30분 / 250 kcal</p>
-                        <p class="card-text"><small class="text-muted">🏃‍♀️ 현재 주4회 달성중</small></p> -->
                     </div>
                     <div class="card-footer text-center">
-                        <a href="/activities/history.html" class="btn btn-primary btn-sm">운동 기록</a>
-                        <a href="/activities/history.html" class="btn btn-outline-primary btn-sm">모든 기록</a>
+                        <a href="activity_form.html" class="btn btn-primary btn-sm">운동 기록</a>
+                        <a href="activity_record.html" class="btn btn-outline-primary btn-sm">모든 기록</a>
                     </div>
                 </div>
             </div>
 
             <!-- 3. 단식 카드 -->
             <div class="col-12 col-md-6 col-lg-3 mb-4">
-                <div class="card h-100">
+                <div class="card h-100 border-info">
                     <div class="card-body text-center">
                         <img src="assert/icons/no1.png" class="img-fluid mb-3" alt="단식 아이콘" style="max-height: 80px;">
                         <h5 class="card-title">⏱️현재 단식</h5>
-                        <p class="card-text fs-5 text-info">상태: <span id="fasting-status-display"></span></p>
-                        <p class="card-text fs-5 text-info">경과: <span id="fasting-duration-display"></span></p>
-                        <p class="card-text fs-5 text-info">남은시간: <span id="fasting-remaining-display"></span></p>
-                        <!-- <p class="card-text fs-4 text-info">14시간 30분 경과</p>
-                        <p class="card-text"><small class="text-muted">⏱️ 16시간 단식 중</small></p> -->
+                        <p class="card-text text-info"><span id="fasting-status-display">시작 전</span></p>
+                        <div id='fasting-information'>
+                            <p class="card-text text-info"><span id="fasting-goal-display"></span></p>
+                            <p id="fasting-duration-display" class="card-text text-info"></p>
+                            <p id="fasting-remaining-display" class="card-text text-info"></p>
+                            <p id="fasting-goal-time-display" class="card-text text-info"></p>
+
+                        </div>
                     </div>
                     <div class="card-footer text-center d-flex justify-content-center align-items-center">
-                        <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-start-btn">단식 시작</a>
-                        <a href="/fasting/history.html" class="btn btn-info btn-sm mx-1" id="fast-end-btn">단식 중단</a>
-                        <a href="/fasting/history.html" class="btn btn-outline-info btn-sm mx-1">모든 기록</a>
+                        <button type="button" class="btn btn-info btn-sm mx-1" id="fast-start-btn"
+                            data-bs-toggle="modal" data-bs-target="#startFastingModal">단식 시작</button>
+                        <button type="button" class="btn btn-warning btn-sm mx-1 d-none" id="fast-complete-btn"
+                            data-bs-toggle="modal" data-bs-target="#endFastingModal" data-fasting-action="complete">
+                            완료</button>
+                        <button type="button" class="btn btn-danger btn-sm mx-1 d-none" id="fast-stop-btn"
+                            data-fasting-action="stop">
+                            중단</button>
+                        <a href="fasting_record.html" class="btn btn-outline-info btn-sm mx-1"
+                            id="fast-all-records-btn">모든 기록</a>
                     </div>
                 </div>
             </div>
 
             <!-- 4. 인바디 카드 -->
             <div class="col-12 col-md-6 col-lg-3 mb-4">
-                <div class="card h-100">
+                <div class="card h-100 border-info">
                     <div class="card-body text-center">
                         <img src="assert/icons/body-scan.png" class="img-fluid mb-3" alt="인바디 아이콘"
                             style="max-height: 80px;">
@@ -112,12 +123,10 @@
                         <p class="card-text fs-5 text-warning">체중: <span id="inbody-weight-display">0</span> kg</p>
                         <p class="card-text fs-5 text-warning">골격근량: <span id="inbody-muscle-display">0</span> kg</p>
                         <p class="card-text fs-5 text-warning">체지방률: <span id="inbody-fat-display">0</span> %</p>
-                        <!-- <p class="card-text fs-4 text-warning">55 kg / 골격근 24 kg</p>
-                        <p class="card-text"><small class="text-muted">📈 목표 체중 -5kg</small></p> -->
                     </div>
                     <div class="card-footer text-center">
-                        <a href="/inbody/history.html" class="btn btn-warning btn-sm">인바디 기록</a>
-                        <a href="/inbody/history.html" class="btn btn-outline-warning btn-sm">모든 기록</a>
+                        <a href="inbody_form.html" class="btn btn-warning btn-sm">인바디 기록</a>
+                        <a href="inbody_record.html" class="btn btn-outline-warning btn-sm">모든 기록</a>
                     </div>
                 </div>
             </div>
@@ -126,13 +135,13 @@
         <div id="login-required-message" class="text-center mt-5 p-4 d-none">
             <h2 class="mb-3" style="color:#547f48;">로그인하여 나만의 건강 대시보드를 확인하세요!</h2>
             <p class="lead">운동, 식단, 단식, 인바디 기록을 통해 건강한 습관을 만들어 보세요.</p>
-            <button class="btn my-btn btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#login-modal">로그인하기</button>
+            <button class="btn btn-info btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#login-modal">로그인하기</button>
             <p class="mt-3">아직 회원이 아니신가요? <a href="/signup.html" data-bs-toggle="modal" data-bs-target="#signup-modal"
                     style="color:#7a7f83; text-decoration: none;" class="card-singup">회원가입</a>
             </p>
         </div>
     </div>
-    <!-- 회원가입 모달창-->
+    <!-- 회원가입 모달창 시작 -->
     <div class="modal fade" id="signup-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -142,23 +151,24 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input class="form-control mb-3" id="signup-email" type="text" placeholder="이메일"
-                        aria-label="default input example">
+                    <input class="form-control mb-3" id="signup-email" type="email" placeholder="이메일"
+                        aria-label="default input example" required>
                     <input class="form-control mb-3" id="signup-nickname" type="text"
                         placeholder="닉네임(미 입력 시 이메일 아이디로 설정됩니다.)" aria-label="default input example">
                     <input class="form-control mb-3" id="signup-password" type="password" placeholder="비밀번호"
-                        aria-label="default input example">
+                        aria-label="default input example" required>
                     <input class="form-control mb-3" id="signup-password2" type="password" placeholder="비밀번호 확인"
-                        aria-label="default input example">
+                        aria-label="default input example" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn my-btn" onclick="handleSignup()">회원 가입</button>
+                    <button type="button" class="btn btn-info" onclick="handleSignup()">회원 가입</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- 로그인 모달창-->
+    <!-- 회원가입 모달창 끝 -->
+    <!-- 로그인 모달창 시작-->
     <div class="modal" tabindex="-1" id="login-modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -170,13 +180,13 @@
                     <div class="sign-in-up">
                         <form class="sign-in-form active">
                             <input name="email" id="login-email" type="email" class="form-control login-input"
-                                placeholder="이메일">
+                                placeholder="이메일" required>
                             <input name="password" id="login-password" type="password" class="form-control login-input"
-                                placeholder="비밀번호" style="margin-bottom: 10px;">
+                                placeholder="비밀번호" style="margin-bottom: 10px;" required>
 
                             <span>
-                                <button type="button" onclick="handleSignin()" class="my-btn"
-                                    style="float: right; width: 100%;">
+                                <button type="button" onclick="handleSignin()" class="mybtn"
+                                    style="float: right; width: 100%; padding: 10px 12px;">
                                     로그인
                                 </button>
                             </span>
@@ -198,31 +208,108 @@
                         </button>
                     </div>
                     <div style="text-align: center;">
-                        <!-- <a href="" data-bs-toggle="modal" data-bs-target="#findPassword" id="find-password"
-                        class="findpassword"
-                        style="text-decoration: none; font-size: 18px; color: #7a7f83; margin: 5px;">
-                        비밀번호를 잃어버리셨나요? </a> -->
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="my-btn" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="mybtn" data-bs-dismiss="modal"
+                        style="padding: 10px 12px;">Close</button>
                 </div>
             </div>
         </div>
     </div>
+    <!-- 로그인 모달창 끝 -->
+    <!-- 단식 시작 모달 시작 -->
+    <div class="modal fade" id="startFastingModal" tabindex="-1" aria-labelledby="startFastingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="startFastingModalLabel">⏱️ 단식 시작</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="startFastingForm">
+                        <div class="mb-3">
+                            <label for="start-time-input" class="form-label">시작 시간</label>
+                            <input type="datetime-local" class="form-control" id="start-time-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="target-duration-input" class="form-label">목표 시간 (시간 단위)</label>
+                            <input type="number" class="form-control" id="target-duration-input" min="1" max="72"
+                                value="16" required sep="0.1">
+                            <div class="form-text">예: 16시간, 18시간 (최대 72시간)</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-info" id="start-fasting-submit-btn">단식 시작</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 단식 시작 모달  끝-->
+    <!-- 단식 종료/중단 모달 시작 -->
+    <div class="modal fade" id="endFastingModal" tabindex="-1" aria-labelledby="endFastingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endFastingModalLabel">📝 단식 기록 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card p-2 border-info border-2 mb-3">
+                        <div class="text-muted">🔥 목표 시간: <span id="goal-minutes"></span> </div>
+                        <div class="text-muted">🔥 <span id="current-minutes"></span> 동안 단식 중</div>
+                        <div class="text-muted">🔥 <span id="remaining-time"></span> 후 목표 시간을 달성해요!</div>
+                        <div class="text-muted">🔥 목표 종료 시간: <span id="estimated-time"></span> </div>
+                    </div>
+                    <form id="endFastingForm">
+                        <div class="mb-3">
+                            <label for="edit-start-time-input" class="form-label">시작 시간</label>
+                            <input type="datetime-local" class="form-control" id="edit-start-time-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end-time-input" class="form-label">종료 시간</label>
+                            <input type="datetime-local" class="form-control" id="end-time-input" required>
+                            <div class="form-text">종료 시간을 입력하면 단식이 종료됩니다. <br>
+                                다른 항목만 수정할 경우 이 필드를 비워두세요.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-target-duration-input" class="form-label">목표 시간 (시간 단위)</label>
+                            <input type="number" class="form-control" id="edit-target-duration-input" min="1" max="72"
+                                value="16" required sep="0.1">
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes-input" class="form-label">메모 (선택 사항)</label>
+                            <textarea class="form-control" id="notes-input" rows="3"></textarea>
+                        </div>
+                        <input type="hidden" id="hidden-fasting-id" value="">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-info" id="end-fasting-submit-btn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 단식 종료/중단 모달 종료 -->
     <!-- footer-->
-    <footer class="bg-light text-center py-3 mt-5">
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
         <div class="container">
             <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
             <p class="mb-0">Developed by 김정은</p>
             <div class="mt-2">
                 <small class="text-muted">
-                    <a href="http://localhost:8000/api/schema/swagger-ui/" target="_blank" rel="noopener noreferrer"
-                        class="text-decoration-none mx-2 footer-link">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
                         API 문서 (Swagger)
                     </a>
                     |
-                    <a href="http://localhost:5555" target="_blank" rel="noopener noreferrer"
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
                         class="text-decoration-none mx-2 footer-link">
                         Task Monitor (Flower)
                     </a>
@@ -238,10 +325,9 @@
                     </a>
                 </small>
             </div>
-
-            <!-- 필요하다면 GitHub 링크 등 다른 정보 추가 -->
         </div>
     </footer>
+    <script type="module" src="js/websocket-alerts.js" defer></script>
 </body>
 
 </html>

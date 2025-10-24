@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💪BodySync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/activity_record.js"></script>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <!-- navbar 시작 -->
+    <header class="site-header">
+        <div id="dynamic-navbar-insert-point">
+            <!-- navbar -->
+        </div>
+    </header>
+    <!-- navbar 끝 -->
+    <!-- Toast 시작 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1081;">
+        <div id="common-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header">
+                <strong class="me-auto" id="common-toast-title">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="common-toast-body">
+            </div>
+        </div>
+    </div>
+    <!-- Toast 끝 -->
+    <!-- summary 시작 -->
+    <div class="container" id="activity-summary-container">
+        <h5 style="margin: 2em;">
+            <div style="text-align: center;">
+                <a href="#" id="prev-day-btn" class="text-decoration-none text-dark">
+                    <img src="/assert/icons/angle-circle-left.png" alt="" style="vertical-align: middle;">
+                </a>
+                <input type="date" id="activity-date" class="form-control" style="display:inline-block; width:auto;">
+                <a href="#" id="next-day-btn" class="text-decoration-none text-dark">
+                    <img src="/assert/icons/angle-circle-right.png">
+                </a>
+            </div>
+            <!-- 운동 등록, 관리 버튼 -->
+            <div style="text-align: end;">
+                <button class="btn btn-info" onclick="window.location.href='activity_form.html'">운동 기록하기</button>
+                <button id="manage-exercises-button" class="btn btn-outline-dark" type="button"
+                    onclick="window.location.href='exercise_management.html'">
+                    운동 관리
+                </button>
+            </div>
+        </h5>
+    </div>
+    <!-- summary 끝 -->
+    <!-- 운동 기록 리스트 -->
+    <div class="container mt-4">
+        <div class="card record-card mb-4 border-info">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-3">오늘의 운동 요약</h5>
+                <div class="d-flex justify-content-around text-center">
+                    <div>
+                        <p class="mb-0 text-muted">총 운동 시간</p>
+                        <h4 class="fw-bold" id="total-daily-exercise-time">0분</h4>
+                    </div>
+                    <div>
+                        <p class="mb-0 text-muted">총 소모 칼로리</p>
+                        <h4 class="fw-bold" id="total-daily-calories-burned">0 kcal</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  ActivityRecord를 렌더링할 컨테이너 -->
+    <div id="activity-records-list-container" class="container mb-5">
+        <!-- ActivityRecord가 여기에 동적으로 렌더링 -->
+
+        <!-- ActivityRecord가 없는 경우 메시지 -->
+        <div id="no-activity-records-message" class="text-center text-muted mt-5">
+            <p>선택하신 날짜의 운동 기록이 없습니다. 새로운 운동 기록을 등록해 보세요!</p>
+        </div>
+    </div>
+
+    <!-- ActivityRecord 렌더링 -->
+    <template id="activity-record-template">
+        <div class="card record-card mb-4 border-info activity-record mb-lg-5" data-id="">
+            <!-- data-id에 ActivityRecord.id -->
+            <div
+                class="card-header card-header-custom d-flex justify-content-between align-items-center bg-info-subtle text-info-shade-20">
+                <!-- 시간과 메모 -->
+                <h6 class="mb-0">
+                    <span class="activity-record-time">--:--</span>
+                </h6>
+                <div>
+                    <!-- ActivityRecord 수정/삭제 -->
+                    <button type="button" class="btn btn-sm btn-outline-primary me-1 edit-activity-record-btn"
+                        data-id="">기록
+                        편집</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-activity-record-btn" data-id="">기록
+                        삭제</button>
+                </div>
+            </div>
+            <div class="card-body" style="background-color: antiquewhite;">
+                <!-- ExerciseItem들이 렌더링 -->
+                <div class="exercise-items-for-record">
+                    <p class="text-muted text-center no-exercise-items-in-record" style="display: none;">이 기록에는 운동
+                        항목이 없습니다.</p>
+                </div>
+                <!-- activity record 메모, 소모 시간, 칼로리-->
+                <p
+                    class="card-text mt-2 mb-0 text-muted d-none activity-record-notes-display border border-info rounded p-2 bg-white">
+                    <small>메모: <span class="activity-record-notes-text"></span></small>
+                </p>
+                <hr class="my-3">
+                <div class="d-flex justify-content-end align-items-center">
+                    <span class="me-2 text-muted">기록 내 총 시간: <strong class="total-record-duration">0분</strong></span>
+                    <span class="text-muted">총 소모 칼로리: <strong class="total-record-calories">0 kcal</strong></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- single ExerciseItem 렌더링 -->
+    <!-- 각 '활동 기록' 안에 들어갈 개별 '운동 항목' -->
+    <template id="exercise-item-template">
+        <div class="card bg-light mb-2 exercise-item" data-id="">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <span class="exercise-name">운동 이름</span>
+                    <span class="badge ms-2 exercise-category">카테고리</span>
+                </h6>
+                <div>
+                    <!-- ExerciseItem 수정 버튼 -->
+                    <button type="button" class="btn btn-sm btn-outline-info me-1 edit-exercise-item-btn"
+                        data-activity-id="" data-exercise-item-id="">수정</button>
+                    <!-- ExerciseItem 삭제 버튼 -->
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-exercise-item-btn"
+                        data-activity-id="" data-exercise-item-id="">삭제</button>
+                </div>
+            </div>
+            <div class="card-body py-2 bg-white">
+                <div class="row gx-2">
+                    <div class="col-6">
+                        <p class="card-text mb-1"><small class="text-muted">시간:</small> <span
+                                class="exercise-duration">0분</span></p>
+                        <p class="card-text mb-1"><small class="text-muted">세트:</small> <span
+                                class="exercise-sets">0</span></small></p>
+                    </div>
+                    <div class="col-6">
+                        <p class="card-text mb-1"><small class="text-muted">중량:</small> <span
+                                class="exercise-weight">0kg</span></p>
+                        <p class="card-text mb-1"><small class="text-muted">횟수:</small> <span
+                                class="exercise-reps">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- 운동 기록 목록 끝 -->
+    <!-- ExerciseItem 수정 모달 시작 -->
+    <div class="modal fade" id="editExerciseItemModal" tabindex="-1" aria-labelledby="editExerciseItemModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-muted" id="editExerciseItemModalLabel">운동 항목 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editExerciseItemForm">
+                        <!-- 현재 activityRecord id와 exerciseItem id를 저장할 hidden input -->
+                        <input type="hidden" id="modalActivityRecordId" name="activityRecordId">
+                        <input type="hidden" id="modalExerciseItemId" name="exerciseItemId">
+                        <input type="hidden" id="modalExerciseItemExerciseId" name="exerciseItemExerciseId">
+                        <!-- Exercise 모델의 ID 저장 -->
+
+                        <!-- 운동명 -->
+                        <div class="mb-3">
+                            <h5 class="form-control-plaintext fw-bold text-info" id="modalExerciseName"></h5>
+                        </div>
+
+                        <!-- 시간, 세트, 횟수, 무게 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalDurationMinutes" class="form-label text-muted">운동 시간 (분):</label>
+                                    <input type="number" class="form-control" id="modalDurationMinutes"
+                                        name="duration_minutes" min="1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalSets" class="form-label text-muted">세트:</label>
+                                    <input type="number" class="form-control" id="modalSets" name="sets" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalReps" class="form-label text-muted">횟수 (Reps):</label>
+                                    <input type="number" class="form-control" id="modalReps" name="reps" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modalWeight" class="form-label text-muted">무게 (kg):</label>
+                                    <input type="number" class="form-control" id="modalWeight" name="weight" step="0.01"
+                                        min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            <button type="submit" class="btn btn-info">수정 완료</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ExerciseItem 수정 모달 끝-->
+    <!-- footer-->
+    <footer class="bg-light text-center py-3 mt-5 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 BodySync. All rights reserved.</p>
+            <p class="mb-0">Developed by 김정은</p>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <a href="https://api.body-sync.shop/api/schema/swagger-ui/" target="_blank"
+                        rel="noopener noreferrer" class="text-decoration-none mx-2 footer-link">
+                        API 문서 (Swagger)
+                    </a>
+                    |
+                    <a href="https://api.body-sync.shop:5555" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        Task Monitor (Flower)
+                    </a>
+                    |
+                    <a href="https://blog.naver.com/deedyy" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        블로그
+                    </a>
+                    |
+                    <a href="https://github.com/Eunnylog" target="_blank" rel="noopener noreferrer"
+                        class="text-decoration-none mx-2 footer-link">
+                        GitHub
+                    </a>
+                </small>
+            </div>
+        </div>
+    </footer>
+    <script type="module" src="js/websocket-alerts.js" defer></script>
+</body>
+
+</html>
