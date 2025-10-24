@@ -1,9 +1,9 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
-const backend_base_url = 'http://127.0.0.1:8000'
-const frontend_base_url = "http://127.0.0.1:5500"
-// const backend_base_url = "https://api.body-sync.shop";
-// const frontend_base_url = "https://body-sync.shop";
+// const backend_base_url = 'http://127.0.0.1:8000'
+// const frontend_base_url = "http://127.0.0.1:5500"
+const backend_base_url = "https://api.body-sync.shop";
+const frontend_base_url = "https://body-sync.shop";
 
 
 
@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 로그인 모달 닫을 때 초기화
     if (loginModal) {
+        const loginEmailField = document.getElementById('login-email')
+        const loginPasswordField = document.getElementById('login-password')
         loginModal.addEventListener('hide.bs.modal', function () {
-            const loginEmailField = document.getElementById('login-email');
-            const loginPasswordField = document.getElementById('login-password');
             if (loginEmailField) loginEmailField.value = "";
             if (loginPasswordField) loginPasswordField.value = "";
         });
