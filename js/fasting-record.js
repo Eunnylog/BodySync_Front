@@ -14,7 +14,7 @@ let isFastingInProgress = false
 
 const today = formatDateTime(new Date())
 
-const FASTING_STATUS_CODES = {
+export const FASTING_STATUS_CODES = {
     BEFORE_START: 0,
     IN_PROGRESS: 1,
     COMPLETED: 2,
@@ -53,7 +53,7 @@ function setDateRange(rangeType) {
 }
 
 
-async function loadFastingRecords() {
+export async function loadFastingRecords() {
     const from_date = startDateInput.value
     const to_date = endDateInput.value
     const res = await getFastingRecords(from_date, to_date)

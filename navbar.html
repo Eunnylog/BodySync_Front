@@ -38,9 +38,28 @@
                 </li>
 
                 <!-- 로그인 후 보이는 메뉴 -->
+                <!-- 알림 -->
+                <li class="nav-item dropdown" id="notification-area-li" style="display: none;">
+                    <!-- 로그인 후 보이도록 기본 display:none -->
+                    <a class="nav-link dropdown-toggle position-relative" href="#" id="bellIcon" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span id="notificationBadge"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                            0 <!-- 알림 개수, JS에서 업데이트 -->
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bellIcon" id="notificationDropdown"
+                        style="max-height: 400px; overflow-y: auto;">
+                        <!-- ⭐⭐ JS가 여기에 직접 li 아이템들을 추가할 것입니다. ⭐⭐ -->
+                        <!-- 초기 메시지는 JS에서 renderNotificationList()를 통해 넣어줄 것입니다. -->
+                    </ul>
+                </li>
                 <li class="nav-item" id="nav-intro-li">
                     <a id="nav-intro" class="nav-link" href="mypage.html"></a>
                 </li>
+                <!-- 로그아웃 -->
                 <li class="nav-item" id="nav-logout-li" style="display: none;">
                     <a class="nav-link" id="nav-logout" href="#" onclick="handleLogout()">로그아웃</a>
                 </li>

@@ -1251,3 +1251,62 @@ async function deleteFastingFetch(recordId) {
         return { ok: false, error: error }
     }
 }
+
+
+async function getNotificationFetch() {
+    try {
+        const response = await authFetch(`${backend_base_url}/notifications/`, {
+            method: 'GET'
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+async function NotificationMarkAsRead(notiId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/notifications/${notiId}/read/`, {
+            method: 'PATCH'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+async function DeleteNotificationFetch(notiId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/notifications/${notiId}/`, {
+            method: 'DELETE'
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}

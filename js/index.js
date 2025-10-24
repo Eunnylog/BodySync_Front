@@ -1,5 +1,5 @@
 import {
-    formatDateTime, handleStartFasting,
+    formatDateTime, handleStartFasting, getPayload,
     handleAbortFasting, handleEditFasting, handleLoadFasting
 } from "./utils.js"
 
@@ -16,6 +16,8 @@ let startFastingSubmitBtn, hiddenFastingId
 let editStartTimeInput, editCurrentMinutes, editEstimatedTime
 let editRemainingTime, editGoalMinutes, fastingEditBtn, fastingNotesInput
 let endTimeInput, editTargetDurationInput, fastingInformation
+
+const payload = getPayload()
 
 const today = formatDateTime(new Date())
 
@@ -159,7 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
     endTimeInput = document.getElementById('end-time-input')
     fastingInformation = document.getElementById('fasting-information')
 
-    updateDashboardCards()
+    if (payload) {
+        updateDashboardCards()
+    }
 
     if (startFastingModal) {
         startFastingModal.addEventListener('hide.bs.modal', function () {
