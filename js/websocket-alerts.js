@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         waitForElement('#notificationBadge', (elBadge) => {
             notificationBadge = elBadge
             loadNotification()
+            updateNotificationCount()
         })
 
         waitForElement('#notificationDropdown', (elDropdown) => {
