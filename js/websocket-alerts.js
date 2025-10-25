@@ -5,7 +5,7 @@ import { formatDateTime, getPayload, formatErrorMessage } from './utils.js'
 const WEBSOCKET_URL = `wss://api.body-sync.shop/ws/fasting-alerts/`
 let fastingAlertSocket = null
 
-let payload = getPayload()
+let payload
 let bellIcon
 let notificationBadge
 let notificationDropdown
@@ -213,10 +213,21 @@ async function handleDeleteNotification(notiId) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    payload = getPayload()
     if (!payload) {
+        console.log('❌ payload 없음: 로그인되지 않음')
         return
     }
+    console.log('✅ payload 확인됨:', payload)
+    const refreshed = await tokenRefresh();
+    if (!refreshed) {
+        console.log('❌ 토큰 갱신 실패');
+        return;
+    }
+    console.log('✅ 토큰 갱신 완료 → WebSocket 연결 시작')
+    connectFastingAlertWebSocket()
+
     waitForElement('#bellIcon', (el) => {
         bellIcon = el
         console.log('✅ bellIcon element 발견:', el)
