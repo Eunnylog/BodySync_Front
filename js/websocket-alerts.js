@@ -226,21 +226,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     console.log('✅ 토큰 갱신 완료 → WebSocket 연결 시작')
-    connectFastingAlertWebSocket()
+    // connectFastingAlertWebSocket()
 
     waitForElement('#bellIcon', (el) => {
         bellIcon = el
-        console.log('✅ bellIcon element 발견:', el)
+        console.log('✅ bellIcon 발견:', el)
+
+        setTimeout(() => {
+            notificationBadge = document.querySelector('#notificationBadge')
+            if (notificationBadge) {
+                console.log('✅ notificationBadge 발견됨 (지연 탐색):', notificationBadge)
+                loadNotification().then(() => {
+                    updateNotificationCount()
+                    connectFastingAlertWebSocket()
+                })
+            } else {
+                console.warn('⚠️ notificationBadge 여전히 탐색 실패')
+            }
+        }, 500)
+
 
         // bellIcon이 발견된 후에 다른 관련 요소들을 찾습니다.
-        waitForElement('#notificationBadge', (elBadge) => {
-            console.log('notificationBadge:', notificationBadge)
-            notificationBadge = elBadge
-            loadNotification().then(() => {
-                updateNotificationCount()
-                connectFastingAlertWebSocket()
-            })
-        })
+        // waitForElement('#notificationBadge', (elBadge) => {
+        //     console.log('notificationBadge:', notificationBadge)
+        //     notificationBadge = elBadge
+        //     loadNotification().then(() => {
+        //         updateNotificationCount()
+        //         connectFastingAlertWebSocket()
+        //     })
+        // })
 
         waitForElement('#notificationDropdown', (elDropdown) => {
             notificationDropdown = elDropdown
