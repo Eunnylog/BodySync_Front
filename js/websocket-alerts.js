@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // bellIcon이 발견된 후에 다른 관련 요소들을 찾습니다.
         waitForElement('#notificationBadge', (elBadge) => {
+            console.log('notificationBadge:', notificationBadge)
             notificationBadge = elBadge
             loadNotification()
             updateNotificationCount()
