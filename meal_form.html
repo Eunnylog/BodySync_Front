@@ -80,6 +80,8 @@
                         <!-- 음식 등록 -->
                         <button class="btn btn-outline-success" type="button" data-bs-toggle="modal"
                             data-bs-target="#food-create-modal">음식 등록</button>
+                        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
+                            data-bs-target="#my-foods-modal">나의 음식</button>
                     </div>
 
                     <!-- 음식 검색 결과 리스트-->
@@ -147,6 +149,7 @@
                     </div>
 
                     <div class="modal-body">
+                        <input type="hidden" id="edit-food-id-input" name="food_id" value="">
                         <div class="mb-3">
                             <label class="form-label">음식 이름</label>
                             <input type="text" id="food-create-name" class="form-control" name="name" required>
@@ -210,6 +213,35 @@
         </div>
     </div>
     <!-- 음식 등록 모달창 끝-->
+    <!-- 나의 음식 모달 시작 -->
+    <div class="modal fade" id="my-foods-modal" tabindex="-1" aria-labelledby="myFoodsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myFoodsModalLabel">내가 등록한 음식</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="my-foods-empty-message" class="alert alert-warning text-center" role="alert"
+                        style="display: none;">
+                        아직 등록한 음식이 없어요! 😢 <br> '음식 등록' 버튼으로 나만의 음식을 추가해보세요!
+                    </div>
+
+                    <ul class="list-group" id="my-custom-foods-list">
+                        <!-- li 렌더 -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success me-auto" data-bs-toggle="modal"
+                        data-bs-target="#food-create-modal">
+                        새 음식 등록
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 나의 음식 모달 끝-->
     <!-- footer-->
     <footer class="bg-light text-center py-3 mt-5 mt-auto">
         <div class="container">

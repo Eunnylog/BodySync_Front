@@ -1,9 +1,9 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
 // const backend_base_url = 'http://127.0.0.1:8000'
-// const frontend_base_url = "http://127.0.0.1:5500"
+const frontend_base_url = "http://127.0.0.1:5500"
 const backend_base_url = "https://api.body-sync.shop";
-const frontend_base_url = "https://body-sync.shop";
+// const frontend_base_url = "https://body-sync.shop";
 
 
 
@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 handleSignin()
             }
         })
+        loginModal.addEventListener('submit', handleSignin)
     }
 
     // 회원가입 모달 닫을 때 초기화
@@ -49,6 +50,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (signupPasswordField) signupPasswordField.value = "";
             if (signupPassword2Field) signupPassword2Field.value = "";
         });
+        signupModal.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault()
+            }
+        })
     }
 
     injectNavbar();
@@ -555,6 +561,49 @@ async function foodSearchFetch(searchStr) {
     }
 }
 
+
+// 음식 삭제
+async function deleteFoodFetch(foodId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/${foodId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: errorData }
+    }
+}
+
+
+// 음식 수정
+async function EditFoodFetch(foodData, foodId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/${foodId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(foodData)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: errorData }
+    }
+}
+
+
 // 식단 등록
 async function createMealRecord(data) {
     try {
@@ -578,6 +627,7 @@ async function createMealRecord(data) {
     }
 }
 
+// 식단 리스트 조회
 async function getMealRecords(date) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/meal-records/?date=${encodeURIComponent(date)}`, {
@@ -599,7 +649,7 @@ async function getMealRecords(date) {
     }
 }
 
-
+// 식단 디테일 조회
 async function getMealRecord(mealRecordId) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}`, {
@@ -1302,6 +1352,7 @@ async function NotificationMarkAsRead(notiId) {
 }
 
 
+// 알람 삭제
 async function DeleteNotificationFetch(notiId) {
     try {
         const response = await authFetch(`${backend_base_url}/notifications/${notiId}/`, {
@@ -1310,6 +1361,27 @@ async function DeleteNotificationFetch(notiId) {
 
         if (response.ok) {
             return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
+
+
+// 나의 음식 조회
+async function getMyFoodsListFetch() {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/my-food-list/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
         } else {
             const errorData = await response.json()
             return { ok: false, error: errorData }

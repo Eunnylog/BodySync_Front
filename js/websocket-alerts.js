@@ -126,6 +126,7 @@ function updateNotificationCount() {
 
 
 function renderNotificationList(notiData) {
+    console.log()
     notificationDropdown.innerHTML = ''
     unReadNotiCount = 0
 
