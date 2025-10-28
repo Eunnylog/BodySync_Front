@@ -1,9 +1,9 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
 // const backend_base_url = 'http://127.0.0.1:8000'
-// const frontend_base_url = "http://127.0.0.1:5500"
+const frontend_base_url = "http://127.0.0.1:5500"
 const backend_base_url = "https://api.body-sync.shop";
-const frontend_base_url = "https://body-sync.shop";
+// const frontend_base_url = "https://body-sync.shop";
 
 
 
@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 handleSignin()
             }
         })
+        loginModal.addEventListener('submit', handleSignin)
     }
 
     // 회원가입 모달 닫을 때 초기화
@@ -49,6 +50,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (signupPasswordField) signupPasswordField.value = "";
             if (signupPassword2Field) signupPassword2Field.value = "";
         });
+        signupModal.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault()
+            }
+        })
     }
 
     injectNavbar();
@@ -552,6 +558,26 @@ async function foodSearchFetch(searchStr) {
         console.error('네트워크 오류', error)
         window.showToast('네트워크 오류 발생', 'danger')
         return null
+    }
+}
+
+
+// 음식 삭제
+async function deleteFoodFetch(foodId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/${foodId}/`, {
+            method: 'DELETE',
+        })
+
+        if (response.ok) {
+            return { ok: true }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: errorData }
     }
 }
 
@@ -1302,6 +1328,7 @@ async function NotificationMarkAsRead(notiId) {
 }
 
 
+// 알람 삭제
 async function DeleteNotificationFetch(notiId) {
     try {
         const response = await authFetch(`${backend_base_url}/notifications/${notiId}/`, {

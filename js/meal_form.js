@@ -1,7 +1,12 @@
-import { formatDateTime } from "./utils.js"
+import { formatDateTime, formatErrorMessage, getPayload } from "./utils.js"
 const urlPrams = new URLSearchParams(window.location.search)
 const mealRecordId = urlPrams.get('id')
-
+const payload = getPayload()
+let isStaff, userId
+if (payload) {
+    isStaff = payload['is_staff']
+    userId = payload['user_id']
+}
 // 식사 수정 모드 유무
 let isEdit = false
 let mealRecordData = null
@@ -49,24 +54,55 @@ async function performFoodSearch() {
         return
     }
 
-    console.log(`음식 검색 클릭! 키워드: ${searchStr}`)
-    window.showToast('음식 검색 중...', 'info')
-
     foodSearchResultUI.innerHTML = ''
+
+    // 로딩 스피너
+    foodSearchBtn.disabled = true
+    foodSearchResultUI.innerHTML = `
+        <li class="list-group-item d-flex justify-content-center align-items-center">
+            <div class="spinner-border text-info" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span class="ms-3">음식 정보 찾는 중... 잠시만 기다려 주세요.</span>
+        </li>
+    `
 
     try {
         const searchResults = await foodSearchFetch(searchStr)
+
+        foodSearchResultUI.innerHTML = '' // 로딩 스피너 지우기
 
         if (searchResults && searchResults.length > 0) {
             searchResults.forEach(food => {
                 const li = document.createElement('li')
                 li.className = 'list-group-item d-flex justify-content-between align-items-center'
+                let editBtnHtml = ''
+                let deleteBtnHtml = ''
+
+                const canManage = isStaff || (food.is_custom && food.registered_by === userId)
+
+                if (canManage) {
+                    editBtnHtml = `
+                    <button type="button" class="btn badge border border-secondary text-secondary edit-food-btn" 
+                    data-id="${food.id}" data-bs-toggle="modal" data-bs-target="#food-create-modal">수정</button>
+                    `
+                    deleteBtnHtml = `
+                        <button type="button" class="btn badge border border-danger text-danger delete-food-btn" 
+                        data-id="${food.id}">삭제</button>
+                    `
+                }
+
                 li.innerHTML = `
-                <span>${food.name} (${food.calories_per_100g || 0}kcal / ${food.carbs_per_100g || 0}g / ${food.protein_per_100g || 0}g / ${food.fat_per_100g || 0}g / ${food.sugars_per_100g || 0}g / ${food.dietary_fiber_per_100g || 0}g )</span>
-                <button type="button" class="btn btn-sm btn-outline-success add-food-btn"
-                data-food-id="${food.id}" data-food-name="${food.name}" data-food-calories="${food.calories_per_100g}"
-                data-food-carbs="${food.carbs_per_100g || 0}" data-food-sugars="${food.sugars_per_100g || 0}" data-food-fiber="${food.dietary_fiber_per_100g || 0}"
-                data-food-protein="${food.protein_per_100g || 0}" data-food-fat="${food.fat_per_100g || 0}" data-food-base-unit="${food.base_unit}">추가</button>
+                <div>
+                    <span>${food.name} (${food.calories_per_100g || 0}kcal / ${food.carbs_per_100g || 0}g / ${food.protein_per_100g || 0}g / ${food.fat_per_100g || 0}g / ${food.sugars_per_100g || 0}g / ${food.dietary_fiber_per_100g || 0}g )</span>
+                    ${editBtnHtml}
+                    ${deleteBtnHtml}
+                
+                </div>
+                    <button type="button" class="btn btn-sm btn-success add-food-btn"
+                    data-food-id="${food.id}" data-food-name="${food.name}" data-food-calories="${food.calories_per_100g}"
+                    data-food-carbs="${food.carbs_per_100g || 0}" data-food-sugars="${food.sugars_per_100g || 0}" data-food-fiber="${food.dietary_fiber_per_100g || 0}"
+                    data-food-protein="${food.protein_per_100g || 0}" data-food-fat="${food.fat_per_100g || 0}" data-food-base-unit="${food.base_unit}">추가</button>
                 `
 
                 foodSearchResultUI.appendChild(li)
@@ -83,6 +119,8 @@ async function performFoodSearch() {
         console.error('음식 검색 중 오류 발생', error)
         foodSearchResultUI.innerHTML = '<p class="text-danger">음식 검색 중 오류가 발생했습니다.</p>'
         window.showToast('음식 검색 중 오류가 발생했습니다.', 'danger')
+    } finally {
+        foodSearchBtn.disabled = false
     }
 }
 
@@ -302,7 +340,7 @@ function resetFoodCreateForm() {
 async function handleFoodCreationSubmit(e) {
     e.preventDefault()
 
-    const name = parseFloat(foodNameInput.value)
+    const name = foodNameInput.value
     const calories = parseFloat(foodCaloriesInput.value)
     const carbs = parseFloat(foodCarbsInput.value)
     const protein = parseFloat(foodProteinInput.value)
@@ -392,6 +430,27 @@ async function handleMealRecordSubmit(e) {
     }
 }
 
+// 음식 삭제
+async function handleDeleteFood(foodId, deleteBtn) {
+    const confirmed = confirm('해당 음식을 삭제하시겠습니까? \n 삭제 시 더이상 사용할 수 없습니다.')
+
+    if (confirmed) {
+        const res = await deleteFoodFetch(foodId)
+
+        if (res.ok) {
+            if (deleteBtn) {
+                const itemToRemove = deleteBtn.closest('li')
+                if (itemToRemove) {
+                    itemToRemove.remove()
+                }
+            }
+            window.showToast('삭제되었습니다.', 'info')
+        } else {
+            const errorMessage = formatErrorMessage(res.error)
+            window.showToast(errorMessage, 'danger')
+        }
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async function () {
     pageTitle = document.getElementById('page-title')
@@ -480,6 +539,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 음식 추가 버튼
     if (foodSearchResultUI) {
         foodSearchResultUI.addEventListener('click', (event) => {
+            // 추가 버튼
             if (event.target.classList.contains('add-food-btn')) {
                 const addBtn = event.target
 
@@ -494,6 +554,16 @@ document.addEventListener('DOMContentLoaded', async function () {
                     foodBaseUnit: addBtn.dataset.foodBaseUnit,
                 }
                 addFoodItemToSelectedList(foodDetails)
+            }
+
+            // 삭제 버튼
+            if (event.target.classList.contains('delete-food-btn')) {
+                const deleteBtn = event.target
+                const foodId = deleteBtn.dataset.id
+
+                if (foodId) {
+                    handleDeleteFood(foodId, deleteBtn)
+                }
             }
         })
     }
@@ -530,6 +600,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (event.target.id === 'food-search-input') {
                     event.preventDefault()
                     await performFoodSearch()
+                } else {
+                    event.preventDefault()
                 }
             }
         })
