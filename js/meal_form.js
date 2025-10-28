@@ -46,6 +46,8 @@ let totalFatSpan
 let totalSugarsSpan
 let totalFiberSpan
 
+// 나의 음식
+let myFoodsModal, myFoodsEmptyMessage, myFoodsList
 
 // 음식 검색 및 결과 렌더링
 async function performFoodSearch() {
@@ -390,7 +392,8 @@ async function handleFoodSubmit(e) {
 
         if (res.ok) {
             window.showToast('음식 수정 완료!', 'info')
-            bsFoodCreateModal.hide()
+            if (bsFoodCreateModal) bsFoodCreateModal.hide()
+            // if (myFoodsModal) myFoodsModal.hide()
 
             // 수정 후 li 업데이트
             if (curEditFoodLi) {
@@ -501,10 +504,12 @@ function loadEditFoodModal(foodData) {
     foodSugarsInput.value = foodData.foodSugars
     foodFiberInput.value = foodData.foodFiber
     foodBaseUnitInput.value = foodData.foodBaseUnit
+    console.log('ㅇㅇㅇ', foodData)
 }
 
 // 음식 수정 후 음식 li 업데이트
 function updateFoodLi(foodData) {
+    console.log('updateFoodLi')
     if (curEditFoodLi) {
         // 1. li 요소의 dataset 업데이트
         curEditFoodLi.dataset.foodName = foodData.name;
@@ -525,6 +530,56 @@ function updateFoodLi(foodData) {
     }
 }
 
+
+async function loadMyFoodsList() {
+    myFoodsList.innerHTML = ''
+    const res = await getMyFoodsListFetch()
+
+    if (res.ok) {
+        const foods = res.data.results
+
+        if (foods.length === 0) {
+            myFoodsEmptyMessage.style.display = 'block'
+        } else {
+            myFoodsEmptyMessage.style.display = 'none'
+            foods.forEach(food => {
+                const li = document.createElement('li')
+                li.className = 'list-group-item d-flex justify-content-between align-items-center'
+                li.dataset.foodId = food.id
+                li.dataset.foodName = food.name
+                li.dataset.foodCalories = food.calories_per_100g || 0
+                li.dataset.foodCarbs = food.carbs_per_100g || 0
+                li.dataset.foodProtein = food.protein_per_100g || 0
+                li.dataset.foodFat = food.fat_per_100g || 0
+                li.dataset.foodSugars = food.sugars_per_100g || 0
+                li.dataset.foodFiber = food.dietary_fiber_per_100g || 0
+                li.dataset.foodBaseUnit = food.base_unit || 'g'
+
+                const editBtnHtml = `<button type="button" class="btn badge border border-secondary text-secondary edit-food-btn" data-id="${food.id}" data-bs-toggle="modal" data-bs-target="#food-create-modal">수정</button>`
+                const deleteBtnHtml = `<button type="button" class="btn badge border border-danger text-danger delete-food-btn" data-id="${food.id}">삭제</button>`
+                const addBtnHtml = `<button type="button" class="btn btn-sm btn-success add-food-btn"
+                data-food-id="${food.id}" data-food-name="${food.name}" data-food-calories="${food.calories_per_100g}"
+                data-food-carbs="${food.carbs_per_100g || 0}" data-food-sugars="${food.sugars_per_100g || 0}" data-food-fiber="${food.dietary_fiber_per_100g || 0}"
+                data-food-protein="${food.protein_per_100g || 0}" data-food-fat="${food.fat_per_100g || 0}" data-food-base-unit="${food.base_unit}">추가</button>`
+
+                li.innerHTML = `
+                    <div>
+                        <span>${food.name} (${food.calories_per_100g || 0}kcal / ${food.carbs_per_100g || 0}g / ${food.protein_per_100g || 0}g / ${food.fat_per_100g || 0}g / ${food.sugars_per_100g || 0}g / ${food.dietary_fiber_per_100g || 0}g )</span>
+                            ${editBtnHtml}
+                            ${deleteBtnHtml}
+                    </div>
+                    <div>
+                        ${addBtnHtml}
+                    </div>
+                `
+                myFoodsList.appendChild(li)
+            })
+        }
+    } else {
+        const errorMessage = formatErrorMessage(res.error)
+        window.showToast(errorMessage, 'danger')
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async function () {
     pageTitle = document.getElementById('page-title')
@@ -564,6 +619,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     totalSugarsSpan = document.getElementById('total-sugars')
     totalFiberSpan = document.getElementById('total-fiber')
 
+    // 나의 음식 모달
+    myFoodsModal = document.getElementById('my-foods-modal')
+    myFoodsEmptyMessage = document.getElementById('my-foods-empty-message')
+    myFoodsList = document.getElementById('my-custom-foods-list')
 
     // 식단 생성 or 수정 모드
     if (mealRecordId) {
@@ -718,4 +777,73 @@ document.addEventListener('DOMContentLoaded', async function () {
         mealRecordForm.addEventListener('submit', handleMealRecordSubmit)
     }
     calculateTotalMacros()
+
+    if (myFoodsModal) {
+        myFoodsModal.addEventListener('hidden.bs.modal', function () {
+            // myFoodsEmptyMessage.style.display = 'block'
+            myFoodsList.innerHTML = ''
+
+        })
+
+        myFoodsModal.addEventListener('show.bs.modal', function () {
+            loadMyFoodsList()
+        })
+
+        myFoodsModal.addEventListener('click', (event) => {
+            // 추가버튼
+            if (event.target.classList.contains('add-food-btn')) {
+                const addBtn = event.target
+
+                const foodDetails = {
+                    foodId: addBtn.dataset.foodId,
+                    foodName: addBtn.dataset.foodName,
+                    foodCalories: addBtn.dataset.foodCalories,
+                    foodCarbs: addBtn.dataset.foodCarbs,
+                    foodProtein: addBtn.dataset.foodProtein,
+                    foodFat: addBtn.dataset.foodFat,
+                    foodSugars: addBtn.dataset.foodSugars,
+                    foodFiber: addBtn.dataset.foodFiber,
+                    foodBaseUnit: addBtn.dataset.foodBaseUnit,
+                }
+                addFoodItemToSelectedList(foodDetails)
+            }
+
+            // 삭제 버튼
+            if (event.target.classList.contains('delete-food-btn')) {
+                const deleteBtn = event.target
+                const foodId = deleteBtn.dataset.id
+
+                if (foodId) {
+                    handleDeleteFood(foodId, deleteBtn)
+                }
+            }
+
+            // 수정 버튼
+            if (event.target.classList.contains('edit-food-btn')) {
+                const editBtn = event.target
+                const foodId = editBtn.dataset.id
+                if (foodId) {
+                    const foodItem = editBtn.closest('li')
+
+                    if (foodItem) {
+                        const foodNutrition = {
+                            foodId: foodItem.dataset.foodId,
+                            foodName: foodItem.dataset.foodName,
+                            foodCalories: foodItem.dataset.foodCalories,
+                            foodCarbs: foodItem.dataset.foodCarbs,
+                            foodProtein: foodItem.dataset.foodProtein,
+                            foodFat: foodItem.dataset.foodFat,
+                            foodSugars: foodItem.dataset.foodSugars,
+                            foodFiber: foodItem.dataset.foodFiber,
+                            foodBaseUnit: foodItem.dataset.foodBaseUnit,
+                        }
+                        console.log(foodNutrition)
+                        curEditFoodLi = foodItem
+                        loadEditFoodModal(foodNutrition)
+                    }
+
+                }
+            }
+        })
+    }
 })

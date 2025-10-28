@@ -1370,3 +1370,24 @@ async function DeleteNotificationFetch(notiId) {
         return { ok: false, error: error }
     }
 }
+
+
+// 나의 음식 조회
+async function getMyFoodsListFetch() {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/my-food-list/`, {
+            method: 'GET',
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.log('네트워크 오류', error)
+        return { ok: false, error: error }
+    }
+}
