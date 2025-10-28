@@ -222,30 +222,16 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="my-foods-empty-message" class="alert alert-info text-center" role="alert"
+                    <div id="my-foods-empty-message" class="alert alert-warning text-center" role="alert"
                         style="display: none;">
                         아직 등록한 음식이 없어요! 😢 <br> '음식 등록' 버튼으로 나만의 음식을 추가해보세요!
                     </div>
 
                     <ul class="list-group" id="my-custom-foods-list">
-                        <!-- JavaScript로 동적으로 음식 목록 li 요소가 추가될 위치 -->
-                        <!-- 예시 li 구조:
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>닭가슴살 (100kcal / 10g / 20g / 2g / 1g / 0g )</span>
-                            <div>
-                                <button type="button" class="btn badge border border-secondary text-secondary edit-food-btn" 
-                                        data-id="123" data-bs-toggle="modal" data-bs-target="#food-create-modal">수정</button>
-                                <button type="button" class="btn badge border border-danger text-danger delete-food-btn" 
-                                        data-id="123">삭제</button>
-                                <button type="button" class="btn btn-sm btn-success add-food-btn" 
-                                        data-food-id="123" data-food-name="닭가슴살" ... >추가</button>
-                            </div>
-                        </li>
-                        -->
+                        <!-- li 렌더 -->
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <!-- 편리성을 위해 '음식 등록' 버튼을 이곳에도 배치할 수 있습니다. -->
                     <button type="button" class="btn btn-outline-success me-auto" data-bs-toggle="modal"
                         data-bs-target="#food-create-modal">
                         새 음식 등록

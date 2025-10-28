@@ -350,7 +350,6 @@ function resetFoodCreateForm() {
     if (foodModalTitle) foodModalTitle.textContent = '새 음식 등록'
     if (foodHiddenInput) foodHiddenInput.value = ''
     curEditFoodLi = null
-    console.log('food create modal 초기화')
 }
 
 
@@ -780,7 +779,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (myFoodsModal) {
         myFoodsModal.addEventListener('hidden.bs.modal', function () {
-            // myFoodsEmptyMessage.style.display = 'block'
+            myFoodsEmptyMessage.style.display = 'block'
             myFoodsList.innerHTML = ''
 
         })
