@@ -581,6 +581,29 @@ async function deleteFoodFetch(foodId) {
     }
 }
 
+
+// 음식 수정
+async function EditFoodFetch(foodData, foodId) {
+    try {
+        const response = await authFetch(`${backend_base_url}/meals/foods/${foodId}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(foodData)
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            return { ok: true, data: data }
+        } else {
+            const errorData = await response.json()
+            return { ok: false, error: errorData }
+        }
+    } catch (error) {
+        console.error('네트워크 오류', error)
+        return { ok: false, error: errorData }
+    }
+}
+
+
 // 식단 등록
 async function createMealRecord(data) {
     try {
@@ -604,6 +627,7 @@ async function createMealRecord(data) {
     }
 }
 
+// 식단 리스트 조회
 async function getMealRecords(date) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/meal-records/?date=${encodeURIComponent(date)}`, {
@@ -625,7 +649,7 @@ async function getMealRecords(date) {
     }
 }
 
-
+// 식단 디테일 조회
 async function getMealRecord(mealRecordId) {
     try {
         const response = await authFetch(`${backend_base_url}/meals/meal-records/${mealRecordId}`, {
