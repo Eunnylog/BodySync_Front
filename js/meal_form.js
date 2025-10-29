@@ -88,11 +88,11 @@ async function performFoodSearch() {
 
                 if (canManage) {
                     editBtnHtml = `
-                    <button type="button" class="btn badge border border-secondary text-secondary edit-food-btn" 
+                    <button type="button" class="badge btn btn-outline-secondary btn-sm text-secondary badge-hover edit-food-btn" 
                     data-id="${food.id}" data-bs-toggle="modal" data-bs-target="#food-create-modal">수정</button>
                     `
                     deleteBtnHtml = `
-                        <button type="button" class="btn badge border border-danger text-danger delete-food-btn" 
+                        <button type="button" class="badge btn btn-outline-danger btn-sm text-danger badge-hover delete-food-btn" 
                         data-id="${food.id}">삭제</button>
                     `
                 }

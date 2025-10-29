@@ -1,9 +1,9 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
 // const backend_base_url = 'http://127.0.0.1:8000'
-const frontend_base_url = "http://127.0.0.1:5500"
+// const frontend_base_url = "http://127.0.0.1:5500"
 const backend_base_url = "https://api.body-sync.shop";
-// const frontend_base_url = "https://body-sync.shop";
+const frontend_base_url = "https://body-sync.shop";
 
 
 
@@ -1331,7 +1331,7 @@ async function getNotificationFetch() {
     }
 }
 
-
+// 알람 읽음 표시
 async function NotificationMarkAsRead(notiId) {
     try {
         const response = await authFetch(`${backend_base_url}/notifications/${notiId}/read/`, {
