@@ -126,12 +126,15 @@ function updateNotificationCount() {
 
 
 function renderNotificationList(notiData) {
-    console.log()
-    notificationDropdown.innerHTML = ''
+    const dropdown = document.querySelector('#notificationDropdown');
+    if (!dropdown) return console.warn('❌ dropdown 없음')
+
+    dropdown.innerHTML = ''
     unReadNotiCount = 0
 
-    if (!notiData) {
-        notificationDropdown.innerHTML = `<li class="dropdown-item text-muted">새 알림이 없습니다</li>`
+    if (!notiData || notiData.length === 0) {
+        dropdown.innerHTML = `<li class="dropdown-item text-muted">새 알림이 없습니다</li>`
+        updateNotificationCount()
         return
     }
 
@@ -153,14 +156,14 @@ function renderNotificationList(notiData) {
                 <a class="dropdown-item d-flex justify-content-between align-items-center ${!isRead ? 'fw-bold' : ''} border-gray-200 p-2" data-notification-id="${notiId}" data-action="move-page" href="/fasting_record.html">
                     <small class="text-muted">${isRead ? '✅' : '🔴'} ${message}</small>
                 </a>
-                <button class="btn btn-sm btn-outline-danger badge ms-2 text-danger" data-notification-id="${notiId}" data-action="delete-notification" style="margin-right: 8px;">
+                <button class="btn btn-sm btn-outline-danger badge ms-2 text-danger badge-hover" data-notification-id="${notiId}" data-action="delete-notification" style="margin-right: 8px;">
                     삭제
                 </button>
             </div>
 
         `
         console.log('length > 0', li)
-        notificationDropdown.appendChild(li)
+        dropdown.appendChild(li)
     })
     updateNotificationCount()
 }
@@ -181,6 +184,7 @@ async function loadNotification() {
 
 
 async function handleReadNotification(notiId) {
+    console.log('마크', notiId)
     if (!notiId) {
         window.showToast('알림 정보를 가져올 수 없습니다.', 'danger')
         return
@@ -207,6 +211,7 @@ async function handleDeleteNotification(notiId) {
     const res = await DeleteNotificationFetch(notiId)
 
     if (res.ok) {
+        window.showToast('알림을 삭재했습니다.', 'info')
         loadNotification()
     } else {
         const errorMessage = formatErrorMessage(res.data)
@@ -237,59 +242,101 @@ document.addEventListener('DOMContentLoaded', async () => {
             notificationBadge = document.querySelector('#notificationBadge')
             if (notificationBadge) {
                 console.log('✅ notificationBadge 발견됨 (지연 탐색):', notificationBadge)
-                loadNotification().then(() => {
-                    updateNotificationCount()
-                    connectFastingAlertWebSocket()
-                })
             } else {
                 console.warn('⚠️ notificationBadge 여전히 탐색 실패')
             }
         }, 500)
 
-
-        // bellIcon이 발견된 후에 다른 관련 요소들을 찾습니다.
-        // waitForElement('#notificationBadge', (elBadge) => {
-        //     console.log('notificationBadge:', notificationBadge)
-        //     notificationBadge = elBadge
-        //     loadNotification().then(() => {
-        //         updateNotificationCount()
-        //         connectFastingAlertWebSocket()
-        //     })
-        // })
-
         waitForElement('#notificationDropdown', (elDropdown) => {
             notificationDropdown = elDropdown
-            notificationDropdown.addEventListener('click', (event) => {
+            console.log('✅ notificationDropdown 발견됨:', elDropdown)
+            // const observer = new MutationObserver((mutations) => {
+            //     console.log('🧨 notificationDropdown DOM 변경 발생:', mutations)
+            // })
+            // observer.observe(notificationDropdown, { childList: true })
+            // notificationDropdown.addEventListener('click', (event) => {
+            //     console.log('드랍다운 클릭')
+            //     const target = event.target
+            //     console.log('EVENT TARGET:', target)
+            //     const clickAction = target.closest('[data-action]')
+            //     console.log('CLICK ACTION ELEMENT:', clickAction)
+
+            //     if (!clickAction) {
+            //         console.log('  No data-action element found. Returning.')
+            //         return
+            //     }
+
+            //     // event.stopPropagation() // 자동 닫힘 방지
+
+            //     const action = clickAction.dataset.action
+            //     const notificationId = clickAction.dataset.notificationId
+            //     console.log('클릭됨', action, notificationId)
+
+
+            //     if (action === 'delete-notification') {
+            //         event.preventDefault()
+            //         if (notificationId) {
+            //             console.log('handleDeleteNotification 호출 예정:', notificationId)
+            //             // handleDeleteNotification(notificationId)
+            //         }
+            //     } else if (action === 'move-page') {
+            //         event.preventDefault()
+            //         console.log('handleReadNotification 호출 예정:', notificationId)
+            //         if (notificationId) {
+            //             // handleReadNotification(notificationId)
+            //             console.log('마크', notificationId)
+            //             // const href = clickAction.getAttribute('href')
+            //             // if (href) {
+            //             //     window.location.href = href
+            //             // }
+            //         }
+            //     }
+
+
+            // })
+            document.addEventListener('click', (event) => {
+                console.log('드랍다운 클릭')
                 const target = event.target
+                console.log('EVENT TARGET:', target)
                 const clickAction = target.closest('[data-action]')
+                console.log('CLICK ACTION ELEMENT:', clickAction)
 
                 if (!clickAction) {
+                    console.log('  No data-action element found. Returning.')
                     return
                 }
+
+                // event.stopPropagation() // 자동 닫힘 방지
+
                 const action = clickAction.dataset.action
                 const notificationId = clickAction.dataset.notificationId
+                console.log('클릭됨', action, notificationId)
 
-                if (action) {
+
+                if (action === 'delete-notification') {
                     event.preventDefault()
-                    event.stopPropagation()
-
-                    if (action === 'delete-notification') {
-                        event.preventDefault()
-                        if (notificationId) {
-                            handleDeleteNotification(notificationId)
-                        }
-                    } else if (action === 'move-page') {
-                        event.preventDefault()
-                        if (notificationId) {
-                            handleReadNotification(notificationId)
-                            const href = clickAction.getAttribute('href')
-                            if (href) {
+                    if (notificationId) {
+                        console.log('handleDeleteNotification 호출 예정:', notificationId)
+                        handleDeleteNotification(notificationId)
+                    }
+                } else if (action === 'move-page') {
+                    event.preventDefault()
+                    console.log('handleReadNotification 호출 예정:', notificationId)
+                    if (notificationId) {
+                        handleReadNotification(notificationId)
+                        console.log('마크', notificationId)
+                        const href = clickAction.getAttribute('href')
+                        if (href) {
+                            setTimeout(() => {
                                 window.location.href = href
-                            }
+                            }, 200)
                         }
                     }
-
                 }
+            })
+            loadNotification().then(() => {
+                updateNotificationCount()
+                connectFastingAlertWebSocket()
             })
 
         })

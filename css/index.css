@@ -303,3 +303,8 @@ body {
 .toast.text-bg-info {
     border-color: var(--bs-info);
 }
+
+
+.badge-hover:hover {
+    color: #fff !important
+}
