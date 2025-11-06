@@ -142,7 +142,7 @@ async function performFoodSearch() {
                     renderNoResults(searchStr)
                     window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
                 }
-            }, 2000)
+            }, 1000)
         }
 
 
