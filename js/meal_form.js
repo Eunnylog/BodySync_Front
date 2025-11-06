@@ -142,9 +142,12 @@ async function performFoodSearch() {
                     renderNoResults(searchStr)
                     window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
                 }
-            }, 1000)
+            }, 1500)
         } else {
-            renderFoodResults(searchResults, searchStr)
+            if (searchResults && searchResults.length > 0) {
+                renderFoodResults(searchResults, searchStr)
+                window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'info')
+            }
         }
 
 
