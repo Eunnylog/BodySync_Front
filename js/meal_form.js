@@ -75,83 +75,15 @@ async function performFoodSearch() {
     try {
         const searchResults = await foodSearchFetch(searchStr)
 
+        foodSearchResultUI.innerHTML = '' // 스피너 삭제
 
-        if (!searchResults || searchResults.length === 0) {
-            console.log('API에서 아직 데이터 안 들어옴 2초 후 재요청')
-            setTimeout(async () => {
-                const retryResults = await foodSearchFetch(searchStr)
-                foodSearchResultUI.innerHTML = '' // 로딩 스피너 지우기
-
-                // if (retryResults && retryResults.length > 0) {
-                //     retryResults.forEach(food => {
-                //         const li = document.createElement('li')
-                //         li.className = 'list-group-item d-flex justify-content-between align-items-center'
-                //         let editBtnHtml = ''
-                //         let deleteBtnHtml = ''
-
-                //         const canManage = isStaff || (food.is_custom && food.registered_by === userId)
-
-                //         if (canManage) {
-                //             editBtnHtml = `
-                //             <button type="button" class="badge btn btn-outline-secondary btn-sm text-secondary badge-hover edit-food-btn" 
-                //             data-id="${food.id}" data-bs-toggle="modal" data-bs-target="#food-create-modal">수정</button>
-                //             `
-                //             deleteBtnHtml = `
-                //                 <button type="button" class="badge btn btn-outline-danger btn-sm text-danger badge-hover delete-food-btn" 
-                //                 data-id="${food.id}">삭제</button>
-                //             `
-                //         }
-
-                //         li.dataset.foodId = food.id
-                //         li.dataset.foodName = food.name
-                //         li.dataset.foodCalories = food.calories_per_100g || 0
-                //         li.dataset.foodCarbs = food.carbs_per_100g || 0
-                //         li.dataset.foodProtein = food.protein_per_100g || 0
-                //         li.dataset.foodFat = food.fat_per_100g || 0
-                //         li.dataset.foodSugars = food.sugars_per_100g || 0
-                //         li.dataset.foodFiber = food.dietary_fiber_per_100g || 0
-                //         li.dataset.foodBaseUnit = food.base_unit || 'g'
-
-                //         li.innerHTML = `
-                //         <div>
-                //             <span>${food.name} (${food.calories_per_100g || 0}kcal / ${food.carbs_per_100g || 0}g / ${food.protein_per_100g || 0}g / ${food.fat_per_100g || 0}g / ${food.sugars_per_100g || 0}g / ${food.dietary_fiber_per_100g || 0}g )</span>
-                //             ${editBtnHtml}
-                //             ${deleteBtnHtml}
-
-                //         </div>
-                //             <button type="button" class="btn btn-sm btn-success add-food-btn"
-                //             data-food-id="${food.id}" data-food-name="${food.name}" data-food-calories="${food.calories_per_100g}"
-                //             data-food-carbs="${food.carbs_per_100g || 0}" data-food-sugars="${food.sugars_per_100g || 0}" data-food-fiber="${food.dietary_fiber_per_100g || 0}"
-                //             data-food-protein="${food.protein_per_100g || 0}" data-food-fat="${food.fat_per_100g || 0}" data-food-base-unit="${food.base_unit}">추가</button>
-                //         `
-
-                //         foodSearchResultUI.appendChild(li)
-                //     })
-                //     window.showToast(`${searchStr}에 대한 ${retryResults.length}개의 결과를 찾았습니다.`, 'info')
-                // } else {
-                //     const li = document.createElement('li')
-                //     li.className = 'list-group-item'
-                //     li.textContent = `${searchStr}에 대한 검색 결과가 없습니다. 직접 등록해주세요.`
-                //     foodSearchResultUI.appendChild(li)
-                //     window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
-                // }
-                if (retryResults && retryResults.length > 0) {
-                    renderFoodResults(retryResults, searchStr)
-                    window.showToast(`${searchStr}에 대한 ${retryResults.length}개의 결과를 찾았습니다.`, 'info')
-                } else {
-                    renderNoResults(searchStr)
-                    window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
-                }
-            }, 2000)
+        if (searchResults && searchResults.length > 0) {
+            renderFoodResults(searchResults, searchStr)
+            window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'info')
         } else {
-            if (searchResults && searchResults.length > 0) {
-                foodSearchResultUI.innerHTML = ''
-                renderFoodResults(searchResults, searchStr)
-                window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'info')
-            }
+            renderNoResults(searchStr)
+            window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
         }
-
-
     } catch (error) {
         console.error('음식 검색 중 오류 발생', error)
         foodSearchResultUI.innerHTML = '<p class="text-danger">음식 검색 중 오류가 발생했습니다.</p>'
