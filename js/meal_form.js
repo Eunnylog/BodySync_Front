@@ -145,6 +145,7 @@ async function performFoodSearch() {
             }, 1500)
         } else {
             if (searchResults && searchResults.length > 0) {
+                foodSearchResultUI.innerHTML = ''
                 renderFoodResults(searchResults, searchStr)
                 window.showToast(`${searchStr}에 대한 ${searchResults.length}개의 결과를 찾았습니다.`, 'info')
             }
