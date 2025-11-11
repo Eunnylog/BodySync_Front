@@ -225,7 +225,7 @@ function calculateTotalExerciseInformation() {
         totalMinutes += itemEffectiveDuration
 
         document.getElementById('total-minutes-display').textContent = `총 운동 시간(분) : ${totalMinutes}분`
-        document.getElementById('total-calories-display').textContent = `총 소모 칼로리 : ${totalCalories || 0}kcal`
+        document.getElementById('total-calories-display').textContent = `총 소모 칼로리 : ${(totalCalories || 0).toFixed(2)}kcal`
 
     })
 
