@@ -120,7 +120,7 @@ function renderSingleActivityRecord(record) {
             }
 
             totalRecordCalories += item.calculated_calories_burned
-            totalRecordDuration += item.duration_minutes
+            totalRecordDuration += item.total_duration_minutes
         })
     } else {
         if (noExerciseItemsInRecord) {
