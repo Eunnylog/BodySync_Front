@@ -86,8 +86,6 @@ function renderActivityRecordsPage(records) {
 }
 
 function renderSingleActivityRecord(record) {
-    let totalRecordDuration = 0
-    let totalRecordCalories = 0
     if (!activityRecordTemplate) {
         console.log('템플릿을 찾을 수 없습니다.')
         return null
@@ -118,17 +116,14 @@ function renderSingleActivityRecord(record) {
                     exerciseItemsInRecord.appendChild(exerciseItemElement)
                 }
             }
-
-            totalRecordCalories += item.calculated_calories_burned
-            totalRecordDuration += item.total_duration_minutes
         })
     } else {
         if (noExerciseItemsInRecord) {
             noExerciseItemsInRecord.style.display = 'none'
         }
     }
-    activityRecordDiv.querySelector('.total-record-duration').innerText = `${totalRecordDuration}분`
-    activityRecordDiv.querySelector('.total-record-calories').innerText = `${totalRecordCalories} kcal`
+    activityRecordDiv.querySelector('.total-record-duration').innerText = `${record.total_duration_minutes}분`
+    activityRecordDiv.querySelector('.total-record-calories').innerText = `${record.total_calories_burned} kcal`
     return recordClone
 }
 
