@@ -1,9 +1,9 @@
 // const backend_base_url = 'http://localhost:8000'
 // const frontend_base_url = "http://localhost:5500"
-// const backend_base_url = 'http://127.0.0.1:8000'
-// const frontend_base_url = "http://127.0.0.1:5500"
-const backend_base_url = "https://api.body-sync.shop";
-const frontend_base_url = "https://body-sync.shop";
+const backend_base_url = 'http://127.0.0.1:8000'
+const frontend_base_url = "http://127.0.0.1:5500"
+// const backend_base_url = "https://api.body-sync.shop"
+// const frontend_base_url = "https://body-sync.shop"
 
 
 
@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (payload) {
-        console.log(payload)
         if (dashboardRow) {
             dashboardRow.classList.remove('d-none')
             loadDashboardData()
@@ -89,17 +88,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // Toast
 function showToast(message, type = 'info', title = '알림') {
     if (!commonToastInstance) {
-        console.log('Toast Error')
         return
     }
 
     const toastElement = commonToastInstance._element // Toast DOM 접근
 
     toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning')
-
-    // if (type !== 'info') {
-    //     toastElement.classList.add(`text-bg-${type}`)
-    // }
 
     if (type) {
         toastElement.classList.add(`text-bg-${type}`);
@@ -145,8 +139,6 @@ async function handleSignin(email = null, password = null) {
             const errorData = await response.json();
             let errorMessage = '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.'; // 일반적인 실패 메시지
 
-            console.error('로그인 API 실패:', response.status, errorData); // 디버깅용
-
             if (response.status === 401) { // Unauthorized (인증 실패)
                 // simplejwt가 기본으로 반환하는 에러 코드와 커스텀 에러 코드를 모두 확인
                 if (errorData && (errorData.code === 'user_inactive' || errorData.code === 'user_inactive_account')) {
@@ -166,7 +158,7 @@ async function handleSignin(email = null, password = null) {
             showToast(`로그인 실패: ${errorMessage}`, 'danger', '오류')
         }
     } catch (error) {
-        console.log(error)
+        return error
     }
 
 }
@@ -207,7 +199,6 @@ async function handleSignup() {
 
         } else {
             const errorData = await response.json()
-            console.log(errorData.status, errorData)
 
             let errorMessage = '';
 
@@ -304,7 +295,6 @@ async function loadDashboardData() {
         }
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -316,10 +306,8 @@ async function fetchUserProfile() {
 
     if (response && response.ok) {
         const userData = await response.json()
-        console.log(userData)
         return userData
     } else {
-        console.log('사용자 정보 불러오기 실패')
         return null
     }
 }
@@ -345,12 +333,10 @@ async function updateProfile(data) {
             return true
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             showToast('프로필 수정 실패', 'danger')
             return false
         }
     } catch (e) {
-        console.log('네트워크에러', e)
         return false
     }
 }
@@ -367,11 +353,9 @@ async function deleteUser() {
             return true
         } else {
             const errorData = await response.json()
-            console.log('회원 탍퇴 실패', errorData)
             return false
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return false
     }
 }
@@ -394,7 +378,6 @@ async function changePassword(data) {
             try {
                 errorData = await response.json();
             } catch (parseError) {
-                console.warn('비밀번호 변경: 에러 응답 본문이 JSON 형식이 아님:', parseError);
                 errorData = await response.text(); // 텍스트로 파싱
             }
 
@@ -402,18 +385,14 @@ async function changePassword(data) {
 
             if (response.status === 401) {
                 showToast(errorMessage, 'danger')
-                console.log(1, errorMessage)
             } else if (response.status === 400) {
                 showToast(errorMessage, 'danger')
-                console.log(2, errorMessage)
             } else {
                 showToast(errorMessage, 'danger')
-                console.log(3, errorMessage)
             }
             return false
         }
     } catch (error) {
-        console.error('비밀번호 변경 네트워크 오류 (fetch 실패):', error);
         showToast('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'danger', '네트워크 오류');
         return false
     }
@@ -434,17 +413,14 @@ async function tokenRefresh() {
             if (typeof injectNavbar === 'function') { // 함수가 정의되어 있는지 확인 후 호출
                 injectNavbar();
             }
-            console.log('access token 재발급 성공')
             return true
         } else {
             const errorData = await response.json()
-            console.log('access token 재발급 실패', response.status)
             showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'danger')
             await handleLogout()
             return false
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         showToast('네트워크 오류가 발생했습니다. 다시 로그인해주세요', 'danger')
         await handleLogout()
         return false
@@ -463,7 +439,6 @@ async function handleAccessTokenExpiration(response, originalRequestFn) {
         try {
             errorData = await response.clone().json()
         } catch (e) {
-            console.warn('handleAccessTokenExpiration 오류', e)
             return response
         }
     }
@@ -476,14 +451,11 @@ async function handleAccessTokenExpiration(response, originalRequestFn) {
 
 
     if (expired) {
-        console.log('access token 만료 감지, 재발급 시도 중')
         const refreshSuccess = await tokenRefresh()
 
         if (refreshSuccess) {
-            console.log('access token 재발급 성공! 원래 요청 재시도')
             return await originalRequestFn()
         } else {
-            console.log('access token 재발급 실패')
             return null
         }
     }
@@ -525,15 +497,12 @@ async function FoodCreateFetch(data) {
         })
         if (response.ok) {
             const response_json = await response.json()
-            console.log(response_json)
             return true
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             return false
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return false
     }
 }
@@ -547,15 +516,12 @@ async function foodSearchFetch(searchStr) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log('음식 검색 성공', data)
             return data
         } else {
             const errorData = await response.json()
-            console.log('음식 검색 실패', errorData)
             return null
         }
     } catch (error) {
-        console.error('네트워크 오류', error)
         window.showToast('네트워크 오류 발생', 'danger')
         return null
     }
@@ -576,7 +542,6 @@ async function deleteFoodFetch(foodId) {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error('네트워크 오류', error)
         return { ok: false, error: errorData }
     }
 }
@@ -598,7 +563,6 @@ async function EditFoodFetch(foodData, foodId) {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error('네트워크 오류', error)
         return { ok: false, error: errorData }
     }
 }
@@ -614,15 +578,12 @@ async function createMealRecord(data) {
 
         if (response.ok) {
             const response_json = await response.json()
-            console.log('mealRecord POST 성공', response_json)
             return true
         } else {
             const errorData = await response.json()
-            console.error('mealRecord POST 실패', response_json)
             return false
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return false
     }
 }
@@ -636,15 +597,12 @@ async function getMealRecords(date) {
 
         if (response.ok) {
             response_json = await response.json()
-            console.log(response_json)
             return response_json
         } else {
             const errorData = await response.json()
-            console.error('getMealRecords GET 실패', errorData)
             return null
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return null
     }
 }
@@ -668,13 +626,11 @@ async function getMealRecord(mealRecordId) {
             return data
         } else {
             const errorData = response.json()
-            console.log(errorData)
             return null
         }
 
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return null
     }
 }
@@ -691,15 +647,12 @@ async function updateMealRecord(data, mealRecordId) {
 
         if (response.ok) {
             const response_json = await response.json()
-            console.log(response_json)
             return true
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             return false
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return false
     }
 }
@@ -716,11 +669,9 @@ async function deleteMealRecordApi(recordId) {
             return true
         } else {
             const errorData = await response.json()
-            console.error(errorData.message)
             return false
         }
     } catch (error) {
-        console.error(error)
         return false
     }
 }
@@ -738,11 +689,9 @@ async function exerciseSearchFetch(searchStr) {
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.error(errorData.message)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error(error)
         return { ok: false, error: `네트워크오류: ${error}` }
     }
 }
@@ -758,14 +707,12 @@ async function activityRecordCreateFetch(data) {
 
         if (response.ok) {
             const response_json = await response.json()
-            console.log(response_json)
             return null
         } else {
             const errorData = await response.json()
             return errorData
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return error
     }
 }
@@ -812,7 +759,6 @@ async function exerciseManagementSearchFetch(searchStr = '', page = 1) {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('exerciseManagement 네트워크오류', error)
         return { ok: false, error: error }
     }
 }
@@ -827,15 +773,12 @@ async function recoverExerciseFetch(exerciseId) {
 
         if (response.ok) {
             const response_json = await response.json()
-            console.log(response_json)
             return { ok: true, data: response_json }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error('네트워크 오류', error)
         return { ok: true, error: error }
     }
 }
@@ -849,15 +792,12 @@ async function getExerciseDetailFetch(exerciseId) {
 
         if (response.ok) {
             const response_json = await response.json()
-            console.log(response_json)
             return { ok: true, data: response_json }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error('네트워크오류', error)
         return { ok: false, error: error }
     }
 
@@ -873,15 +813,12 @@ async function updateExerciseFetch(exerciseId, exerciseData) {
 
         if (response.ok) {
             const response_json = await response.json()
-            console.log(response_json)
             return { ok: true, data: response_json }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error('네트워크오류', error)
         return { ok: false, error: error }
     }
 }
@@ -898,12 +835,11 @@ async function deleteExerciseFetch(exerciseId) {
             return { ok: true, }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.error('네트워크오류', error)
+
         return { ok: false, error: error }
     }
 }
@@ -918,16 +854,13 @@ async function getActivityRecordFetch(date) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.error('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -944,12 +877,10 @@ async function deleteActivityRecordFetch(recordId) {
             return { ok: true }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.error('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -964,15 +895,12 @@ async function getActivityRecordDetail(recordId) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.error('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -988,15 +916,12 @@ async function activityRecordEditFetch(activityRecordData, activityRecordId) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1012,15 +937,12 @@ async function editExerciseItemFetch(recordId, itemId, data) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: true, error: error }
     }
 }
@@ -1037,11 +959,9 @@ async function deleteExerciseItemFetch(recordId, itemId) {
             return { ok: true }
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1057,15 +977,12 @@ async function createInbodyFetch(data) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1086,16 +1003,13 @@ async function getInbodyRecordsFetch(startDate, endDate) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1112,11 +1026,9 @@ async function deleteInbodyRecordFetch(recordId) {
             return { ok: true }
         } else {
             const errorData = await response.json()
-            console.log(errorData)
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1131,16 +1043,13 @@ async function getInbodyRecordFetch(recordId) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1156,16 +1065,13 @@ async function EditInbodyRecordFetch(data, recordId) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1181,15 +1087,12 @@ async function createFastingRecord(data) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1203,15 +1106,12 @@ async function getFastingDetail(id) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1227,15 +1127,12 @@ async function editFastingFetch(data, id) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1249,15 +1146,12 @@ async function abortFastingStart(id) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.log((errorData))
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1277,16 +1171,13 @@ async function getFastingRecords(from_date, to_date) {
 
         if (response.ok) {
             const data = await response.json()
-            console.log(data)
             return { ok: true, data: data }
         } else {
             const errorData = await response.json()
-            console.error(errorData)
             return { ok: false, error: errorData }
         }
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1306,7 +1197,6 @@ async function deleteFastingFetch(recordId) {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1326,7 +1216,6 @@ async function getNotificationFetch() {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1346,7 +1235,6 @@ async function NotificationMarkAsRead(notiId) {
         }
 
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1366,7 +1254,6 @@ async function DeleteNotificationFetch(notiId) {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }
@@ -1387,7 +1274,6 @@ async function getMyFoodsListFetch() {
             return { ok: false, error: errorData }
         }
     } catch (error) {
-        console.log('네트워크 오류', error)
         return { ok: false, error: error }
     }
 }

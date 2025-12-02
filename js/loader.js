@@ -10,9 +10,6 @@ async function injectNavbar() {
         const dynamicNavbarInsertPoint = document.getElementById('dynamic-navbar-insert-point')
         if (dynamicNavbarInsertPoint) {
             dynamicNavbarInsertPoint.innerHTML = navbarHtmlContent
-        } else {
-            console.log("Error")
-            return
         }
 
         // 필요한 id값 불러오기
@@ -46,17 +43,8 @@ async function injectNavbar() {
             if (nav_login) nav_login.style.display = "none"
             if (nav_signup) nav_signup.style.display = "none"
 
-            // try {
-            //     payload_parse = JSON.parse(payload);
-            // } catch (e) {
-            //     console.error("Error parsing payload from localStorage:", e);
-            //     // 유효하지 않은 payload는 무시하고 로그인되지 않은 상태처럼 처리
-            //     payload = null;
-            // }
-            // payload에서 불러온 email값 넣어주기
+
             if (payload) {
-                // intro.innerText = `안녕하세요! ${payload_parse.email.split('@')[0]}님 😄`
-                console.log(payload_parse.nickname)
                 if (nav_mypage) nav_mypage.style.display = "block"
                 if (nav_activity) nav_activity.style.display = "block"
                 if (nav_fasting) nav_fasting.style.display = "block"
@@ -70,7 +58,7 @@ async function injectNavbar() {
 
         }
     } catch (error) {
-        console.error("error in injectNavbar", error)
+        return error
     }
 
 }

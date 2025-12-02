@@ -1,8 +1,8 @@
 // import { FASTING_STATUS_CODES, loadFastingRecords } from './fasting-record.js'
 import { formatDateTime, getPayload, formatErrorMessage } from './utils.js'
 
-// const WEBSOCKET_URL = `ws://127.0.0.1:8000/ws/fasting-alerts/`
-const WEBSOCKET_URL = `wss://api.body-sync.shop/ws/fasting-alerts/`
+const WEBSOCKET_URL = `ws://127.0.0.1:8000/ws/fasting-alerts/`
+// const WEBSOCKET_URL = `wss://api.body-sync.shop/ws/fasting-alerts/`
 let fastingAlertSocket = null
 
 let payload
@@ -26,22 +26,18 @@ function connectFastingAlertWebSocket() {
     if (fastingAlertSocket &&
         (fastingAlertSocket.readyState === WebSocket.OPEN ||
             fastingAlertSocket.readyState === WebSocket.CONNECTING)) {
-        console.log('[WebSocket] 이미 연결되어 있거나 연결 중입니다.');
         return;
     }
 
-    // 웹소켓 연결
-    // isConnecting = true
     fastingAlertSocket = new WebSocket(WEBSOCKET_URL)
 
     // websocket open
-    fastingAlertSocket.onopen = (event) => {
-        console.log('[WebSocket] 알림 서비스 연결 성공!', event)
-    }
+    // fastingAlertSocket.onopen = (event) => {
+    //     console.log('[WebSocket] 알림 서비스 연결 성공!', event)
+    // }
 
     // 메시지 받았을 때 message
     fastingAlertSocket.onmessage = (event) => {
-        console.log('[WebSocket] 메시지 수신:', event.data)
         const data = JSON.parse(event.data)
 
         if (data.type === 'fasting_start_alert') {
@@ -53,18 +49,15 @@ function connectFastingAlertWebSocket() {
 
     // 에러 났을 때 onerror
     fastingAlertSocket.onerror = (error) => {
-        console.error('[WebSocket] 에러 발생:', error)
         window.showToast('알림 서비스 연결 중 문제가 생겼어요! 재연결해볼게요!', 'danger')
-        // setTimeout(connectFastingAlertWebSocket, 5000)
+        setTimeout(connectFastingAlertWebSocket, 5000)
     }
 
     // 연결이 끊어졌을 때 onclose
     fastingAlertSocket.onclose = (event) => {
-        console.warn('[WebSocket] 연결이 끊어졌어요:', event.code, event.reason)
         window.showToast('알림 서비스 연결이 끊어졌어요!', 'warning')
         if (event.code !== 1000) {
-            console.log('[WebSocket] 다시 연결해볼게요...')
-            // setTimeout(connectFastingAlertWebSocket, 5000)
+            setTimeout(connectFastingAlertWebSocket, 5000)
         }
     }
 
@@ -74,7 +67,6 @@ function connectFastingAlertWebSocket() {
 
 // 알림 메시지 안의 단식 시작 버튼을 눌렀을 떄 작동하는 함수
 async function handleStartFastingAlertClick(fastingId) {
-    console.log(`[FE] 알림 메시지 안의 단식 시작 버튼 클릭 fastingId: ${fastingId}`)
     const confirmed = confirm('단식을 시작하겠습니까?')
 
     if (confirmed) {
@@ -99,17 +91,12 @@ async function handleStartFastingAlertClick(fastingId) {
 }
 
 function updateNotificationCount() {
-    console.log('updateNotificationCount 호출')
-    console.log('unReadNotiCount', unReadNotiCount)
     if (notificationBadge) {
         if (unReadNotiCount > 0) {
             notificationBadge.textContent = unReadNotiCount
             notificationBadge.classList.remove('d-none')
-            console.log('updateNotificationCount > 0')
-
         } else {
             notificationBadge.classList.add('d-none')
-            console.log('updateNotificationCount = 0 ')
         }
     } else {
         console.warn('badge가 없음')
@@ -127,7 +114,6 @@ function updateNotificationCount() {
 
 function renderNotificationList(notiData) {
     const dropdown = document.querySelector('#notificationDropdown');
-    if (!dropdown) return console.warn('❌ dropdown 없음')
 
     dropdown.innerHTML = ''
     unReadNotiCount = 0
@@ -162,7 +148,6 @@ function renderNotificationList(notiData) {
             </div>
 
         `
-        console.log('length > 0', li)
         dropdown.appendChild(li)
     })
     updateNotificationCount()
@@ -174,7 +159,6 @@ async function loadNotification() {
 
     if (res.ok) {
         const notiData = res.data
-        console.log('notiData:', notiData)
         renderNotificationList(notiData)
     } else {
         const errorMessage = formatErrorMessage(res.data)
@@ -184,7 +168,6 @@ async function loadNotification() {
 
 
 async function handleReadNotification(notiId) {
-    console.log('마크', notiId)
     if (!notiId) {
         window.showToast('알림 정보를 가져올 수 없습니다.', 'danger')
         return
@@ -192,9 +175,7 @@ async function handleReadNotification(notiId) {
 
     const res = await NotificationMarkAsRead(notiId)
 
-    if (res.ok) {
-        console.log('읽음처리 완료')
-    } else {
+    if (!res.ok) {
         const errorMessage = formatErrorMessage(res.data)
         window.showToast(errorMessage, 'danger')
     }
@@ -222,109 +203,40 @@ async function handleDeleteNotification(notiId) {
 document.addEventListener('DOMContentLoaded', async () => {
     payload = getPayload()
     if (!payload) {
-        console.log('❌ payload 없음: 로그인되지 않음')
         return
     }
-    console.log('✅ payload 확인됨:', payload)
     const refreshed = await tokenRefresh();
     if (!refreshed) {
-        console.log('❌ 토큰 갱신 실패');
-        return;
+        return
     }
-    console.log('✅ 토큰 갱신 완료 → WebSocket 연결 시작')
-    // connectFastingAlertWebSocket()
 
     waitForElement('#bellIcon', (el) => {
         bellIcon = el
-        console.log('✅ bellIcon 발견:', el)
 
         setTimeout(() => {
             notificationBadge = document.querySelector('#notificationBadge')
-            if (notificationBadge) {
-                console.log('✅ notificationBadge 발견됨 (지연 탐색):', notificationBadge)
-            } else {
-                console.warn('⚠️ notificationBadge 여전히 탐색 실패')
-            }
         }, 500)
 
         waitForElement('#notificationDropdown', (elDropdown) => {
             notificationDropdown = elDropdown
-            console.log('✅ notificationDropdown 발견됨:', elDropdown)
-            // const observer = new MutationObserver((mutations) => {
-            //     console.log('🧨 notificationDropdown DOM 변경 발생:', mutations)
-            // })
-            // observer.observe(notificationDropdown, { childList: true })
-            // notificationDropdown.addEventListener('click', (event) => {
-            //     console.log('드랍다운 클릭')
-            //     const target = event.target
-            //     console.log('EVENT TARGET:', target)
-            //     const clickAction = target.closest('[data-action]')
-            //     console.log('CLICK ACTION ELEMENT:', clickAction)
 
-            //     if (!clickAction) {
-            //         console.log('  No data-action element found. Returning.')
-            //         return
-            //     }
-
-            //     // event.stopPropagation() // 자동 닫힘 방지
-
-            //     const action = clickAction.dataset.action
-            //     const notificationId = clickAction.dataset.notificationId
-            //     console.log('클릭됨', action, notificationId)
-
-
-            //     if (action === 'delete-notification') {
-            //         event.preventDefault()
-            //         if (notificationId) {
-            //             console.log('handleDeleteNotification 호출 예정:', notificationId)
-            //             // handleDeleteNotification(notificationId)
-            //         }
-            //     } else if (action === 'move-page') {
-            //         event.preventDefault()
-            //         console.log('handleReadNotification 호출 예정:', notificationId)
-            //         if (notificationId) {
-            //             // handleReadNotification(notificationId)
-            //             console.log('마크', notificationId)
-            //             // const href = clickAction.getAttribute('href')
-            //             // if (href) {
-            //             //     window.location.href = href
-            //             // }
-            //         }
-            //     }
-
-
-            // })
             document.addEventListener('click', (event) => {
-                console.log('드랍다운 클릭')
                 const target = event.target
-                console.log('EVENT TARGET:', target)
                 const clickAction = target.closest('[data-action]')
-                console.log('CLICK ACTION ELEMENT:', clickAction)
-
-                if (!clickAction) {
-                    console.log('  No data-action element found. Returning.')
-                    return
-                }
-
-                // event.stopPropagation() // 자동 닫힘 방지
 
                 const action = clickAction.dataset.action
                 const notificationId = clickAction.dataset.notificationId
-                console.log('클릭됨', action, notificationId)
 
 
                 if (action === 'delete-notification') {
                     event.preventDefault()
                     if (notificationId) {
-                        console.log('handleDeleteNotification 호출 예정:', notificationId)
                         handleDeleteNotification(notificationId)
                     }
                 } else if (action === 'move-page') {
                     event.preventDefault()
-                    console.log('handleReadNotification 호출 예정:', notificationId)
                     if (notificationId) {
                         handleReadNotification(notificationId)
-                        console.log('마크', notificationId)
                         const href = clickAction.getAttribute('href')
                         if (href) {
                             setTimeout(() => {

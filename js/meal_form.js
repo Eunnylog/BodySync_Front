@@ -85,7 +85,6 @@ async function performFoodSearch() {
             window.showToast(`'${searchStr}'에 대한 검색 결과가 없습니다.`, 'danger')
         }
     } catch (error) {
-        console.error('음식 검색 중 오류 발생', error)
         foodSearchResultUI.innerHTML = '<p class="text-danger">음식 검색 중 오류가 발생했습니다.</p>'
         window.showToast('음식 검색 중 오류가 발생했습니다.', 'danger')
     } finally {
@@ -250,7 +249,6 @@ function calculateTotalMacros() {
     let totalFiber = 0
 
     const SelectedItems = selectedFoodsList.querySelectorAll('.selected-food-item')
-    console.log('계산 시작 SelectedItems', SelectedItems)
 
     SelectedItems.forEach(item => {
         const caloriesPer100g = parseFloat(item.dataset.foodCalories)
@@ -293,8 +291,6 @@ function calculateTotalMacros() {
     totalFatSpan.textContent = totalFat.toFixed(2)
     totalSugarsSpan.textContent = totalSugars.toFixed(2)
     totalFiberSpan.textContent = totalFiber.toFixed(2)
-
-    console.log('계산 완료 total calories:', totalCalories)
 }
 
 // 식단 기록 수정 폼 채우기
@@ -304,7 +300,6 @@ async function populateFormForEdit(recordId) {
     if (mealData) {
         mealRecordData = mealData
 
-        // setDateTimeInputs(new Date(mealRecordData.date))
         const formatted = formatDateTime(new Date(mealRecordData.date))
 
         if (formatted) {
@@ -318,8 +313,6 @@ async function populateFormForEdit(recordId) {
         selectedFoodsList.innerHTML = ''
         if (mealData.food_items && Array.isArray(mealData.food_items)) {
             mealData.food_items.forEach(item => {
-                console.log('food_items', mealData.food_items)
-                console.log('item', item)
                 const foodDetails = {
                     foodId: item.food,
                     foodName: item.food_name,
@@ -339,7 +332,6 @@ async function populateFormForEdit(recordId) {
         calculateTotalMacros()
         return true
     } else {
-        console.error('addFoodItemToSelectedList 식단 기록 불러오기 실패')
         window.showToast('식단 기록 불러오기 실패', 'danger')
         return false
     }
@@ -401,7 +393,6 @@ async function handleFoodSubmit(e) {
         if (res.ok) {
             window.showToast('음식 수정 완료!', 'info')
             if (bsFoodCreateModal) bsFoodCreateModal.hide()
-            // if (myFoodsModal) myFoodsModal.hide()
 
             // 수정 후 li 업데이트
             if (curEditFoodLi) {
@@ -420,7 +411,6 @@ async function handleFoodSubmit(e) {
 // meal record 폼 제출
 async function handleMealRecordSubmit(e) {
     e.preventDefault()
-    console.log()
 
     const mealType = mealTypeSelect.value
     const mealDate = mealDateInput.value
@@ -512,12 +502,10 @@ function loadEditFoodModal(foodData) {
     foodSugarsInput.value = foodData.foodSugars
     foodFiberInput.value = foodData.foodFiber
     foodBaseUnitInput.value = foodData.foodBaseUnit
-    console.log('ㅇㅇㅇ', foodData)
 }
 
 // 음식 수정 후 음식 li 업데이트
 function updateFoodLi(foodData) {
-    console.log('updateFoodLi')
     if (curEditFoodLi) {
         // 1. li 요소의 dataset 업데이트
         curEditFoodLi.dataset.foodName = foodData.name;
@@ -648,8 +636,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             isEdit = false
         }
     } else {
-        // pageTitle.textContent = '식단 기록 등록'
-        // setDateTimeInputs()
         const formatted = formatDateTime()
         mealDateInput.value = formatted.date
         mealTimeInput.value = formatted.time
@@ -845,7 +831,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                             foodFiber: foodItem.dataset.foodFiber,
                             foodBaseUnit: foodItem.dataset.foodBaseUnit,
                         }
-                        console.log(foodNutrition)
                         curEditFoodLi = foodItem
                         loadEditFoodModal(foodNutrition)
                     }

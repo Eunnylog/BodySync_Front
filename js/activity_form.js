@@ -4,14 +4,10 @@ let isStaff
 
 if (payload) {
     isStaff = payload['is_staff']
-    console.log(isStaff)
-} else {
-    console.log('payload 불러오기 실패(activity form)')
 }
 
 const urlPrams = new URLSearchParams(window.location.search)
 const activityRecordId = urlPrams.get('id')
-console.log('activityRecordId', activityRecordId)
 let initialExerciseItemIds = [] // 수정 페이지가 로드될 때 ActivityRecord에 속해 있던 모든 ExerciseItem의 ID를 저장
 
 // 운동 수정 모드 유무
@@ -53,7 +49,6 @@ async function handleExerciseSearch() {
         renderExerciseSearchResults(res.data)
         window.showToast(`${searchStr}에 대한 검색 결과 ${res.data.length}개를 찾았습니다.`, 'info')
     } else {
-        console.error(res.error)
         const errorMessage = formatErrorMessage(res.error)
         window.showToast(res.error, 'danger')
     }
@@ -118,12 +113,10 @@ function renderSelectedExerciseResult(exerciseData) {
             return
         }
     } else {
-        console.error('exerciseItemContainer가 초기화되지 않음')
         return
     }
 
     if (!exerciseTemplate) {
-        console.error('exerciseTemplate 에러')
         return
     }
 
@@ -177,7 +170,7 @@ function renderSelectedExerciseResult(exerciseData) {
         window.showToast(`${exerciseData.name}(이)가 추가되었습니다.`, 'info')
         exerciseItemsContainer.appendChild(clone)
     } else {
-        console.error('exerciseItemsContainer 요소를 찾을 수 없음')
+        return
     }
 }
 
@@ -209,7 +202,7 @@ function calculateTotalExerciseInformation() {
         const sets = parseFloat(setsInput.value || 1)
 
         const caloriesPerMinutes = parseFloat(exerciseIdInput?.dataset.caloriesPerUnit || 0)
-        console.log('칼', exerciseIdInput.dataset.caloriesPerUnit)
+
         let itemEffectiveDuration = 0
 
         // 세트 값이 1보다 크거나 세트에 값이 있다면 세트당 시간으로 간주
@@ -241,7 +234,7 @@ function collectedExerciseItemsData() {
     const currentExistingExerciseItemIds = [] // 폼에 현재 남아있는 즉 수정될 운동항목들의 id
 
     const allExerciseItems = document.querySelectorAll('#exerciseItemsContainer .exercise-item')
-    console.log(allExerciseItems)
+
     for (const itemDiv of allExerciseItems) {
         const exerciseIdInput = itemDiv.querySelector('.exercise-id-input')
         const durationInput = itemDiv.querySelector('.duration-minutes-input')
@@ -285,18 +278,15 @@ function collectedExerciseItemsData() {
                 itemsToUpdate.push(itemData)
                 currentExistingExerciseItemIds.push(itemData.id)
             } else {
-                console.error('운동 id 추출 오류, exerciseInputName:', exerciseInputName)
                 return null
             }
         } else {
-            console.error('이외의 오류, exerciseInputName:', exerciseInputName)
             return null
         }
     }
 
     // initialExerciseItemIds에 있지만 currentExistingExerciseItemIds에는 없는 ID들을 찾음
     const deletedItemIds = initialExerciseItemIds.filter(id => !currentExistingExerciseItemIds.includes(id))
-    console.log('삭제될 운동아이템 id:', deletedItemIds)
     return {
         exercise_items_to_create: itemsToCreate,
         exercise_items_to_update: itemsToUpdate,
@@ -312,7 +302,6 @@ async function handleActivityRecordSubmit(event) {
     const time = timeInput.value
     const notes = notesInput.value
     const collectedItems = collectedExerciseItemsData()
-    console.log('collectedItems', collectedItems)
 
     if (collectedItems === null) {
         return
@@ -335,7 +324,6 @@ async function handleActivityRecordSubmit(event) {
             exercise_items_to_update: exercise_items_to_update,
             exercise_items_to_delete: exercise_items_to_delete
         }
-        console.log('activityRecordData', activityRecordData)
 
         const result = await activityRecordEditFetch(activityRecordData, activityRecordId)
 
@@ -366,7 +354,6 @@ async function handleActivityRecordSubmit(event) {
             }, 1500)
         } else {
             const errorMessages = formatErrorMessage(result.error)
-            console.log(errorMessages)
             window.showToast(errorMessages, 'danger')
         }
     }
@@ -481,7 +468,6 @@ async function loadEditActivityRecord(recordId) {
             notesInput.value = record.notes
             initialExerciseItemIds = record.exercise_items.map(item => item.id)
             renderEditExerciseItems(record.exercise_items)
-            console.log('record', record)
         }
     } else {
         const errorMessage = formatErrorMessage(res.error)
@@ -511,13 +497,11 @@ document.addEventListener('DOMContentLoaded', function () {
     exerciseCaloriesInput = document.getElementById('exercise-calories-input')
     exerciseBaseUnitInput = document.getElementById('exercise-base-unit-input')
     createExerciseBtn = document.getElementById('create-exercise-btn')
-    console.log('isEdit 확인 전', isEdit)
 
     const title = document.getElementById('activity-title')
     const createAndEditBtn = document.getElementById('create-activity-record')
     if (activityRecordId) {
         isEdit = true
-        console.log('isEdit 확인 후', isEdit)
         title.innerText = '운동 기록 수정'
         createAndEditBtn.innerText = '수정'
         loadEditActivityRecord(activityRecordId)
@@ -564,7 +548,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (exerciseItemsContainer) {
         exerciseItemsContainer.addEventListener('click', (event) => {
             if (event.target.classList.contains('remove-exercise-item-btn')) {
-                console.log(event.target.closest('.exercise-item'))
                 const exerciseItemElement = event.target.closest('.exercise-item')
                 deleteSelectedExercise(exerciseItemElement)
             }
@@ -649,10 +632,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (createExerciseBtn) {
         if (isStaff === true) {
             createExerciseBtn.style.display = 'block'
-            console.log('is_staff=true')
         } else {
             createExerciseBtn.style.display = 'none'
-            console.log('is_staff=false')
         }
     }
 

@@ -5,17 +5,14 @@ let recordId
 
 // 오늘 날짜로 초기값 세팅
 async function initializeDateInput(date = new Date()) {
-    console.log('연걸')
     const formattedDate = formatDateTime(date)
     dateInput.value = formattedDate.date
 
     const mealRecordsData = await getMealRecords(formattedDate.date)
 
     if (mealRecordsData) {
-        console.log('초기 식단 불러오기 성공')
         loadMealAccordionUI(mealRecordsData)
     } else {
-        console.log('초기 식단 불러오기 실패')
         loadMealAccordionUI({})
     }
 }
@@ -196,7 +193,6 @@ async function handleDeleteRecord(recordId, recordDate) {
         }
     } else {
         window.showToast('식단 기록 삭제가 취소되었습니다.', 'info')
-        console.log('식단 기록 삭제 취소')
     }
 }
 

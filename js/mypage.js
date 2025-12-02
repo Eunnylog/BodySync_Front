@@ -85,7 +85,6 @@ async function loadUserProfile() {
         }
     }
     const userData = await fetchUserProfile()
-    console.log(userData)
 
     if (userData) {
         const nicknameField = document.getElementById('mypage-nickname')
@@ -107,13 +106,12 @@ async function loadUserProfile() {
 
         }
     } else {
-        console.log('사용자 정보 불러오기 실패')
+        return
     }
 }
 
 // 마이페이지 수정할 데이터 담기
 async function handleProfileSubmit(event) {
-    console.log(event)
     event.preventDefault()
 
     const nickname = document.getElementById('mypage-nickname').value

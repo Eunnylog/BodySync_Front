@@ -26,7 +26,6 @@ async function updateDashboardCards() {
 
     if (res.ok) {
         const dashboardData = res.data
-        console.log('dashboardData', dashboardData)
 
         // 1. 식단 요약 카드 업데이트
         const mealData = dashboardData.meal_summary

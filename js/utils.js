@@ -20,7 +20,6 @@ export function getPayload() {
         try {
             return JSON.parse(payload)
         } catch (e) {
-            console.error('payload 불러오기 실패', e)
             return null
         }
     }
@@ -83,7 +82,6 @@ export async function handleStartFasting() {
         "target_duration_minutes": targetMinutes
     }
 
-    console.log(data)
     const res = await createFastingRecord(data)
 
     if (res.ok) {
@@ -169,7 +167,6 @@ export async function handleLoadFasting() {
 export async function handleEditFasting() {
     const id = hiddenFastingId.value
     const startTimeValue = editStartTimeInput.value
-    console.log(startTimeValue)
     const endTimeValue = endTimeInput.value
     const targetHours = parseFloat(editTargetDurationInput.value)
     const notes = fastingNotesInput.value

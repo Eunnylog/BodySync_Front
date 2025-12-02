@@ -5,9 +5,6 @@ const payload = getPayload()
 let isStaff
 if (payload) {
     isStaff = payload['is_staff']
-    console.log(isStaff)
-} else {
-    console.log('payload 불러오기 실패(activity form)')
 }
 
 let exerciseListContainer, noExerciseMessage, exerciseSearchInput, exerciseSearchBtn
@@ -378,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (deleteBtn && deleteBtn.classList.contains('delete-exercise-btn')) {
                 const exerciseId = deleteBtn.dataset.id
                 if (exerciseId) {
-                    console.log(exerciseId)
                     handleDeleteExercise(exerciseId)
                 }
             }
@@ -397,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // 수정 버튼 클릭 시
         if (editBtn && editBtn.classList.contains('edit-exercise-btn')) {
             const exerciseId = editBtn.dataset.id
-            console.log('exerciseId', exerciseId)
 
             // 수정 모드
             if (exerciseId) {

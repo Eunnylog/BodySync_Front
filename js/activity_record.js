@@ -4,9 +4,6 @@ const payload = getPayload()
 let isStaff
 if (payload) {
     isStaff = payload['is_staff']
-    console.log(isStaff)
-} else {
-    console.log('payload 불러오기 실패(activity form)')
 }
 
 const urlPrams = new URLSearchParams(window.location.search)
@@ -86,10 +83,6 @@ function renderActivityRecordsPage(records) {
 }
 
 function renderSingleActivityRecord(record) {
-    if (!activityRecordTemplate) {
-        console.log('템플릿을 찾을 수 없습니다.')
-        return null
-    }
 
     const recordClone = activityRecordTemplate.content.cloneNode(true)
     const activityRecordDiv = recordClone.querySelector('.activity-record')
@@ -129,8 +122,7 @@ function renderSingleActivityRecord(record) {
 
 function renderSingleExerciseItem(recordId, item) {
     if (!exerciseItemTemplate) {
-        console.error('exerciseItemTemplate을 찾을 수 없습니다.');
-        return null;
+        return null
     }
     const itemClone = exerciseItemTemplate.content.cloneNode(true)
     const exerciseItemDiv = itemClone.querySelector('.exercise-item')
@@ -202,7 +194,6 @@ function EditExerciseItemModal(btnEvent) {
 
     if (!exerciseItemDiv) {
         window.showToast('수정할 운동 항목을 찾을 수 없습니다.', 'danger')
-        console.error('Cannot find exercise item with ID:', itemId)
         return
     }
 
@@ -245,7 +236,6 @@ async function handleEditExerciseItemSubmit(event) {
         "reps": reps,
         "weight": weight
     }
-    console.log(data)
 
     const res = await editExerciseItemFetch(recordId, itemId, data)
 
@@ -307,9 +297,6 @@ document.addEventListener('DOMContentLoaded', function () {
         modalExerciseItemExerciseIdInput = document.getElementById('modalExerciseItemExerciseId');
 
         document.getElementById('editExerciseItemForm').addEventListener('submit', handleEditExerciseItemSubmit);
-    } else {
-        // ⭐⭐ 이 오류는 모달 HTML 자체가 없는 경우 (HTML 구조 문제) ⭐⭐
-        console.error('editExerciseItemModal 오류.');
     }
 
     initializeDateInput()
@@ -361,7 +348,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } else if (target.classList.contains('delete-activity-record-btn')) {
                 // 기록 삭제 버튼
-                console.log('기록삭제버튼')
                 const recordId = target.dataset.id
                 if (recordId) {
                     handleDeleteActivityRecord(recordId)
@@ -371,8 +357,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const target = event.target
                 if (editExerciseItemModalInstance) {
                     EditExerciseItemModal(target)
-                } else {
-                    console.error('EditExerciseItemModal 오류')
                 }
             } else if (target.classList.contains('delete-exercise-item-btn')) {
                 const exerciseItemDiv = target.closest('.exercise-item')
@@ -381,8 +365,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const recordId = exerciseItemDiv.dataset.recordId
                     const itemId = exerciseItemDiv.dataset.itemId
                     handleDeleteExerciseItem(recordId, itemId)
-                } else {
-                    console.error('삭제할 운동 항목의 부모 DIV를 찾을 수 없습니다.')
                 }
             }
         })
