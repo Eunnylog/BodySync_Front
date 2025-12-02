@@ -1,9 +1,7 @@
-// const backend_base_url = 'http://localhost:8000'
-// const frontend_base_url = "http://localhost:5500"
-const backend_base_url = 'http://127.0.0.1:8000'
-const frontend_base_url = "http://127.0.0.1:5500"
-// const backend_base_url = "https://api.body-sync.shop"
-// const frontend_base_url = "https://body-sync.shop"
+// const backend_base_url = 'http://127.0.0.1:8000'
+// const frontend_base_url = "http://127.0.0.1:5500"
+const backend_base_url = "https://api.body-sync.shop"
+const frontend_base_url = "https://body-sync.shop"
 
 
 
