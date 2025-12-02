@@ -50,14 +50,14 @@ function connectFastingAlertWebSocket() {
     // 에러 났을 때 onerror
     fastingAlertSocket.onerror = (error) => {
         window.showToast('알림 서비스 연결 중 문제가 생겼어요! 재연결해볼게요!', 'danger')
-        setTimeout(connectFastingAlertWebSocket, 5000)
+        // setTimeout(connectFastingAlertWebSocket, 5000)
     }
 
     // 연결이 끊어졌을 때 onclose
     fastingAlertSocket.onclose = (event) => {
         window.showToast('알림 서비스 연결이 끊어졌어요!', 'warning')
         if (event.code !== 1000) {
-            setTimeout(connectFastingAlertWebSocket, 5000)
+            // setTimeout(connectFastingAlertWebSocket, 5000)
         }
     }
 
