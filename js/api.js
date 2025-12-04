@@ -111,6 +111,7 @@ async function handleSignin(email = null, password = null) {
 
     if (emailInput === '' || passwordInput === '') {
         window.showToast('아이디 또는 비밀번호를 입력해주세요', 'danger')
+        return
     }
 
     try {
