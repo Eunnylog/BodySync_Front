@@ -223,28 +223,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.addEventListener('click', (event) => {
                 const target = event.target
                 const clickAction = target.closest('[data-action]')
+                if (clickAction) {
+                    const action = clickAction.dataset.action
+                    const notificationId = clickAction.dataset.notificationId
 
-                const action = clickAction.dataset.action
-                const notificationId = clickAction.dataset.notificationId
 
-
-                if (action === 'delete-notification') {
-                    event.preventDefault()
-                    if (notificationId) {
-                        handleDeleteNotification(notificationId)
-                    }
-                } else if (action === 'move-page') {
-                    event.preventDefault()
-                    if (notificationId) {
-                        handleReadNotification(notificationId)
-                        const href = clickAction.getAttribute('href')
-                        if (href) {
-                            setTimeout(() => {
-                                window.location.href = href
-                            }, 200)
+                    if (action === 'delete-notification') {
+                        event.preventDefault()
+                        if (notificationId) {
+                            handleDeleteNotification(notificationId)
+                        }
+                    } else if (action === 'move-page') {
+                        event.preventDefault()
+                        if (notificationId) {
+                            handleReadNotification(notificationId)
+                            const href = clickAction.getAttribute('href')
+                            if (href) {
+                                setTimeout(() => {
+                                    window.location.href = href
+                                }, 200)
+                            }
                         }
                     }
+
                 }
+
             })
             loadNotification().then(() => {
                 updateNotificationCount()
@@ -253,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         })
 
-        connectFastingAlertWebSocket()
+        // connectFastingAlertWebSocket()
         const notificationAreaLi = document.getElementById('notification-area-li');
         if (notificationAreaLi) {
             notificationAreaLi.style.display = 'block'

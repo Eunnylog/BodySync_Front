@@ -30,3 +30,21 @@
     background-color: #e6ffe6;
     /* 마우스 오버 시 연한 초록색 */
 }
+
+.table-responsive {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.chart-container {
+    position: relative;
+    /* 중요: 차트가 컨테이너에 맞춰 스케일링되도록 */
+    width: 100%;
+    /* 컨테이너의 넓이를 부모의 100%로 설정 */
+    max-width: 800px;
+    /* 최대 넓이 제한 (선택 사항) */
+    height: 400px;
+    /* 고정된 높이 또는 max-height 설정 */
+    margin: auto;
+    /* 가운데 정렬 (선택 사항) */
+}

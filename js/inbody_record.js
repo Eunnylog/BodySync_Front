@@ -126,10 +126,10 @@ function drawChart(chartData) {
                 x: {
                     type: 'time', // 날짜/시간 축으로 설정
                     time: {
-                        unit: 'day', // 하루 단위로 표시
+                        unit: 'month',
                         tooltipFormat: 'yyyy년 MM월 dd일 HH시 mm분', // 툴팁에 표시될 날짜/시간 형식
                         displayFormats: {
-                            day: 'MM/dd'
+                            day: 'yy/MM'
                         }
                     },
                     title: {
@@ -204,7 +204,7 @@ function showInbodyDetailModal(record, recordId) {
 }
 
 
-function renderRecentRecords(records, count = 5) { // 최근 5개 기록 표시
+function renderRecentRecords(records) {
     recentInbodyRecordsBody.innerHTML = '' // 기존 내용 지우기
 
     if (records.length === 0) {
@@ -216,7 +216,7 @@ function renderRecentRecords(records, count = 5) { // 최근 5개 기록 표시
 
     // 날짜 최신 순으로 정렬
     const sortedRecords = [...records].sort((a, b) => new Date(b.measured_at) - new Date(a.measured_at))
-    const recentRecords = sortedRecords.slice(0, count) // 최신 N개 기록 가져오기
+    const recentRecords = sortedRecords.slice(0) // 최신 N개 기록 가져오기
 
     recentRecords.forEach(record => {
         const row = document.createElement('tr')
@@ -263,7 +263,7 @@ async function handelDeleteInbodyRecord(recordId) {
     }
 }
 
-// 특정 기간 계싼 후 input에 설정
+// 특정 기간 계산 후 input에 설정
 function setDateRange(rangeType) {
     const today = new Date()
     let startDateForInput, startDateForFetch
@@ -295,7 +295,7 @@ function setDateRange(rangeType) {
     endDateInput.value = formatDateTime(today).date
 }
 
-// 
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     inbodyDetailModal = new bootstrap.Modal(document.getElementById('inbodyDetailModal'))
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 조회 버튼
     if (filterByDateBtn) {
         filterByDateBtn.addEventListener('click', async () => {
-            await handelDeleteInbodyRecord(startDateInput.value, endDateInput.value)
+            await handleLoadInbodyRecord(startDateInput.value, endDateInput.value)
         })
     }
 
