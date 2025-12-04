@@ -56,9 +56,9 @@ function connectFastingAlertWebSocket() {
     // 연결이 끊어졌을 때 onclose
     fastingAlertSocket.onclose = (event) => {
         window.showToast('알림 서비스 연결이 끊어졌어요!', 'warning')
-        if (event.code !== 1000) {
-            // setTimeout(connectFastingAlertWebSocket, 5000)
-        }
+        // if (event.code !== 1000) {
+        //     setTimeout(connectFastingAlertWebSocket, 5000)
+        // }
     }
 
 }
@@ -98,8 +98,6 @@ function updateNotificationCount() {
         } else {
             notificationBadge.classList.add('d-none')
         }
-    } else {
-        console.warn('badge가 없음')
     }
 
     if (bellIcon) {
