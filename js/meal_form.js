@@ -296,15 +296,18 @@ function calculateTotalMacros() {
 // 식단 기록 수정 폼 채우기
 async function populateFormForEdit(recordId) {
     const mealData = await getMealRecord(recordId)
+    console.log(mealData)
 
     if (mealData) {
         mealRecordData = mealData
 
-        const formatted = formatDateTime(new Date(mealRecordData.date))
+        const formatted = formatDateTime(new Date(mealRecordData.time))
+        console.log(formatted)
 
         if (formatted) {
             mealDateInput.value = formatted.date
             mealTimeInput.value = formatted.time
+            console.log(mealTimeInput.value)
         }
 
         mealNoteInput.value = mealData.notes || ''
@@ -627,10 +630,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const success = await populateFormForEdit(mealRecordId)
 
-        const formatted = formatDateTime(new Date(mealRecordData.date))
-
-        mealDateInput.value = formatted.date
-        mealTimeInput.value = formatted.time
 
         if (!success) {
             isEdit = false

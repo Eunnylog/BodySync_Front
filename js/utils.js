@@ -138,7 +138,6 @@ export async function handleLoadFasting() {
 
     if (res.ok) {
         const data = res.data
-
         editGoalMinutes.innerText = `${Math.round(data.target_duration_minutes / 60)}시간`
         editCurrentMinutes.innerText = data.current_elapsed_minutes_display
         editEstimatedTime.innerText = (data.estimated_end_time_display).split('월 ')[1]
@@ -156,7 +155,9 @@ export async function handleLoadFasting() {
             }
         }
 
-        editStartTimeInput.value = data.start_time
+        const startDate = new Date(data.start_time)
+        const formatted = formatDateTime(startDate)
+        editStartTimeInput.value = `${formatted.date}T${formatted.time}`
         editTargetDurationInput.value = Math.round(data.target_duration_minutes / 60)
         fastingNotesInput.value = data.notes
 
@@ -176,7 +177,6 @@ export async function handleEditFasting() {
         "target_duration_minutes": Math.round(targetHours * 60),
         "notes": notes
     }
-
     // 단식 종료
     if (endTimeValue) {
         const confirmed = confirm('종료 시각을 입력했습니다.\n단식을 종료하시겠습니까?')
