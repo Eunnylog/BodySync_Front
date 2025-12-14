@@ -31,11 +31,6 @@ function connectFastingAlertWebSocket() {
 
     fastingAlertSocket = new WebSocket(WEBSOCKET_URL)
 
-    // websocket open
-    // fastingAlertSocket.onopen = (event) => {
-    //     console.log('[WebSocket] 알림 서비스 연결 성공!', event)
-    // }
-
     // 메시지 받았을 때 message
     fastingAlertSocket.onmessage = (event) => {
         const data = JSON.parse(event.data)
