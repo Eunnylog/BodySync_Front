@@ -81,7 +81,6 @@ export async function loadFastingRecords() {
 
 
 function createFastingCard(record) {
-    // start_time과 end_time은 ISO string으로 오므로 여전히 이 함수로 포매팅합니다.
     const getFormattedTime = (isoString) => {
         if (!isoString) return '미정';
         const date = new Date(isoString);
@@ -182,12 +181,7 @@ function createFastingCard(record) {
                 <strong>목표 시간:</strong> ${formatMinutesToDisplay(record.target_duration_minutes)}
             </p>
             ${timeInfoHtml}
-            ${record.notes ? `<p class="text-muted small mt-2 mb-0"><strong>메모:</strong> ${record.notes}</p>` : ''}
-            <p class="text-muted small mt-2 mb-0">
-                <i class="bi bi-calendar-check me-1"></i>기록 생성: ${record.formatted_created_at}
-                ${record.created_at !== record.updated_at ? `<br><i class="bi bi-pencil me-1"></i>최종 수정: ${record.formatted_updated_at}` : ''}
-            </p>
-            
+            ${record.notes ? `<p class="text-muted small mt-2 mb-0"><strong>메모:</strong> ${record.notes}</p>` : ''}            
             <div class="btn-action-group pt-3 mt-3 border-top border-light">
                 ${actionBtnHtml}
             </div>
